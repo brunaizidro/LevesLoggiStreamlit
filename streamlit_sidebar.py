@@ -82,9 +82,7 @@ def sidebar():
     with st.sidebar:
         st.markdown(
             "<div style='color:#fff;font-size:22px;font-weight:800;"
-            "letter-spacing:.3px;margin-top:6px;'>Portal LEVES</div>"
-            "<div style='color:rgba(255,255,255,.8);font-size:11px;"
-            "letter-spacing:2px;text-transform:uppercase;'>loggi</div>",
+            "letter-spacing:.3px;margin-top:6px;'>Portal LEVES</div>",
             unsafe_allow_html=True,
         )
         st.markdown("<hr class='sb-sep'>", unsafe_allow_html=True)
