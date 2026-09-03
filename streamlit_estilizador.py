@@ -68,30 +68,26 @@ class PageStyler:
         )
 
     def apply_sidebar_css(self, image_base64):
-        """Sidebar azul da marca com a logo (base64) no topo e texto branco.
+        """Sidebar azul da marca, com texto branco.
+
+        A logo (base64) não entra mais como *background* do menu — ela é
+        renderizada como um <img> normal em streamlit_sidebar.sidebar(),
+        pois como imagem de fundo ela ficava atrás do gradiente e era
+        cortada. O argumento `image_base64` é mantido só por compatibilidade
+        de assinatura e não é mais usado aqui.
 
         Argumentos:
-            image_base64: str — imagem (ex.: logo da lebre) codificada em base64.
+            image_base64: str — não utilizado (ver observação acima).
         """
         st.markdown(
-            f"""
+            """
         <style>
-            [data-testid="stSidebar"] {{
-                background-image: url("data:image/png;base64,{image_base64}");
-                background-repeat: no-repeat;
-                background-size: 160px;
-                background-position: center top;
-                position: relative;
-                padding-top: 40px;
+            [data-testid="stSidebar"] {
                 background-color: #0067fc;
-            }}
-            [data-testid="stSidebar"]::before {{
-                margin-left: 20px; margin-top: 20px; font-size: 30px;
-                position: relative; top: 100px;
-            }}
+            }
             [data-testid="stSidebar"] h1,
             [data-testid="stSidebar"] li,
-            [data-testid="stSidebar"] p {{ color: white; }}
+            [data-testid="stSidebar"] p { color: white; }
         </style>
         """,
             unsafe_allow_html=True,

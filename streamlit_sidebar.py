@@ -73,13 +73,18 @@ def sidebar():
     estilizador = PageStyler()
     base = os.path.dirname(os.path.abspath(__file__))
     caminho = os.path.join(base, LOGO_PATH)
-    if os.path.exists(caminho):
-        estilizador.apply_sidebar_css(get_base64_image(caminho))
-    else:
-        estilizador.apply_sidebar_css("")  # sem logo, mantém o azul
+    logo_base64 = get_base64_image(caminho) if os.path.exists(caminho) else ""
+    estilizador.apply_sidebar_css(logo_base64)
     _estilos_extra()
 
     with st.sidebar:
+        if logo_base64:
+            st.markdown(
+                f"<img src='data:image/png;base64,{logo_base64}' "
+                "style='display:block;margin:4px auto 14px;width:140px;"
+                "max-width:70%;height:auto;'>",
+                unsafe_allow_html=True,
+            )
         st.markdown(
             "<div style='color:#fff;font-size:22px;font-weight:800;"
             "letter-spacing:.3px;margin-top:6px;'>Portal LEVES</div>",
