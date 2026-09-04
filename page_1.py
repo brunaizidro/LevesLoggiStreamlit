@@ -1,7 +1,7 @@
 """
 page_1.py — Visão de Envios do Portal LEVES.
 
-V6 — renovação visual da área interna, mantendo a mesma lógica de dados,
+V7 — renovação visual da área interna, mantendo a mesma lógica de dados,
 filtros, gráficos, multi-tenant e exportação CSV.
 """
 
@@ -40,8 +40,17 @@ def _injetar_css():
         """
 <style>
 /* ============================================================
-   PORTAL LEVES — ÁREA INTERNA V6
+   PORTAL LEVES — ÁREA INTERNA V7
    ============================================================ */
+
+/* Remove a barra superior padrão do Streamlit */
+[data-testid="stHeader"] {
+    display: none !important;
+}
+
+[data-testid="stToolbar"] {
+    display: none !important;
+}
 
 [data-testid="stAppViewContainer"] {
     background: #f7f9fc !important;
@@ -295,14 +304,17 @@ def page_1():
 
     kpis = [("Total de insumos", total_geral, "📦", "no período")]
     for t in tipos_disp:
-        kpis.append((str(t).title(), por_tipo.get(t, 0), _icone_tipo(t), "enviados"))
+        # Os cards individuais ficam sem emoji; apenas o total usa ícone.
+        kpis.append((str(t).title(), por_tipo.get(t, 0), "", "enviados"))
 
     cols = st.columns(len(kpis))
     for col, (nome, valor, icone, subtitulo) in zip(cols, kpis):
         with col:
             st.markdown(
                 f'<div class="leves-kpi">'
-                f'<div class="leves-kpi-top"><span class="leves-kpi-icon">{icone}</span>{html.escape(nome)}</div>'
+                f'<div class="leves-kpi-top">'
+                f'<span class="leves-kpi-icon" style="display:{"inline-flex" if icone else "none"};">{icone}</span>'
+                f'{html.escape(nome)}</div>'
                 f'<div class="leves-kpi-value">{_fmt(valor)}</div>'
                 f'<div class="leves-kpi-sub">{html.escape(subtitulo)}</div>'
                 f'</div>',
