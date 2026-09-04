@@ -282,10 +282,10 @@ div[data-testid="column"]:nth-child(2) > div {
     margin: 10px auto 5px auto;
 }
 
-.login-brand-block .login-floating-logo {
+.login-floating-logo {
     position: fixed;
-    top: 28px;
-    right: 38px;
+    top: 28px !important;
+    right: 38px !important;
     z-index: 1000;
     width: 128px;
     text-align: center;
@@ -504,7 +504,7 @@ div[data-testid="column"]:nth-child(2) > div {
         st.markdown(
             '<div class="login-panel">'
             '<div class="login-panel-badge">📦 PORTAL LEVES</div>'
-            '<div class="login-panel-title">Gestão de <span>Insumos</span></div>'
+            '<div class="login-panel-title">Gestão de <span>insumos</span></div>'
             '<div class="login-panel-text">Consulte, acompanhe e gerencie os insumos enviados para sua operação em um único lugar.</div>'
             '<div class="login-feature"><div class="login-feature-icon">📦</div><div>Controle de insumos</div></div>'
             '<div class="login-feature"><div class="login-feature-icon">↩️</div><div>Acompanhamento de devoluções</div></div>'
