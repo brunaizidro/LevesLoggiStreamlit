@@ -58,17 +58,19 @@ def tela_login():
             st.markdown(
                 f"<img src='data:image/png;base64,{logo_base64}' "
                 "style='display:block;width:180px;max-width:60%;height:auto;"
-                "margin-bottom:6px;'>"
-                "<div style='letter-spacing:2px;text-transform:uppercase;color:#6e6e6e;"
-                "font-size:12px;'>Portal LEVES</div>",
+                "margin:0 auto 10px;'>"
+                "<div style='text-align:center;letter-spacing:2px;text-transform:uppercase;"
+                "color:#0067fc;font-weight:800;font-size:16px;"
+                "font-family:Montserrat,sans-serif;'>Portal LEVES</div>",
                 unsafe_allow_html=True,
             )
         else:
             st.markdown(
-                "<div style='font-size:34px;font-weight:800;color:#0067fc;"
+                "<div style='text-align:center;font-size:34px;font-weight:800;color:#0067fc;"
                 "font-family:Montserrat,sans-serif;'>loggi</div>"
-                "<div style='letter-spacing:2px;text-transform:uppercase;color:#6e6e6e;"
-                "font-size:12px;'>Portal LEVES</div>",
+                "<div style='text-align:center;letter-spacing:2px;text-transform:uppercase;"
+                "color:#0067fc;font-weight:800;font-size:16px;"
+                "font-family:Montserrat,sans-serif;'>Portal LEVES</div>",
                 unsafe_allow_html=True,
             )
         st.caption("Acesse para ver os ativos enviados para a sua operação.")
