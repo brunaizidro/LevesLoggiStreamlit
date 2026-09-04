@@ -116,7 +116,7 @@ def _estilos_extra():
 }
 
 [data-testid="stSidebar"] [role="radiogroup"] label {
-    color: rgba(255,255,255,.92) !important;
+    color: #ffffff !important;
     background: transparent !important;
     border-radius: 10px !important;
     padding: 8px 10px !important;
@@ -128,6 +128,15 @@ def _estilos_extra():
     background: rgba(255,255,255,.10) !important;
 }
 
+/* Texto dos itens não selecionados: sempre branco */
+[data-testid="stSidebar"] [role="radiogroup"] label,
+[data-testid="stSidebar"] [role="radiogroup"] label p,
+[data-testid="stSidebar"] [role="radiogroup"] label span,
+[data-testid="stSidebar"] [role="radiogroup"] label div {
+    color: #ffffff !important;
+}
+
+/* Item selecionado: fundo branco + texto azul */
 [data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked) {
     background: #ffffff !important;
     color: #0067fc !important;
@@ -140,9 +149,15 @@ def _estilos_extra():
 }
 
 [data-testid="stSidebar"] [role="radiogroup"] label p {
-    color: inherit !important;
+    color: #ffffff !important;
     font-family: Montserrat, sans-serif !important;
     font-size: 13px !important;
+}
+
+[data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked) p,
+[data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked) span,
+[data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked) div {
+    color: #0067fc !important;
 }
 
 [data-testid="stSidebar"] [data-testid="stWidgetLabel"] {
