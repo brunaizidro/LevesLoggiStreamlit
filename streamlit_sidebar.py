@@ -1,5 +1,5 @@
 """
-streamlit_sidebar.py — Sidebar V5 do Portal LEVES.
+streamlit_sidebar.py — Sidebar V6 do Portal LEVES.
 
 Mantém a mesma função pública sidebar() e get_base64_image(), mas melhora a
 hierarquia visual sem alterar a navegação ou as regras do app.py.
@@ -25,8 +25,19 @@ def _estilos_extra():
         """
 <style>
 /* ============================================================
-   PORTAL LEVES — SIDEBAR V5
+   PORTAL LEVES — SIDEBAR V6
    ============================================================ */
+
+
+/* Largura da navegação */
+[data-testid="stSidebar"] {
+    width: 280px !important;
+    min-width: 280px !important;
+}
+
+[data-testid="stSidebar"] > div {
+    width: 280px !important;
+}
 
 [data-testid="stSidebar"] > div:first-child {
     background: linear-gradient(180deg, #0067fc 0%, #0058dc 100%) !important;
@@ -43,7 +54,7 @@ def _estilos_extra():
 }
 
 .leves-sb-logo img {
-    width: 128px;
+    width: 118px;
     max-width: 72%;
     height: auto;
 }
@@ -51,11 +62,11 @@ def _estilos_extra():
 .leves-sb-title {
     color: #ffffff;
     font-family: Montserrat, sans-serif;
-    font-size: 21px;
+    font-size: 20px;
     font-weight: 800;
     letter-spacing: -.2px;
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
 }
 
 /* Card da operação */
