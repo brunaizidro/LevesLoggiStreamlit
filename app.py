@@ -9,6 +9,7 @@ Executar: streamlit run app.py
 
 from __future__ import annotations
 import os
+import textwrap
 import streamlit as st
 import auth
 import contato
@@ -386,42 +387,44 @@ def tela_login():
 
     with col_left:
         st.markdown(
-            """
-            <div class="login-left">
-                <div class="login-left-badge">📦 PORTAL LEVES</div>
+            textwrap.dedent(
+                """
+                <div class="login-left">
+                    <div class="login-left-badge">📦 PORTAL LEVES</div>
 
-                <h1 class="login-left-title">
-                    Gestão de <span>insumos</span><br>
-                    mais simples.
-                </h1>
+                    <h1 class="login-left-title">
+                        Gestão de <span>insumos</span><br>
+                        mais simples.
+                    </h1>
 
-                <div class="login-left-text">
-                    Consulte, acompanhe e gerencie os insumos enviados
-                    para sua operação em um único lugar.
+                    <div class="login-left-text">
+                        Consulte, acompanhe e gerencie os insumos enviados
+                        para sua operação em um único lugar.
+                    </div>
+
+                    <div class="login-feature">
+                        <div class="login-feature-icon">📦</div>
+                        Controle de insumos
+                    </div>
+
+                    <div class="login-feature">
+                        <div class="login-feature-icon">↩️</div>
+                        Acompanhamento de devoluções
+                    </div>
+
+                    <div class="login-feature">
+                        <div class="login-feature-icon">📊</div>
+                        Informações da operação
+                    </div>
+
+                    <div class="login-visual">
+                        <div class="login-visual-box one"></div>
+                        <div class="login-visual-box two"></div>
+                        <div class="login-visual-label">LOGGI · LEVES</div>
+                    </div>
                 </div>
-
-                <div class="login-feature">
-                    <div class="login-feature-icon">📦</div>
-                    Controle de insumos
-                </div>
-
-                <div class="login-feature">
-                    <div class="login-feature-icon">↩️</div>
-                    Acompanhamento de devoluções
-                </div>
-
-                <div class="login-feature">
-                    <div class="login-feature-icon">📊</div>
-                    Informações da operação
-                </div>
-
-                <div class="login-visual">
-                    <div class="login-visual-box one"></div>
-                    <div class="login-visual-box two"></div>
-                    <div class="login-visual-label">LOGGI · LEVES</div>
-                </div>
-            </div>
-            """,
+                """
+            ),
             unsafe_allow_html=True,
         )
 
