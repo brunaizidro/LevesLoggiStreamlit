@@ -54,13 +54,13 @@ def tela_login():
         base = os.path.dirname(os.path.abspath(__file__))
         caminho_logo = os.path.join(base, LOGO_LOGIN_PATH)
         logo_base64 = get_base64_image(caminho_logo) if os.path.exists(caminho_logo) else ""
-        if logo_base64:
+       if logo_base64:
             st.markdown(
                 f"<img src='data:image/png;base64,{logo_base64}' "
                 "style='display:block;width:180px;max-width:60%;height:auto;"
                 "margin:0 auto 10px;'>"
                 "<div style='text-align:center;letter-spacing:2px;text-transform:uppercase;"
-                "color:#0067fc;font-weight:800;font-size:16px;"
+                "color:#0067fc;font-weight:800;font-size:16px;margin-bottom:16px;"
                 "font-family:Montserrat,sans-serif;'>Portal LEVES</div>",
                 unsafe_allow_html=True,
             )
@@ -69,11 +69,16 @@ def tela_login():
                 "<div style='text-align:center;font-size:34px;font-weight:800;color:#0067fc;"
                 "font-family:Montserrat,sans-serif;'>loggi</div>"
                 "<div style='text-align:center;letter-spacing:2px;text-transform:uppercase;"
-                "color:#0067fc;font-weight:800;font-size:16px;"
+                "color:#0067fc;font-weight:800;font-size:16px;margin-bottom:16px;"
                 "font-family:Montserrat,sans-serif;'>Portal LEVES</div>",
                 unsafe_allow_html=True,
             )
-        st.caption("Acesse para ver os ativos enviados para a sua operação.")
+        st.markdown(
+            "<div style='text-align:center;color:#6e6e6e;font-size:14px;"
+            "font-family:Montserrat,sans-serif;'>Acesse para ver os ativos enviados "
+            "para a sua operação.</div>",
+            unsafe_allow_html=True,
+        )
 
         if st.session_state["tentativas"] >= 5:
             st.error("Muitas tentativas. Recarregue a página e tente novamente.")
