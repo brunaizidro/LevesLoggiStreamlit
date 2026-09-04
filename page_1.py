@@ -1,7 +1,7 @@
 """
 page_1.py — Visão de Envios do Portal LEVES.
 
-V5 — renovação visual da área interna, mantendo a mesma lógica de dados,
+V6 — renovação visual da área interna, mantendo a mesma lógica de dados,
 filtros, gráficos, multi-tenant e exportação CSV.
 """
 
@@ -40,7 +40,7 @@ def _injetar_css():
         """
 <style>
 /* ============================================================
-   PORTAL LEVES — ÁREA INTERNA V5
+   PORTAL LEVES — ÁREA INTERNA V6
    ============================================================ */
 
 [data-testid="stAppViewContainer"] {
@@ -48,8 +48,8 @@ def _injetar_css():
 }
 
 [data-testid="stAppViewBlockContainer"] {
-    padding-top: 30px !important;
-    padding-bottom: 50px !important;
+    padding-top: 12px !important;
+    padding-bottom: 40px !important;
 }
 
 /* Cabeçalho */
@@ -65,7 +65,7 @@ def _injetar_css():
 .leves-page-title {
     color: #172033;
     font-family: Montserrat, sans-serif;
-    font-size: 34px;
+    font-size: 32px;
     line-height: 1.15;
     font-weight: 800;
     letter-spacing: -1px;
@@ -82,7 +82,7 @@ def _injetar_css():
     font-size: 14px;
     line-height: 1.6;
     margin-top: 8px;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
 /* Blocos */
@@ -99,8 +99,8 @@ def _injetar_css():
     background: #ffffff;
     border: 1px solid #e5eaf1;
     border-radius: 16px;
-    padding: 18px 19px 17px 19px;
-    min-height: 104px;
+    padding: 15px 17px 14px 17px;
+    min-height: 96px;
     box-shadow: 0 5px 18px rgba(23, 32, 51, .035);
     box-sizing: border-box;
 }
@@ -131,17 +131,17 @@ def _injetar_css():
 .leves-kpi-value {
     color: #172033;
     font-family: Montserrat, sans-serif;
-    font-size: 30px;
+    font-size: 28px;
     line-height: 1;
     font-weight: 700;
-    margin-top: 14px;
+    margin-top: 11px;
 }
 
 .leves-kpi-sub {
     color: #a0a9b6;
     font-family: Montserrat, sans-serif;
     font-size: 10px;
-    margin-top: 6px;
+    margin-top: 5px;
 }
 
 /* Espaçamento dos widgets */
@@ -172,9 +172,9 @@ div[data-testid="stHorizontalBlock"] {
     background: #ffffff;
     border: 1px solid #e5eaf1;
     border-radius: 16px;
-    padding: 15px 16px 7px 16px;
+    padding: 13px 14px 5px 14px;
     box-shadow: 0 5px 18px rgba(23, 32, 51, .035);
-    min-height: 395px;
+    min-height: 345px;
 }
 
 .leves-chart-title {
@@ -312,7 +312,7 @@ def page_1():
     # ============================================================
     # Gráficos
     # ============================================================
-    st.markdown('<div style="height:24px"></div>', unsafe_allow_html=True)
+    st.markdown('<div style="height:18px"></div>', unsafe_allow_html=True)
     g1, g2 = st.columns(2)
 
     tdf = (
@@ -331,7 +331,7 @@ def page_1():
     )
     fig_tipo.update_layout(
         showlegend=False,
-        height=330,
+        height=285,
         font_family="Montserrat",
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
@@ -355,7 +355,7 @@ def page_1():
         labels={"dia": "Data", "total": "Total", "tipo": "Tipo"},
     )
     fig_dia.update_layout(
-        height=330,
+        height=285,
         font_family="Montserrat",
         legend_title_text="Tipo",
         barmode="stack",
@@ -376,7 +376,7 @@ def page_1():
     # Admin — ranking
     # ============================================================
     if eh_admin:
-        st.markdown('<div style="height:24px"></div>', unsafe_allow_html=True)
+        st.markdown('<div style="height:18px"></div>', unsafe_allow_html=True)
         st.markdown('<div class="leves-section-label">Destinos</div>', unsafe_allow_html=True)
         rank = (
             dfx.groupby("destino", as_index=False)["total"]
@@ -393,7 +393,7 @@ def page_1():
         )
         fig_dest.update_traces(marker_color=AZUL)
         fig_dest.update_layout(
-            height=460,
+            height=400,
             font_family="Montserrat",
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
@@ -406,7 +406,7 @@ def page_1():
     # ============================================================
     # Tabela detalhada
     # ============================================================
-    st.markdown('<div style="height:16px"></div>', unsafe_allow_html=True)
+    st.markdown('<div style="height:12px"></div>', unsafe_allow_html=True)
     with st.expander("Ver tabela detalhada"):
         cols_tab = ["dt", "tipo", "destino", "total"] if eh_admin else ["dt", "tipo", "total"]
         tab = dfx[cols_tab].sort_values("dt", ascending=False).copy()
