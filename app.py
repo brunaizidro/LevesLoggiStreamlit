@@ -54,7 +54,7 @@ def tela_login():
         base = os.path.dirname(os.path.abspath(__file__))
         caminho_logo = os.path.join(base, LOGO_LOGIN_PATH)
         logo_base64 = get_base64_image(caminho_logo) if os.path.exists(caminho_logo) else ""
-       if logo_base64:
+        if logo_base64:
             st.markdown(
                 f"<img src='data:image/png;base64,{logo_base64}' "
                 "style='display:block;width:180px;max-width:60%;height:auto;"
