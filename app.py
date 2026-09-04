@@ -74,6 +74,12 @@ def tela_login():
     width: 100%;
 }
 
+/* O vertical_alignment="center" do st.columns faz o alinhamento principal.
+   Esta regra só garante que o conteúdo do lado direito não herde altura extra. */
+div[data-testid="column"]:nth-child(2) > div {
+    min-height: auto !important;
+}
+
 /* ============================================================
    PAINEL ESQUERDO
    ============================================================ */
@@ -81,8 +87,8 @@ def tela_login():
 .login-panel {
     box-sizing: border-box;
     width: 100%;
-    min-height: 650px;
-    padding: 55px 58px;
+    min-height: 520px;
+    padding: 48px 52px;
     border-radius: 30px;
     background: #eef6ff;
     display: flex;
@@ -219,7 +225,6 @@ def tela_login():
 
 .login-right {
     width: 100%;
-    min-height: 650px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -376,7 +381,7 @@ def tela_login():
     }
 
     .login-panel {
-        min-height: 520px;
+        min-height: 500px;
         padding: 40px;
     }
 
@@ -384,9 +389,7 @@ def tela_login():
         font-size: 36px;
     }
 
-    .login-right {
-        min-height: 520px;
-    }
+
 }
 
 @media (max-width: 700px) {
@@ -411,12 +414,14 @@ def tela_login():
     # -----------------------------------------------------------------------
     # Layout: painel de apresentação + login
     # -----------------------------------------------------------------------
-    col_left, col_right = st.columns([1.12, 0.88], gap="large")
+    col_left, col_right = st.columns(
+        [1.08, 0.92],
+        gap="large",
+        vertical_alignment="center",
+    )
 
     # =======================================================================
     # ESQUERDA
-    # HTML em bloco único e sem indentação interna para evitar que o
-    # Streamlit interprete as tags como código.
     # =======================================================================
     with col_left:
         st.markdown(
