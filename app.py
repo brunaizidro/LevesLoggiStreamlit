@@ -279,15 +279,33 @@ div[data-testid="column"]:nth-child(2) > div {
 .login-brand-block {
     width: 100%;
     text-align: center;
-    margin: 0 auto 1px auto;
+    margin: 10px auto 5px auto;
 }
 
-.login-brand-block .login-logo {
-    margin-bottom: 1px;
+.login-brand-block .login-floating-logo {
+    position: fixed;
+    top: 28px;
+    right: 38px;
+    z-index: 1000;
+    width: 128px;
+    text-align: center;
+}
+
+.login-floating-logo img {
+    display: block;
+    width: 128px;
+    max-width: 100%;
+    height: auto;
+    margin: 0;
+}
+
+.login-logo {
+    margin-bottom: 7px;
 }
 
 .login-brand-block .login-title {
     margin-top: 0;
+    margin-bottom: 8px;
 }
 
 .login-logo {
@@ -321,8 +339,8 @@ div[data-testid="column"]:nth-child(2) > div {
     font-family: Montserrat, sans-serif;
     font-size: 13px;
     line-height: 1.45;
-    max-width: 360px;
-    margin: 2px auto 18px auto;
+    max-width: 370px;
+    margin: 6px auto 22px auto;
 }
 
 /* Card do login */
@@ -330,7 +348,7 @@ div[data-testid="column"]:nth-child(2) > div {
     background: #ffffff !important;
     border: 1px solid #e0e5ec !important;
     border-radius: 18px !important;
-    padding: 26px 28px 22px 28px !important;
+    padding: 28px 28px 24px 28px !important;
     box-shadow: 0 14px 38px rgba(15, 23, 42, 0.08) !important;
 }
 
@@ -516,27 +534,28 @@ div[data-testid="column"]:nth-child(2) > div {
             else ""
         )
 
+        # Logo institucional fixado no canto superior direito.
+        # O título Portal LEVES permanece centralizado sobre o login.
         if logo_base64:
             st.markdown(
-                f'<div class="login-brand-block">'
-                f'<div class="login-logo">'
+                f'<div class="login-floating-logo">'
                 f'<img src="data:image/png;base64,{logo_base64}">'
-                f'</div>'
-                f'<div class="login-title">Portal LEVES</div>'
                 f'</div>',
                 unsafe_allow_html=True,
             )
         else:
             st.markdown(
-                '<div class="login-brand-block">'
-                '<div class="login-logo">'
+                '<div class="login-floating-logo">'
                 '<div style="color:#0067fc;font-size:32px;font-weight:800;'
                 'font-family:Montserrat,sans-serif;">loggi</div>'
-                '</div>'
-                '<div class="login-title">Portal LEVES</div>'
                 '</div>',
                 unsafe_allow_html=True,
             )
+
+        st.markdown(
+            '<div class="login-title">Portal LEVES</div>',
+            unsafe_allow_html=True,
+        )
 
         st.markdown(
             '<div class="login-description">'
