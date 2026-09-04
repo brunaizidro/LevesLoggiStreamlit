@@ -71,7 +71,11 @@ def envios_df() -> pd.DataFrame:
     df = pd.DataFrame(envios, columns=["data", "tipo", "destino", "total"])
     if df.empty:
         return df
-    df["dt"] = pd.to_datetime(df["data"], errors="coerce")
+    df["dt"] = pd.to_datetime(
+    df["data"],
+    format="%d/%m/%Y",
+    errors="coerce"
+)
     df = df.dropna(subset=["dt"]).copy()
     df["tipo"] = df["tipo"].astype(str).str.upper().str.strip()
     df["destino"] = df["destino"].astype(str).str.strip()
