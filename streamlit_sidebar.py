@@ -12,7 +12,7 @@ import streamlit as st
 
 from streamlit_estilizador import PageStyler
 
-LOGO_PATH = "image_simbolo_lebre.png"
+LOGO_PATH = "image_simbolo_lebre_1.png"
 
 
 def get_base64_image(path: str) -> str:
