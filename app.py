@@ -10,13 +10,17 @@ Executar:  streamlit run app.py
 
 from __future__ import annotations
 
+import os
+
 import streamlit as st
 
 import auth
 import contato
 import manual
 from streamlit_estilizador import PageStyler
-from streamlit_sidebar import sidebar
+from streamlit_sidebar import get_base64_image, sidebar
+
+LOGO_LOGIN_PATH = "image_simbolo_lebre.png"
 
 st.set_page_config(page_title="Portal LEVES — Loggi", page_icon="📦", layout="wide")
 
@@ -47,13 +51,26 @@ def logout():
 def tela_login():
     _, col, _ = st.columns([1, 1.1, 1])
     with col:
-        st.markdown(
-            "<div style='font-size:34px;font-weight:800;color:#0067fc;"
-            "font-family:Montserrat,sans-serif;'>loggi</div>"
-            "<div style='letter-spacing:2px;text-transform:uppercase;color:#6e6e6e;"
-            "font-size:12px;'>Portal LEVES</div>",
-            unsafe_allow_html=True,
-        )
+        base = os.path.dirname(os.path.abspath(__file__))
+        caminho_logo = os.path.join(base, LOGO_LOGIN_PATH)
+        logo_base64 = get_base64_image(caminho_logo) if os.path.exists(caminho_logo) else ""
+        if logo_base64:
+            st.markdown(
+                f"<img src='data:image/png;base64,{logo_base64}' "
+                "style='display:block;width:180px;max-width:60%;height:auto;"
+                "margin-bottom:6px;'>"
+                "<div style='letter-spacing:2px;text-transform:uppercase;color:#6e6e6e;"
+                "font-size:12px;'>Portal LEVES</div>",
+                unsafe_allow_html=True,
+            )
+        else:
+            st.markdown(
+                "<div style='font-size:34px;font-weight:800;color:#0067fc;"
+                "font-family:Montserrat,sans-serif;'>loggi</div>"
+                "<div style='letter-spacing:2px;text-transform:uppercase;color:#6e6e6e;"
+                "font-size:12px;'>Portal LEVES</div>",
+                unsafe_allow_html=True,
+            )
         st.caption("Acesse para ver os ativos enviados para a sua operação.")
 
         if st.session_state["tentativas"] >= 5:
