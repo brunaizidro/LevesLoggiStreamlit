@@ -51,355 +51,398 @@ def tela_login():
     # -----------------------------------------------------------------------
     st.markdown(
         """
-        <style>
-        /* ============================================================
-           LOGIN — PORTAL LEVES
-           ============================================================ */
+<style>
+/* ============================================================
+   PORTAL LEVES — LOGIN
+   ============================================================ */
 
-        [data-testid="stAppViewContainer"] {
-            background: #f7f9fc;
-        }
+[data-testid="stAppViewContainer"] {
+    background: #f7f9fc !important;
+}
 
-        [data-testid="stAppViewBlockContainer"] {
-            max-width: 1220px !important;
-            padding: 2.5rem 30px 2rem 30px !important;
-        }
+[data-testid="stAppViewBlockContainer"] {
+    max-width: 1280px !important;
+    padding: 28px 34px 24px 34px !important;
+}
 
-        [data-testid="stToolbar"] {
-            display: none !important;
-        }
+[data-testid="stToolbar"] {
+    display: none !important;
+}
 
-        /* Espaçamento das duas áreas principais */
-        div[data-testid="stHorizontalBlock"] {
-            gap: 55px !important;
-            align-items: stretch !important;
-        }
+/* Não limitar a coluna que contém o formulário */
+.login-layout {
+    width: 100%;
+}
 
-        /* ============================================================
-           PAINEL ESQUERDO
-           ============================================================ */
+/* ============================================================
+   PAINEL ESQUERDO
+   ============================================================ */
 
-        div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:first-child {
-            background: #eef6ff !important;
-            border-radius: 28px !important;
-            padding: 48px 50px !important;
-            min-height: 610px !important;
-            display: flex !important;
-            flex-direction: column !important;
-            justify-content: center !important;
-        }
+.login-panel {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 650px;
+    padding: 55px 58px;
+    border-radius: 30px;
+    background: #eef6ff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    font-family: Montserrat, sans-serif;
+}
 
-        div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:first-child h2 {
-            color: #172033 !important;
-            font-family: Montserrat, sans-serif !important;
-            font-size: 42px !important;
-            line-height: 1.08 !important;
-            font-weight: 800 !important;
-            letter-spacing: -1.5px !important;
-            margin-top: 12px !important;
-            margin-bottom: 18px !important;
-        }
+.login-panel-badge {
+    color: #0067fc;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
 
-        div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:first-child p {
-            color: #5b6472 !important;
-            font-family: Montserrat, sans-serif !important;
-            font-size: 16px !important;
-            line-height: 1.65 !important;
-        }
+.login-panel-title {
+    color: #172033;
+    font-size: 43px;
+    line-height: 1.08;
+    font-weight: 800;
+    letter-spacing: -1.7px;
+    margin: 0 0 20px 0;
+    max-width: 540px;
+}
 
-        div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:first-child li {
-            color: #374151 !important;
-            font-family: Montserrat, sans-serif !important;
-            font-size: 15px !important;
-            line-height: 1.8 !important;
-            margin-bottom: 6px !important;
-        }
+.login-panel-title span {
+    color: #0067fc;
+}
 
-        .login-left-badge {
-            color: #0067fc;
-            font-family: Montserrat, sans-serif;
-            font-size: 13px;
-            font-weight: 800;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
+.login-panel-text {
+    color: #5d6675;
+    font-size: 16px;
+    line-height: 1.65;
+    max-width: 610px;
+    margin-bottom: 28px;
+}
 
-        .login-left-bottom {
-            color: #7b8492;
-            font-family: Montserrat, sans-serif;
-            font-size: 13px;
-            line-height: 1.5;
-            margin-top: 12px;
-        }
+.login-feature {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #303847;
+    font-size: 15px;
+    font-weight: 600;
+    margin: 9px 0;
+}
 
-        /* ============================================================
-           PAINEL DIREITO
-           ============================================================ */
+.login-feature-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+}
 
-        div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
-            padding: 30px 35px !important;
-            display: flex !important;
-            flex-direction: column !important;
-            justify-content: center !important;
-        }
+.login-panel-bottom {
+    color: #8993a2;
+    font-size: 13px;
+    line-height: 1.55;
+    margin-top: 30px;
+}
 
-        .login-logo {
-            text-align: center;
-            margin: 0 auto 5px auto;
-        }
+/* Ilustração discreta, para aproximar do mockup */
+.login-visual {
+    position: relative;
+    height: 105px;
+    margin-top: 32px;
+    max-width: 460px;
+}
 
-        .login-logo img {
-            display: block;
-            width: 145px;
-            max-width: 70%;
-            height: auto;
-            margin: 0 auto;
-        }
+.login-box {
+    position: absolute;
+    bottom: 0;
+    width: 105px;
+    height: 72px;
+    border-radius: 9px;
+    background: #ffffff;
+    border: 1px solid #dce8f5;
+    box-shadow: 0 12px 22px rgba(0, 75, 150, 0.08);
+}
 
-        .login-title {
-            text-align: center;
-            color: #0067fc;
-            font-family: Montserrat, sans-serif;
-            font-size: 24px;
-            font-weight: 800;
-            letter-spacing: 2px;
-            line-height: 1.2;
-            margin: 4px 0 8px 0;
-            text-transform: uppercase;
-        }
+.login-box:before {
+    content: "";
+    position: absolute;
+    left: 17px;
+    right: 17px;
+    top: 16px;
+    height: 7px;
+    border-radius: 10px;
+    background: #dcecff;
+}
 
-        .login-description {
-            text-align: center;
-            color: #6b7280;
-            font-family: Montserrat, sans-serif;
-            font-size: 14px;
-            line-height: 1.5;
-            max-width: 390px;
-            margin: 0 auto 22px auto;
-        }
+.login-box:after {
+    content: "";
+    position: absolute;
+    left: 17px;
+    width: 48px;
+    top: 31px;
+    height: 7px;
+    border-radius: 10px;
+    background: #eef4fb;
+}
 
-        /* ============================================================
-           FORMULÁRIO
-           ============================================================ */
+.login-box.one {
+    left: 0;
+    transform: rotate(-4deg);
+}
 
-        [data-testid="stForm"] {
-            background: #ffffff !important;
-            border: 1px solid #e1e5eb !important;
-            border-radius: 18px !important;
-            padding: 27px 28px 23px 28px !important;
-            box-shadow: 0 12px 35px rgba(15, 23, 42, 0.08) !important;
-        }
+.login-box.two {
+    left: 85px;
+    bottom: 8px;
+    transform: rotate(4deg);
+}
 
-        [data-testid="stForm"] label {
-            color: #374151 !important;
-            font-family: Montserrat, sans-serif !important;
-            font-size: 13px !important;
-            font-weight: 600 !important;
-        }
+.login-visual-label {
+    position: absolute;
+    left: 245px;
+    bottom: 23px;
+    color: #9aa5b5;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+}
 
-        [data-testid="stForm"] input {
-            border-radius: 10px !important;
-            border: 1px solid #d8dee8 !important;
-            min-height: 44px !important;
-            font-family: Montserrat, sans-serif !important;
-            background: #ffffff !important;
-        }
+/* ============================================================
+   ÁREA DIREITA
+   ============================================================ */
 
-        [data-testid="stForm"] input:focus {
-            border-color: #0067fc !important;
-            box-shadow: 0 0 0 2px rgba(0, 103, 252, 0.10) !important;
-        }
+.login-right {
+    width: 100%;
+    min-height: 650px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    font-family: Montserrat, sans-serif;
+}
 
-        [data-testid="stForm"] [data-testid="stTextInput"] {
-            margin-bottom: 5px !important;
-        }
+.login-logo {
+    text-align: center;
+    margin: 0 auto 5px auto;
+}
 
-        [data-testid="stFormSubmitButton"] button {
-            width: 100% !important;
-            min-height: 46px !important;
-            margin-top: 8px !important;
-            border-radius: 10px !important;
-            border: 0 !important;
-            background: #0067fc !important;
-            color: #ffffff !important;
-            font-family: Montserrat, sans-serif !important;
-            font-size: 15px !important;
-            font-weight: 700 !important;
-            transition: all 0.2s ease !important;
-        }
+.login-logo img {
+    display: block;
+    width: 150px;
+    max-width: 75%;
+    height: auto;
+    margin: 0 auto;
+}
 
-        [data-testid="stFormSubmitButton"] button:hover {
-            background: #0056d6 !important;
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(0, 103, 252, 0.20) !important;
-        }
+.login-title {
+    text-align: center;
+    color: #0067fc;
+    font-family: Montserrat, sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    line-height: 1.2;
+    margin: 4px 0 8px 0;
+    text-transform: uppercase;
+}
 
-        [data-testid="stAlert"] {
-            border-radius: 10px !important;
-            font-family: Montserrat, sans-serif !important;
-            font-size: 13px !important;
-        }
+.login-description {
+    text-align: center;
+    color: #788292;
+    font-family: Montserrat, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    max-width: 390px;
+    margin: 0 auto 23px auto;
+}
 
-        /* ============================================================
-           MANUAL
-           ============================================================ */
+/* Card do login */
+[data-testid="stForm"] {
+    background: #ffffff !important;
+    border: 1px solid #e0e5ec !important;
+    border-radius: 18px !important;
+    padding: 28px 30px 24px 30px !important;
+    box-shadow: 0 14px 38px rgba(15, 23, 42, 0.08) !important;
+}
 
-        .login-manual {
-            margin-top: 14px;
-        }
+[data-testid="stForm"] label {
+    color: #3d4654 !important;
+    font-family: Montserrat, sans-serif !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+}
 
-        [data-testid="stDownloadButton"] button {
-            border: 1px solid #e1e5eb !important;
-            border-radius: 12px !important;
-            background: #ffffff !important;
-            color: #374151 !important;
-            min-height: 46px !important;
-            font-family: Montserrat, sans-serif !important;
-            font-weight: 600 !important;
-            width: 100% !important;
-        }
+[data-testid="stForm"] input {
+    border-radius: 10px !important;
+    border: 1px solid #d8dee8 !important;
+    min-height: 44px !important;
+    font-family: Montserrat, sans-serif !important;
+    background: #ffffff !important;
+}
 
-        [data-testid="stDownloadButton"] button:hover {
-            border-color: #0067fc !important;
-            color: #0067fc !important;
-        }
+[data-testid="stForm"] input:focus {
+    border-color: #0067fc !important;
+    box-shadow: 0 0 0 2px rgba(0, 103, 252, 0.10) !important;
+}
 
-        /* ============================================================
-           SUPORTE E RODAPÉ
-           ============================================================ */
+[data-testid="stFormSubmitButton"] button {
+    width: 100% !important;
+    min-height: 47px !important;
+    margin-top: 9px !important;
+    border-radius: 10px !important;
+    border: 0 !important;
+    background: #0067fc !important;
+    color: #ffffff !important;
+    font-family: Montserrat, sans-serif !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+}
 
-        .login-help-title {
-            text-align: center;
-            color: #9ca3af;
-            font-family: Montserrat, sans-serif;
-            font-size: 12px;
-            margin: 18px 0 8px 0;
-        }
+[data-testid="stFormSubmitButton"] button:hover {
+    background: #0056d6 !important;
+    box-shadow: 0 7px 18px rgba(0, 103, 252, 0.20) !important;
+}
 
-        [data-testid="stExpander"] {
-            border: 1px solid #e1e5eb !important;
-            border-radius: 12px !important;
-            background: #ffffff !important;
-            overflow: hidden !important;
-        }
+[data-testid="stAlert"] {
+    border-radius: 10px !important;
+    font-family: Montserrat, sans-serif !important;
+    font-size: 13px !important;
+}
 
-        [data-testid="stExpander"] summary {
-            font-family: Montserrat, sans-serif !important;
-            font-size: 13px !important;
-            font-weight: 600 !important;
-            color: #374151 !important;
-        }
+/* Manual */
+.login-manual {
+    margin-top: 14px;
+}
 
-        .login-footer {
-            text-align: center;
-            color: #a1a8b3;
-            font-family: Montserrat, sans-serif;
-            font-size: 11px;
-            margin-top: 20px;
-        }
+[data-testid="stDownloadButton"] button {
+    border: 1px solid #e0e5ec !important;
+    border-radius: 12px !important;
+    background: #ffffff !important;
+    color: #566172 !important;
+    min-height: 47px !important;
+    font-family: Montserrat, sans-serif !important;
+    font-weight: 600 !important;
+    width: 100% !important;
+}
 
-        /* ============================================================
-           RESPONSIVO
-           ============================================================ */
+[data-testid="stDownloadButton"] button:hover {
+    border-color: #0067fc !important;
+    color: #0067fc !important;
+}
 
-        @media (max-width: 900px) {
-            [data-testid="stAppViewBlockContainer"] {
-                padding: 1.5rem 18px 2rem 18px !important;
-            }
+/* Suporte */
+.login-help-title {
+    text-align: center;
+    color: #a0a8b5;
+    font-family: Montserrat, sans-serif;
+    font-size: 12px;
+    margin: 19px 0 8px 0;
+}
 
-            div[data-testid="stHorizontalBlock"] {
-                gap: 25px !important;
-            }
+[data-testid="stExpander"] {
+    border: 1px solid #e0e5ec !important;
+    border-radius: 12px !important;
+    background: #ffffff !important;
+    overflow: hidden !important;
+}
 
-            div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:first-child {
-                min-height: auto !important;
-                padding: 35px 30px !important;
-            }
+[data-testid="stExpander"] summary {
+    font-family: Montserrat, sans-serif !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: #566172 !important;
+}
 
-            div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:first-child h2 {
-                font-size: 34px !important;
-            }
+.login-footer {
+    text-align: center;
+    color: #a5adba;
+    font-family: Montserrat, sans-serif;
+    font-size: 11px;
+    margin-top: 19px;
+}
 
-            div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
-                padding: 20px 10px !important;
-            }
-        }
+/* ============================================================
+   RESPONSIVO
+   ============================================================ */
 
-        @media (max-width: 700px) {
-            div[data-testid="stHorizontalBlock"] {
-                flex-direction: column !important;
-            }
+@media (max-width: 900px) {
+    [data-testid="stAppViewBlockContainer"] {
+        padding: 20px 18px 24px 18px !important;
+    }
 
-            div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:first-child {
-                display: none !important;
-            }
+    .login-panel {
+        min-height: 520px;
+        padding: 40px;
+    }
 
-            div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
-                width: 100% !important;
-                padding: 15px 5px !important;
-            }
+    .login-panel-title {
+        font-size: 36px;
+    }
 
-            [data-testid="stForm"] {
-                padding: 22px 18px 20px 18px !important;
-            }
+    .login-right {
+        min-height: 520px;
+    }
+}
 
-            .login-title {
-                font-size: 21px !important;
-            }
-        }
-        </style>
+@media (max-width: 700px) {
+    .login-panel {
+        display: none;
+    }
+
+    .login-right {
+        min-height: auto;
+        padding: 20px 0;
+    }
+
+    [data-testid="stForm"] {
+        padding: 22px 18px 20px 18px !important;
+    }
+}
+</style>
         """,
         unsafe_allow_html=True,
     )
 
     # -----------------------------------------------------------------------
-    # Layout principal: apresentação + login
+    # Layout: painel de apresentação + login
     # -----------------------------------------------------------------------
-
-    col_left, col_right = st.columns([1.15, 0.85], gap="large")
+    col_left, col_right = st.columns([1.12, 0.88], gap="large")
 
     # =======================================================================
-    # LADO ESQUERDO
+    # ESQUERDA
+    # HTML em bloco único e sem indentação interna para evitar que o
+    # Streamlit interprete as tags como código.
     # =======================================================================
-
     with col_left:
         st.markdown(
-            '<div class="login-left-badge">📦 PORTAL LEVES</div>',
-            unsafe_allow_html=True,
-        )
-
-        st.markdown("## Gestão de **insumos** mais simples.")
-
-        st.write(
-            "Consulte, acompanhe e gerencie os insumos enviados "
-            "para sua operação em um único lugar."
-        )
-
-        st.markdown("")
-
-        st.markdown(
-            """
-            - 📦 **Controle de insumos**
-            - ↩️ **Acompanhamento de devoluções**
-            - 📊 **Informações da operação**
-            """
-        )
-
-        st.markdown("")
-
-        st.markdown(
-            '<div class="login-left-bottom">'
-            "Tenha as informações da operação de forma rápida, "
-            "organizada e centralizada."
-            "</div>",
+            '<div class="login-panel">'
+            '<div class="login-panel-badge">📦 PORTAL LEVES</div>'
+            '<div class="login-panel-title">Gestão de <span>insumos</span> mais simples.</div>'
+            '<div class="login-panel-text">Consulte, acompanhe e gerencie os insumos enviados para sua operação em um único lugar.</div>'
+            '<div class="login-feature"><div class="login-feature-icon">📦</div><div>Controle de insumos</div></div>'
+            '<div class="login-feature"><div class="login-feature-icon">↩️</div><div>Acompanhamento de devoluções</div></div>'
+            '<div class="login-feature"><div class="login-feature-icon">📊</div><div>Informações da operação</div></div>'
+            '<div class="login-panel-bottom">Tenha as informações da operação de forma rápida, organizada e centralizada.</div>'
+            '<div class="login-visual">'
+            '<div class="login-box one"></div>'
+            '<div class="login-box two"></div>'
+            '<div class="login-visual-label">LOGGI · LEVES</div>'
+            '</div>'
+            '</div>',
             unsafe_allow_html=True,
         )
 
     # =======================================================================
-    # LADO DIREITO — LOGIN
+    # DIREITA — login original preservado
     # =======================================================================
-
     with col_right:
+        st.markdown('<div class="login-right">', unsafe_allow_html=True)
+
         base = os.path.dirname(os.path.abspath(__file__))
         caminho_logo = os.path.join(base, LOGO_LOGIN_PATH)
 
@@ -409,7 +452,6 @@ def tela_login():
             else ""
         )
 
-        # Logo + título
         if logo_base64:
             st.markdown(
                 f'<div class="login-logo">'
@@ -440,7 +482,7 @@ def tela_login():
                 "Muitas tentativas. Recarregue a página e tente novamente."
             )
 
-        # Login — lógica de autenticação original preservada.
+        # Login — autenticação original preservada.
         with st.form("login"):
             usuario = st.text_input(
                 "Usuário",
@@ -474,7 +516,6 @@ def tela_login():
                 st.session_state["tentativas"] += 1
                 st.error("Usuário ou senha inválidos.")
 
-        # Manual
         if manual.disponivel():
             st.markdown(
                 '<div class="login-manual">',
@@ -483,7 +524,6 @@ def tela_login():
             manual.botao_manual(key="manual_login")
             st.markdown("</div>", unsafe_allow_html=True)
 
-        # Suporte
         st.markdown(
             '<div class="login-help-title">Precisa de ajuda?</div>',
             unsafe_allow_html=True,
@@ -492,11 +532,12 @@ def tela_login():
         with st.expander("💬 Falar com o suporte"):
             contato.form_contato(key="login")
 
-        # Rodapé
         st.markdown(
             '<div class="login-footer">Portal LEVES · Loggi</div>',
             unsafe_allow_html=True,
         )
+
+        st.markdown("</div>", unsafe_allow_html=True)
 
 
 # ---------------------------------------------------------------------------
