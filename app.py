@@ -1,5 +1,5 @@
 """
-app.py — Portal LEVES (Loggi) — camada de apresentação (padrão DLE).
+app.py — Portal LEVES (Loggi) — camada de apresentação (padrão DLE). 
 
 Configura a página, aplica o estilo, trata o login próprio (multi-tenant) e
 roteia entre as páginas via st.sidebar.radio.
