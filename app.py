@@ -56,13 +56,58 @@ def tela_login():
    PORTAL LEVES — LOGIN
    ============================================================ */
 
-[data-testid="stAppViewContainer"] {
+/* ============================================================
+   FUNDO + TOPO DO STREAMLIT
+   ============================================================ */
+
+html,
+body,
+[data-testid="stApp"],
+[data-testid="stAppViewContainer"],
+section.main {
     background: #f7f9fc !important;
 }
 
-[data-testid="stAppViewBlockContainer"] {
-    max-width: 1280px !important;
-    padding: 28px 34px 24px 34px !important;
+header[data-testid="stHeader"],
+[data-testid="stHeader"] {
+    display: none !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    visibility: hidden !important;
+}
+
+[data-testid="stDecoration"] {
+    display: none !important;
+    height: 0 !important;
+}
+
+#MainMenu,
+footer {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+[data-testid="stAppViewContainer"] {
+    background: #f7f9fc !important;
+    top: 0 !important;
+    margin-top: 0 !important;
+}
+
+section.main {
+    background: #f7f9fc !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+section.main > div {
+    padding-top: 0 !important;
+}
+
+[data-testid="stAppViewBlockContainer"],
+[data-testid="stMainBlockContainer"] {
+    max-width: 1220px !important;
+    padding-top: 8px !important;
+    padding-bottom: 20px !important;
 }
 
 [data-testid="stToolbar"] {
@@ -87,8 +132,8 @@ div[data-testid="column"]:nth-child(2) > div {
 .login-panel {
     box-sizing: border-box;
     width: 100%;
-    min-height: 520px;
-    padding: 48px 52px;
+    min-height: 480px;
+    padding: 38px 46px;
     border-radius: 30px;
     background: #eef6ff;
     display: flex;
@@ -377,7 +422,7 @@ div[data-testid="column"]:nth-child(2) > div {
 
 @media (max-width: 900px) {
     [data-testid="stAppViewBlockContainer"] {
-        padding: 20px 18px 24px 18px !important;
+        padding: 4px 18px 16px 18px !important;
     }
 
     .login-panel {
@@ -415,7 +460,7 @@ div[data-testid="column"]:nth-child(2) > div {
     # Layout: painel de apresentação + login
     # -----------------------------------------------------------------------
     col_left, col_right = st.columns(
-        [1.08, 0.92],
+        [1.05, 0.95],
         gap="large",
         vertical_alignment="center",
     )
