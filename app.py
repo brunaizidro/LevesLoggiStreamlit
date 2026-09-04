@@ -472,11 +472,11 @@ div[data-testid="column"]:nth-child(2) > div {
         st.markdown(
             '<div class="login-panel">'
             '<div class="login-panel-badge">📦 PORTAL LEVES</div>'
-            '<div class="login-panel-title">Gestão de <span>Insumos</span>'
+            '<div class="login-panel-title">Gestão de <span>Insumos</span>.</div>'
             '<div class="login-panel-text">Consulte, acompanhe e gerencie os insumos enviados para sua operação em um único lugar.</div>'
             '<div class="login-feature"><div class="login-feature-icon">📦</div><div>Controle de insumos</div></div>'
             '<div class="login-feature"><div class="login-feature-icon">↩️</div><div>Acompanhamento de devoluções</div></div>'
-            '<div class="login-feature"><div class="login-feature-icon">📊</div><div>Informações da descontos</div></div>'
+            '<div class="login-feature"><div class="login-feature-icon">📊</div><div>Informações de descontos</div></div>'
             '<div class="login-panel-bottom">Tenha as informações de forma rápida, organizada e centralizada.</div>'
             '<div class="login-visual">'
             '<div class="login-box one"></div>'
