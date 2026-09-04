@@ -1,51 +1,278 @@
 """
-page_1.py — Visão de Envios (ativos a devolver).
+page_1.py — Visão de Envios do Portal LEVES.
 
-Filtro por mês (principal) + tipo de ativo. Cartões por tipo e gráficos em
-Plotly Express, no padrão visual da Loggi. Multi-tenant: operação vê só o seu
-destino; admin vê tudo e ganha o ranking de destinos.
+V5 — renovação visual da área interna, mantendo a mesma lógica de dados,
+filtros, gráficos, multi-tenant e exportação CSV.
 """
 
 from __future__ import annotations
 
+import html
 import plotly.express as px
 import streamlit as st
 
 import data_processing as dp
 
 AZUL = "#0067fc"
+FUNDO = "#f7f9fc"
+BORDA = "#e5eaf1"
+TEXTO = "#172033"
+CINZA = "#6f7b8c"
 
 
 def _fmt(n) -> str:
     return f"{int(n):,}".replace(",", ".")
 
 
+def _icone_tipo(tipo: str) -> str:
+    mapa = {
+        "gaylord": "📦",
+        "pallet": "▦",
+        "saca": "👜",
+        "caixa": "📦",
+        "etiqueta": "🏷️",
+    }
+    return mapa.get(str(tipo).strip().lower(), "📦")
+
+
+def _injetar_css():
+    st.markdown(
+        """
+<style>
+/* ============================================================
+   PORTAL LEVES — ÁREA INTERNA V5
+   ============================================================ */
+
+[data-testid="stAppViewContainer"] {
+    background: #f7f9fc !important;
+}
+
+[data-testid="stAppViewBlockContainer"] {
+    padding-top: 30px !important;
+    padding-bottom: 50px !important;
+}
+
+/* Cabeçalho */
+.leves-breadcrumb {
+    color: #8a95a5;
+    font-family: Montserrat, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .3px;
+    margin-bottom: 7px;
+}
+
+.leves-page-title {
+    color: #172033;
+    font-family: Montserrat, sans-serif;
+    font-size: 34px;
+    line-height: 1.15;
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin: 0;
+}
+
+.leves-page-title span {
+    color: #0067fc;
+}
+
+.leves-page-description {
+    color: #697587;
+    font-family: Montserrat, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-top: 8px;
+    margin-bottom: 25px;
+}
+
+/* Blocos */
+.leves-section-label {
+    color: #253044;
+    font-family: Montserrat, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    margin: 4px 0 10px 0;
+}
+
+/* KPIs */
+.leves-kpi {
+    background: #ffffff;
+    border: 1px solid #e5eaf1;
+    border-radius: 16px;
+    padding: 18px 19px 17px 19px;
+    min-height: 104px;
+    box-shadow: 0 5px 18px rgba(23, 32, 51, .035);
+    box-sizing: border-box;
+}
+
+.leves-kpi-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #788497;
+    font-family: Montserrat, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .45px;
+}
+
+.leves-kpi-icon {
+    width: 25px;
+    height: 25px;
+    border-radius: 8px;
+    background: #eef6ff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+}
+
+.leves-kpi-value {
+    color: #172033;
+    font-family: Montserrat, sans-serif;
+    font-size: 30px;
+    line-height: 1;
+    font-weight: 700;
+    margin-top: 14px;
+}
+
+.leves-kpi-sub {
+    color: #a0a9b6;
+    font-family: Montserrat, sans-serif;
+    font-size: 10px;
+    margin-top: 6px;
+}
+
+/* Espaçamento dos widgets */
+div[data-testid="stHorizontalBlock"] {
+    gap: 16px;
+}
+
+/* Selectbox / multiselect */
+[data-baseweb="select"] > div {
+    border-color: #dfe5ed !important;
+    border-radius: 10px !important;
+    background: #ffffff !important;
+}
+
+[data-baseweb="select"] > div:hover {
+    border-color: #b9c7d8 !important;
+}
+
+[data-testid="stWidgetLabel"] p {
+    color: #536074 !important;
+    font-family: Montserrat, sans-serif !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+}
+
+/* Cards dos gráficos */
+.leves-chart-card {
+    background: #ffffff;
+    border: 1px solid #e5eaf1;
+    border-radius: 16px;
+    padding: 15px 16px 7px 16px;
+    box-shadow: 0 5px 18px rgba(23, 32, 51, .035);
+    min-height: 395px;
+}
+
+.leves-chart-title {
+    color: #253044;
+    font-family: Montserrat, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+
+/* Tabela */
+[data-testid="stExpander"] {
+    border: 1px solid #e5eaf1 !important;
+    border-radius: 14px !important;
+    background: #ffffff !important;
+}
+
+[data-testid="stExpander"] summary {
+    color: #334056 !important;
+    font-family: Montserrat, sans-serif !important;
+    font-weight: 600 !important;
+}
+
+/* Avisos */
+[data-testid="stAlert"] {
+    border-radius: 12px !important;
+    font-family: Montserrat, sans-serif !important;
+}
+
+@media (max-width: 900px) {
+    .leves-page-title { font-size: 29px; }
+    .leves-kpi { min-height: 96px; }
+}
+</style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 def page_1():
+    _injetar_css()
+
     user = st.session_state.get("usuario") or {}
     eh_admin = user.get("perfil") == "admin"
 
-    st.subheader("Visão geral dos ativos" if eh_admin else "Ativos enviados para você")
+    # ============================================================
+    # Cabeçalho
+    # ============================================================
     st.markdown(
-        "<p class='custom-text'>Estes são os ativos enviados que precisam ser "
-        "devolvidos. Use o filtro de mês para ver o período desejado.</p>",
+        '<div class="leves-breadcrumb">PORTAL LEVES &nbsp;/&nbsp; ENVIOS</div>',
+        unsafe_allow_html=True,
+    )
+
+    titulo = "Visão geral dos envios" if eh_admin else "Insumos enviados para você"
+    st.markdown(
+        f'<div class="leves-page-title">{html.escape(titulo)}</div>',
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        '<div class="leves-page-description">'
+        "Consulte e acompanhe os insumos enviados para sua operação. "
+        "Use os filtros abaixo para analisar o período desejado."
+        "</div>",
         unsafe_allow_html=True,
     )
 
     df = dp.envios_do_usuario(user)
     if df.empty:
-        st.info("Nenhum envio encontrado."
-                if eh_admin else "Nenhum envio encontrado para a sua operação.")
+        st.info(
+            "Nenhum envio encontrado."
+            if eh_admin
+            else "Nenhum envio encontrado para a sua operação."
+        )
         return
 
-    # ---- Filtros ----
+    # ============================================================
+    # Filtros
+    # ============================================================
+    st.markdown('<div class="leves-section-label">Filtros</div>', unsafe_allow_html=True)
+
+    fcol1, fcol2 = st.columns([1, 1.4])
     meses = sorted(df["mes"].unique(), reverse=True)
     rotulos = {m: dp.rotulo_mes(m) for m in meses}
-    fcol1, fcol2 = st.columns([1, 1.4])
     opcoes = ["Todo o período"] + [rotulos[m] for m in meses]
-    escolha = fcol1.selectbox("Mês", opcoes, index=1 if meses else 0)
+
+    escolha = fcol1.selectbox(
+        "Período",
+        opcoes,
+        index=1 if meses else 0,
+    )
 
     tipos_disp = sorted(df["tipo"].unique())
-    sel_tipos = fcol2.multiselect("Tipo de ativo", tipos_disp, default=tipos_disp)
+    sel_tipos = fcol2.multiselect(
+        "Tipo de insumo",
+        tipos_disp,
+        default=tipos_disp,
+    )
 
     dfx = df.copy()
     if escolha != "Todo o período":
@@ -58,59 +285,138 @@ def page_1():
         st.warning("Sem dados para os filtros selecionados.")
         return
 
-    # ---- Cartões: total geral + por tipo ----
+    # ============================================================
+    # KPIs
+    # ============================================================
+    st.markdown('<div class="leves-section-label" style="margin-top:20px;">Resumo do período</div>', unsafe_allow_html=True)
+
     total_geral = int(dfx["total"].sum())
     por_tipo = dfx.groupby("tipo")["total"].sum().to_dict()
-    cols = st.columns(1 + len(tipos_disp))
-    cols[0].metric("Total de ativos", _fmt(total_geral))
-    for i, t in enumerate(tipos_disp, start=1):
-        cols[i].metric(t.title(), _fmt(por_tipo.get(t, 0)))
 
-    st.markdown("---")
+    kpis = [("Total de insumos", total_geral, "📦", "no período")]
+    for t in tipos_disp:
+        kpis.append((str(t).title(), por_tipo.get(t, 0), _icone_tipo(t), "enviados"))
 
-    # ---- Gráficos (Plotly Express) ----
+    cols = st.columns(len(kpis))
+    for col, (nome, valor, icone, subtitulo) in zip(cols, kpis):
+        with col:
+            st.markdown(
+                f'<div class="leves-kpi">'
+                f'<div class="leves-kpi-top"><span class="leves-kpi-icon">{icone}</span>{html.escape(nome)}</div>'
+                f'<div class="leves-kpi-value">{_fmt(valor)}</div>'
+                f'<div class="leves-kpi-sub">{html.escape(subtitulo)}</div>'
+                f'</div>',
+                unsafe_allow_html=True,
+            )
+
+    # ============================================================
+    # Gráficos
+    # ============================================================
+    st.markdown('<div style="height:24px"></div>', unsafe_allow_html=True)
     g1, g2 = st.columns(2)
 
-    tdf = dfx.groupby("tipo", as_index=False)["total"].sum().sort_values("total", ascending=False)
-    fig_tipo = px.bar(
-        tdf, x="tipo", y="total", color="tipo",
-        color_discrete_map=dp.CORES_TIPO, title="Total por tipo de ativo",
-        labels={"tipo": "Tipo de ativo", "total": "Total"},
+    tdf = (
+        dfx.groupby("tipo", as_index=False)["total"]
+        .sum()
+        .sort_values("total", ascending=False)
     )
-    fig_tipo.update_layout(showlegend=False, height=340, font_family="Montserrat")
-    g1.plotly_chart(fig_tipo, width="stretch")
+
+    fig_tipo = px.bar(
+        tdf,
+        x="tipo",
+        y="total",
+        color="tipo",
+        color_discrete_map=dp.CORES_TIPO,
+        labels={"tipo": "Tipo", "total": "Total"},
+    )
+    fig_tipo.update_layout(
+        showlegend=False,
+        height=330,
+        font_family="Montserrat",
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        margin=dict(l=10, r=10, t=15, b=10),
+        xaxis=dict(showgrid=False, title=None),
+        yaxis=dict(gridcolor="#edf0f4", title=None),
+    )
+
+    with g1:
+        with st.container(border=True):
+            st.markdown('<div class="leves-chart-title">Total por tipo de insumo</div>', unsafe_allow_html=True)
+            st.plotly_chart(fig_tipo, width="stretch", config={"displayModeBar": False})
 
     ddf = dfx.groupby(["dia", "tipo"], as_index=False)["total"].sum()
     fig_dia = px.bar(
-        ddf, x="dia", y="total", color="tipo",
-        color_discrete_map=dp.CORES_TIPO, title="Envios por dia",
+        ddf,
+        x="dia",
+        y="total",
+        color="tipo",
+        color_discrete_map=dp.CORES_TIPO,
         labels={"dia": "Data", "total": "Total", "tipo": "Tipo"},
     )
-    fig_dia.update_layout(height=340, font_family="Montserrat",
-                          legend_title_text="Tipo", barmode="stack")
-    g2.plotly_chart(fig_dia, width="stretch")
+    fig_dia.update_layout(
+        height=330,
+        font_family="Montserrat",
+        legend_title_text="Tipo",
+        barmode="stack",
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        margin=dict(l=10, r=10, t=15, b=10),
+        xaxis=dict(showgrid=False, title=None),
+        yaxis=dict(gridcolor="#edf0f4", title=None),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+    )
 
-    # ---- Admin: ranking de destinos ----
+    with g2:
+        with st.container(border=True):
+            st.markdown('<div class="leves-chart-title">Envios por dia</div>', unsafe_allow_html=True)
+            st.plotly_chart(fig_dia, width="stretch", config={"displayModeBar": False})
+
+    # ============================================================
+    # Admin — ranking
+    # ============================================================
     if eh_admin:
-        st.markdown("#### Top destinos no período")
+        st.markdown('<div style="height:24px"></div>', unsafe_allow_html=True)
+        st.markdown('<div class="leves-section-label">Destinos</div>', unsafe_allow_html=True)
         rank = (
-            dfx.groupby("destino", as_index=False)["total"].sum()
-            .sort_values("total", ascending=True).tail(15)
+            dfx.groupby("destino", as_index=False)["total"]
+            .sum()
+            .sort_values("total", ascending=True)
+            .tail(15)
         )
         fig_dest = px.bar(
-            rank, x="total", y="destino", orientation="h",
-            title="15 maiores destinos", labels={"total": "Total", "destino": "Destino"},
+            rank,
+            x="total",
+            y="destino",
+            orientation="h",
+            labels={"total": "Total", "destino": "Destino"},
         )
         fig_dest.update_traces(marker_color=AZUL)
-        fig_dest.update_layout(height=460, font_family="Montserrat")
-        st.plotly_chart(fig_dest, width="stretch")
+        fig_dest.update_layout(
+            height=460,
+            font_family="Montserrat",
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            margin=dict(l=10, r=10, t=15, b=10),
+            xaxis=dict(gridcolor="#edf0f4", title=None),
+            yaxis=dict(title=None),
+        )
+        st.plotly_chart(fig_dest, width="stretch", config={"displayModeBar": False})
 
-    # ---- Tabela detalhada + CSV ----
+    # ============================================================
+    # Tabela detalhada
+    # ============================================================
+    st.markdown('<div style="height:16px"></div>', unsafe_allow_html=True)
     with st.expander("Ver tabela detalhada"):
         cols_tab = ["dt", "tipo", "destino", "total"] if eh_admin else ["dt", "tipo", "total"]
         tab = dfx[cols_tab].sort_values("dt", ascending=False).copy()
         tab["dt"] = tab["dt"].dt.strftime("%d/%m/%Y")
-        nomes = {"dt": "Data", "tipo": "Tipo de ativo", "destino": "Destino", "total": "Total"}
+        nomes = {
+            "dt": "Data",
+            "tipo": "Tipo de insumo",
+            "destino": "Destino",
+            "total": "Total",
+        }
         tab = tab.rename(columns=nomes)
         st.dataframe(tab, width="stretch", hide_index=True)
         st.download_button(
