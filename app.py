@@ -54,23 +54,25 @@ def tela_login():
         base = os.path.dirname(os.path.abspath(__file__))
         caminho_logo = os.path.join(base, LOGO_LOGIN_PATH)
         logo_base64 = get_base64_image(caminho_logo) if os.path.exists(caminho_logo) else ""
-        if logo_base64:
+                if logo_base64:
             st.markdown(
+                f"<div style='margin-top:-3rem;'>"
                 f"<img src='data:image/png;base64,{logo_base64}' "
                 "style='display:block;width:180px;max-width:60%;height:auto;"
                 "margin:0 auto 10px;'>"
                 "<div style='text-align:center;letter-spacing:2px;text-transform:uppercase;"
-                "color:#0067fc;font-weight:800;font-size:16px;margin-bottom:16px;"
-                "font-family:Montserrat,sans-serif;'>Portal LEVES</div>",
+                "color:#0067fc;font-weight:800;font-size:22px;margin-bottom:16px;"
+                "font-family:Montserrat,sans-serif;'>Portal LEVES</div></div>",
                 unsafe_allow_html=True,
             )
         else:
             st.markdown(
+                "<div style='margin-top:-3rem;'>"
                 "<div style='text-align:center;font-size:34px;font-weight:800;color:#0067fc;"
                 "font-family:Montserrat,sans-serif;'>loggi</div>"
                 "<div style='text-align:center;letter-spacing:2px;text-transform:uppercase;"
-                "color:#0067fc;font-weight:800;font-size:16px;margin-bottom:16px;"
-                "font-family:Montserrat,sans-serif;'>Portal LEVES</div>",
+                "color:#0067fc;font-weight:800;font-size:22px;margin-bottom:16px;"
+                "font-family:Montserrat,sans-serif;'>Portal LEVES</div></div>",
                 unsafe_allow_html=True,
             )
         st.markdown(
