@@ -25,9 +25,18 @@ def _estilos_extra():
         """
 <style>
 /* ============================================================
-   PORTAL LEVES — SIDEBAR V6
+   PORTAL LEVES — SIDEBAR V8
    ============================================================ */
 
+
+/* Remove a barra superior padrão do Streamlit */
+[data-testid="stHeader"] {
+    display: none !important;
+}
+
+[data-testid="stToolbar"] {
+    display: none !important;
+}
 
 /* Largura da navegação */
 [data-testid="stSidebar"] {
