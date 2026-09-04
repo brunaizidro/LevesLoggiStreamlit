@@ -202,86 +202,62 @@ div[data-testid="column"]:nth-child(2) > div {
     margin-top: 30px;
 }
 
-/* Ilustração: pacote Loggi */
+/* Ilustração discreta, para aproximar do mockup */
 .login-visual {
     position: relative;
-    height: 115px;
-    margin-top: 30px;
+    height: 105px;
+    margin-top: 32px;
     max-width: 460px;
 }
 
-.login-package {
+.login-box {
     position: absolute;
-    left: 8px;
-    bottom: 2px;
-    width: 145px;
-    height: 88px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #d8a66d 0%, #c98e50 100%);
-    border: 1px solid #bd8147;
-    box-shadow: 0 14px 24px rgba(95, 63, 30, 0.14);
-    transform: rotate(-3deg);
-    overflow: hidden;
-}
-
-.login-package:before {
-    content: "";
-    position: absolute;
-    top: 0;
     bottom: 0;
-    left: 50%;
-    width: 22px;
-    transform: translateX(-50%);
-    background: rgba(255, 224, 176, 0.42);
+    width: 105px;
+    height: 72px;
+    border-radius: 9px;
+    background: #ffffff;
+    border: 1px solid #dce8f5;
+    box-shadow: 0 12px 22px rgba(0, 75, 150, 0.08);
 }
 
-.login-package:after {
+.login-box:before {
     content: "";
     position: absolute;
-    left: 15px;
-    right: 15px;
-    top: 13px;
-    height: 3px;
+    left: 17px;
+    right: 17px;
+    top: 16px;
+    height: 7px;
     border-radius: 10px;
-    background: rgba(112, 70, 31, 0.22);
-}
-
-.login-package-label {
-    position: absolute;
-    z-index: 2;
-    left: 22px;
-    top: 29px;
-    width: 82px;
-    height: 38px;
-    border-radius: 6px;
-    background: #ffffff;
-    border: 1px solid #e3e8ef;
-    box-shadow: 0 5px 10px rgba(15, 23, 42, 0.08);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 3px;
-}
-
-.login-package-label .brand {
-    color: #00a9e8;
-    font-size: 13px;
-    font-weight: 800;
-    letter-spacing: -0.4px;
-}
-
-.login-package-label .code {
-    width: 47px;
-    height: 5px;
-    border-radius: 5px;
     background: #dcecff;
+}
+
+.login-box:after {
+    content: "";
+    position: absolute;
+    left: 17px;
+    width: 48px;
+    top: 31px;
+    height: 7px;
+    border-radius: 10px;
+    background: #eef4fb;
+}
+
+.login-box.one {
+    left: 0;
+    transform: rotate(-4deg);
+}
+
+.login-box.two {
+    left: 85px;
+    bottom: 8px;
+    transform: rotate(4deg);
 }
 
 .login-visual-label {
     position: absolute;
-    left: 190px;
-    bottom: 27px;
+    left: 245px;
+    bottom: 23px;
     color: #9aa5b5;
     font-size: 11px;
     font-weight: 700;
@@ -528,19 +504,15 @@ div[data-testid="column"]:nth-child(2) > div {
         st.markdown(
             '<div class="login-panel">'
             '<div class="login-panel-badge">📦 PORTAL LEVES</div>'
-            '<div class="login-panel-title">Gestão de <span>insumos</span></div>'
+            '<div class="login-panel-title">Gestão de <span>Insumos</span></div>'
             '<div class="login-panel-text">Consulte, acompanhe e gerencie os insumos enviados para sua operação em um único lugar.</div>'
             '<div class="login-feature"><div class="login-feature-icon">📦</div><div>Controle de insumos</div></div>'
             '<div class="login-feature"><div class="login-feature-icon">↩️</div><div>Acompanhamento de devoluções</div></div>'
             '<div class="login-feature"><div class="login-feature-icon">📊</div><div>Informações de valores</div></div>'
             '<div class="login-panel-bottom">Tenha as informações de forma rápida, organizada e centralizada.</div>'
             '<div class="login-visual">'
-            '<div class="login-package">'
-            '<div class="login-package-label">'
-            '<div class="brand">loggi</div>'
-            '<div class="code"></div>'
-            '</div>'
-            '</div>'
+            '<div class="login-box one"></div>'
+            '<div class="login-box two"></div>'
             '<div class="login-visual-label">LOGGI · LEVES</div>'
             '</div>'
             '</div>',
