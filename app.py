@@ -52,48 +52,110 @@ def tela_login():
     st.markdown(
         """
         <style>
-        /* ===== LOGIN ===== */
+        /* ============================================================
+           LOGIN — PORTAL LEVES
+           ============================================================ */
 
-        /* Fundo mais clean */
         [data-testid="stAppViewContainer"] {
             background: #f7f9fc;
         }
 
-        /* Remove o excesso de espaço lateral criado pelo CSS global */
         [data-testid="stAppViewBlockContainer"] {
-            padding-left: 20px !important;
-            padding-right: 20px !important;
-            padding-top: 2.5rem !important;
-            padding-bottom: 2rem !important;
-            max-width: 100% !important;
+            max-width: 1220px !important;
+            padding: 2.5rem 30px 2rem 30px !important;
         }
 
-        /* Esconde a barra de ferramentas do Streamlit na tela de login */
         [data-testid="stToolbar"] {
             display: none !important;
         }
 
-        /* Coluna central */
-        [data-testid="column"]:has([data-testid="stForm"]) {
-            max-width: 440px !important;
-            margin: 0 auto !important;
+        /* Espaçamento das duas áreas principais */
+        div[data-testid="stHorizontalBlock"] {
+            gap: 55px !important;
+            align-items: stretch !important;
         }
 
-        /* Logo */
+        /* ============================================================
+           PAINEL ESQUERDO
+           ============================================================ */
+
+        div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:first-child {
+            background: #eef6ff !important;
+            border-radius: 28px !important;
+            padding: 48px 50px !important;
+            min-height: 610px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+        }
+
+        div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:first-child h2 {
+            color: #172033 !important;
+            font-family: Montserrat, sans-serif !important;
+            font-size: 42px !important;
+            line-height: 1.08 !important;
+            font-weight: 800 !important;
+            letter-spacing: -1.5px !important;
+            margin-top: 12px !important;
+            margin-bottom: 18px !important;
+        }
+
+        div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:first-child p {
+            color: #5b6472 !important;
+            font-family: Montserrat, sans-serif !important;
+            font-size: 16px !important;
+            line-height: 1.65 !important;
+        }
+
+        div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:first-child li {
+            color: #374151 !important;
+            font-family: Montserrat, sans-serif !important;
+            font-size: 15px !important;
+            line-height: 1.8 !important;
+            margin-bottom: 6px !important;
+        }
+
+        .login-left-badge {
+            color: #0067fc;
+            font-family: Montserrat, sans-serif;
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .login-left-bottom {
+            color: #7b8492;
+            font-family: Montserrat, sans-serif;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-top: 12px;
+        }
+
+        /* ============================================================
+           PAINEL DIREITO
+           ============================================================ */
+
+        div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
+            padding: 30px 35px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+        }
+
         .login-logo {
             text-align: center;
-            margin: 0 auto 6px auto;
+            margin: 0 auto 5px auto;
         }
 
         .login-logo img {
             display: block;
-            width: 155px;
+            width: 145px;
             max-width: 70%;
             height: auto;
             margin: 0 auto;
         }
 
-        /* Título */
         .login-title {
             text-align: center;
             color: #0067fc;
@@ -106,27 +168,28 @@ def tela_login():
             text-transform: uppercase;
         }
 
-        /* Descrição */
         .login-description {
             text-align: center;
             color: #6b7280;
             font-family: Montserrat, sans-serif;
             font-size: 14px;
             line-height: 1.5;
-            max-width: 360px;
+            max-width: 390px;
             margin: 0 auto 22px auto;
         }
 
-        /* Formulário/card */
+        /* ============================================================
+           FORMULÁRIO
+           ============================================================ */
+
         [data-testid="stForm"] {
             background: #ffffff !important;
             border: 1px solid #e1e5eb !important;
-            border-radius: 16px !important;
-            padding: 25px 26px 22px 26px !important;
-            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.07) !important;
+            border-radius: 18px !important;
+            padding: 27px 28px 23px 28px !important;
+            box-shadow: 0 12px 35px rgba(15, 23, 42, 0.08) !important;
         }
 
-        /* Labels */
         [data-testid="stForm"] label {
             color: #374151 !important;
             font-family: Montserrat, sans-serif !important;
@@ -134,7 +197,6 @@ def tela_login():
             font-weight: 600 !important;
         }
 
-        /* Inputs */
         [data-testid="stForm"] input {
             border-radius: 10px !important;
             border: 1px solid #d8dee8 !important;
@@ -148,12 +210,10 @@ def tela_login():
             box-shadow: 0 0 0 2px rgba(0, 103, 252, 0.10) !important;
         }
 
-        /* Espaçamento entre campos */
         [data-testid="stForm"] [data-testid="stTextInput"] {
             margin-bottom: 5px !important;
         }
 
-        /* Botão Entrar */
         [data-testid="stFormSubmitButton"] button {
             width: 100% !important;
             min-height: 46px !important;
@@ -174,19 +234,20 @@ def tela_login():
             box-shadow: 0 6px 16px rgba(0, 103, 252, 0.20) !important;
         }
 
-        /* Mensagens de erro */
         [data-testid="stAlert"] {
             border-radius: 10px !important;
             font-family: Montserrat, sans-serif !important;
             font-size: 13px !important;
         }
 
-        /* Manual */
+        /* ============================================================
+           MANUAL
+           ============================================================ */
+
         .login-manual {
             margin-top: 14px;
         }
 
-        /* Botão do manual */
         [data-testid="stDownloadButton"] button {
             border: 1px solid #e1e5eb !important;
             border-radius: 12px !important;
@@ -203,7 +264,10 @@ def tela_login():
             color: #0067fc !important;
         }
 
-        /* Título da área de ajuda */
+        /* ============================================================
+           SUPORTE E RODAPÉ
+           ============================================================ */
+
         .login-help-title {
             text-align: center;
             color: #9ca3af;
@@ -212,7 +276,6 @@ def tela_login():
             margin: 18px 0 8px 0;
         }
 
-        /* Expander do suporte */
         [data-testid="stExpander"] {
             border: 1px solid #e1e5eb !important;
             border-radius: 12px !important;
@@ -227,7 +290,6 @@ def tela_login():
             color: #374151 !important;
         }
 
-        /* Rodapé */
         .login-footer {
             text-align: center;
             color: #a1a8b3;
@@ -236,12 +298,45 @@ def tela_login():
             margin-top: 20px;
         }
 
-        /* Responsivo */
-        @media (max-width: 600px) {
+        /* ============================================================
+           RESPONSIVO
+           ============================================================ */
+
+        @media (max-width: 900px) {
             [data-testid="stAppViewBlockContainer"] {
-                padding-top: 1.5rem !important;
-                padding-left: 14px !important;
-                padding-right: 14px !important;
+                padding: 1.5rem 18px 2rem 18px !important;
+            }
+
+            div[data-testid="stHorizontalBlock"] {
+                gap: 25px !important;
+            }
+
+            div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:first-child {
+                min-height: auto !important;
+                padding: 35px 30px !important;
+            }
+
+            div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:first-child h2 {
+                font-size: 34px !important;
+            }
+
+            div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
+                padding: 20px 10px !important;
+            }
+        }
+
+        @media (max-width: 700px) {
+            div[data-testid="stHorizontalBlock"] {
+                flex-direction: column !important;
+            }
+
+            div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:first-child {
+                display: none !important;
+            }
+
+            div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
+                width: 100% !important;
+                padding: 15px 5px !important;
             }
 
             [data-testid="stForm"] {
@@ -249,7 +344,7 @@ def tela_login():
             }
 
             .login-title {
-                font-size: 21px;
+                font-size: 21px !important;
             }
         }
         </style>
@@ -257,11 +352,57 @@ def tela_login():
         unsafe_allow_html=True,
     )
 
-    _, col, _ = st.columns([1, 1.1, 1])
+    # -----------------------------------------------------------------------
+    # Layout principal: apresentação + login
+    # -----------------------------------------------------------------------
 
-    with col:
+    col_left, col_right = st.columns([1.15, 0.85], gap="large")
+
+    # =======================================================================
+    # LADO ESQUERDO
+    # =======================================================================
+
+    with col_left:
+        st.markdown(
+            '<div class="login-left-badge">📦 PORTAL LEVES</div>',
+            unsafe_allow_html=True,
+        )
+
+        st.markdown("## Gestão de **insumos** mais simples.")
+
+        st.write(
+            "Consulte, acompanhe e gerencie os insumos enviados "
+            "para sua operação em um único lugar."
+        )
+
+        st.markdown("")
+
+        st.markdown(
+            """
+            - 📦 **Controle de insumos**
+            - ↩️ **Acompanhamento de devoluções**
+            - 📊 **Informações da operação**
+            """
+        )
+
+        st.markdown("")
+
+        st.markdown(
+            '<div class="login-left-bottom">'
+            "Tenha as informações da operação de forma rápida, "
+            "organizada e centralizada."
+            "</div>",
+            unsafe_allow_html=True,
+        )
+
+    # =======================================================================
+    # LADO DIREITO — LOGIN
+    # =======================================================================
+
+    with col_right:
         base = os.path.dirname(os.path.abspath(__file__))
         caminho_logo = os.path.join(base, LOGO_LOGIN_PATH)
+
         logo_base64 = (
             get_base64_image(caminho_logo)
             if os.path.exists(caminho_logo)
@@ -271,54 +412,47 @@ def tela_login():
         # Logo + título
         if logo_base64:
             st.markdown(
-                f"""
-                <div class="login-logo">
-                    <img src="data:image/png;base64,{logo_base64}">
-                </div>
-                <div class="login-title">Portal LEVES</div>
-                """,
+                f'<div class="login-logo">'
+                f'<img src="data:image/png;base64,{logo_base64}">'
+                f'</div>'
+                f'<div class="login-title">Portal LEVES</div>',
                 unsafe_allow_html=True,
             )
         else:
             st.markdown(
-                """
-                <div class="login-logo">
-                    <div style="
-                        color:#0067fc;
-                        font-size:36px;
-                        font-weight:800;
-                        font-family:Montserrat,sans-serif;
-                    ">loggi</div>
-                </div>
-                <div class="login-title">Portal LEVES</div>
-                """,
+                '<div class="login-logo">'
+                '<div style="color:#0067fc;font-size:36px;font-weight:800;'
+                'font-family:Montserrat,sans-serif;">loggi</div>'
+                '</div>'
+                '<div class="login-title">Portal LEVES</div>',
                 unsafe_allow_html=True,
             )
 
         st.markdown(
-            """
-            <div class="login-description">
-                Acesse o portal para consultar os ativos
-                enviados para sua operação.
-            </div>
-            """,
+            '<div class="login-description">'
+            "Acesse sua conta para consultar os insumos da sua operação."
+            "</div>",
             unsafe_allow_html=True,
         )
 
         if st.session_state["tentativas"] >= 5:
-            st.error("Muitas tentativas. Recarregue a página e tente novamente.")
+            st.error(
+                "Muitas tentativas. Recarregue a página e tente novamente."
+            )
 
-        # Login — a lógica de autenticação permanece exatamente igual.
+        # Login — lógica de autenticação original preservada.
         with st.form("login"):
             usuario = st.text_input(
                 "Usuário",
                 placeholder="Digite seu usuário",
             )
+
             senha = st.text_input(
                 "Senha",
                 type="password",
                 placeholder="Digite sua senha",
             )
+
             entrar = st.form_submit_button(
                 "Entrar",
                 type="primary",
@@ -358,12 +492,9 @@ def tela_login():
         with st.expander("💬 Falar com o suporte"):
             contato.form_contato(key="login")
 
+        # Rodapé
         st.markdown(
-            """
-            <div class="login-footer">
-                Portal LEVES · Loggi
-            </div>
-            """,
+            '<div class="login-footer">Portal LEVES · Loggi</div>',
             unsafe_allow_html=True,
         )
 
