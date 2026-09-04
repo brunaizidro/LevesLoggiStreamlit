@@ -276,6 +276,20 @@ div[data-testid="column"]:nth-child(2) > div {
     font-family: Montserrat, sans-serif;
 }
 
+.login-brand-block {
+    width: 100%;
+    text-align: center;
+    margin: 0 auto 1px auto;
+}
+
+.login-brand-block .login-logo {
+    margin-bottom: 1px;
+}
+
+.login-brand-block .login-title {
+    margin-top: 0;
+}
+
 .login-logo {
     text-align: center;
     margin: 0 auto 5px auto;
@@ -283,8 +297,8 @@ div[data-testid="column"]:nth-child(2) > div {
 
 .login-logo img {
     display: block;
-    width: 150px;
-    max-width: 75%;
+    width: 128px;
+    max-width: 70%;
     height: auto;
     margin: 0 auto;
 }
@@ -293,11 +307,11 @@ div[data-testid="column"]:nth-child(2) > div {
     text-align: center;
     color: #0067fc;
     font-family: Montserrat, sans-serif;
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 800;
-    letter-spacing: 2px;
+    letter-spacing: 1.8px;
     line-height: 1.2;
-    margin: 4px 0 8px 0;
+    margin: 3px 0 6px 0;
     text-transform: uppercase;
 }
 
@@ -305,10 +319,10 @@ div[data-testid="column"]:nth-child(2) > div {
     text-align: center;
     color: #788292;
     font-family: Montserrat, sans-serif;
-    font-size: 14px;
-    line-height: 1.5;
-    max-width: 390px;
-    margin: 0 auto 23px auto;
+    font-size: 13px;
+    line-height: 1.45;
+    max-width: 360px;
+    margin: 2px auto 18px auto;
 }
 
 /* Card do login */
@@ -316,7 +330,7 @@ div[data-testid="column"]:nth-child(2) > div {
     background: #ffffff !important;
     border: 1px solid #e0e5ec !important;
     border-radius: 18px !important;
-    padding: 28px 30px 24px 30px !important;
+    padding: 26px 28px 22px 28px !important;
     box-shadow: 0 14px 38px rgba(15, 23, 42, 0.08) !important;
 }
 
@@ -342,8 +356,8 @@ div[data-testid="column"]:nth-child(2) > div {
 
 [data-testid="stFormSubmitButton"] button {
     width: 100% !important;
-    min-height: 47px !important;
-    margin-top: 9px !important;
+    min-height: 46px !important;
+    margin-top: 8px !important;
     border-radius: 10px !important;
     border: 0 !important;
     background: #0067fc !important;
@@ -366,7 +380,7 @@ div[data-testid="column"]:nth-child(2) > div {
 
 /* Manual */
 .login-manual {
-    margin-top: 14px;
+    margin-top: 12px;
 }
 
 [data-testid="stDownloadButton"] button {
@@ -391,7 +405,7 @@ div[data-testid="column"]:nth-child(2) > div {
     color: #a0a8b5;
     font-family: Montserrat, sans-serif;
     font-size: 12px;
-    margin: 19px 0 8px 0;
+    margin: 16px 0 7px 0;
 }
 
 [data-testid="stExpander"] {
@@ -413,7 +427,7 @@ div[data-testid="column"]:nth-child(2) > div {
     color: #a5adba;
     font-family: Montserrat, sans-serif;
     font-size: 11px;
-    margin-top: 19px;
+    margin-top: 16px;
 }
 
 /* ============================================================
@@ -472,12 +486,12 @@ div[data-testid="column"]:nth-child(2) > div {
         st.markdown(
             '<div class="login-panel">'
             '<div class="login-panel-badge">📦 PORTAL LEVES</div>'
-            '<div class="login-panel-title">Gestão de <span>Insumos</span></div>'
+            '<div class="login-panel-title">Gestão de <span>insumos</span> mais simples.</div>'
             '<div class="login-panel-text">Consulte, acompanhe e gerencie os insumos enviados para sua operação em um único lugar.</div>'
             '<div class="login-feature"><div class="login-feature-icon">📦</div><div>Controle de insumos</div></div>'
             '<div class="login-feature"><div class="login-feature-icon">↩️</div><div>Acompanhamento de devoluções</div></div>'
-            '<div class="login-feature"><div class="login-feature-icon">📊</div><div>Informações de descontos</div></div>'
-            '<div class="login-panel-bottom">Tenha as informações de forma rápida, organizada e centralizada.</div>'
+            '<div class="login-feature"><div class="login-feature-icon">📊</div><div>Informações da operação</div></div>'
+            '<div class="login-panel-bottom">Tenha as informações da operação de forma rápida, organizada e centralizada.</div>'
             '<div class="login-visual">'
             '<div class="login-box one"></div>'
             '<div class="login-box two"></div>'
@@ -504,19 +518,23 @@ div[data-testid="column"]:nth-child(2) > div {
 
         if logo_base64:
             st.markdown(
+                f'<div class="login-brand-block">'
                 f'<div class="login-logo">'
                 f'<img src="data:image/png;base64,{logo_base64}">'
                 f'</div>'
-                f'<div class="login-title">Portal LEVES</div>',
+                f'<div class="login-title">Portal LEVES</div>'
+                f'</div>',
                 unsafe_allow_html=True,
             )
         else:
             st.markdown(
+                '<div class="login-brand-block">'
                 '<div class="login-logo">'
-                '<div style="color:#0067fc;font-size:36px;font-weight:800;'
+                '<div style="color:#0067fc;font-size:32px;font-weight:800;'
                 'font-family:Montserrat,sans-serif;">loggi</div>'
                 '</div>'
-                '<div class="login-title">Portal LEVES</div>',
+                '<div class="login-title">Portal LEVES</div>'
+                '</div>',
                 unsafe_allow_html=True,
             )
 
