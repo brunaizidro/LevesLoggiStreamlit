@@ -37,14 +37,391 @@ from page_9 import page_9  # noqa: E402
 def _init_state():
     st.session_state.setdefault("usuario", None)
     st.session_state.setdefault("tentativas", 0)
+    st.session_state.setdefault("recuperacao", False)
 
 
 def logout():
     st.session_state["usuario"] = None
     st.session_state["tentativas"] = 0
+    st.session_state["recuperacao"] = False
 
+
+
+def tela_primeiro_acesso():
+    """Tela obrigatória para criação da senha definitiva no primeiro acesso."""
+    user = st.session_state.get("usuario")
+
+    if not user:
+        return
+
+    st.markdown(
+        """
+        <style>
+        .first-access-title {
+            text-align: center;
+            color: #172033;
+            font-family: Montserrat, sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            margin: 8px 0 8px 0;
+        }
+
+        .first-access-description {
+            text-align: center;
+            color: #788292;
+            font-family: Montserrat, sans-serif;
+            font-size: 13px;
+            line-height: 1.5;
+            max-width: 390px;
+            margin: 0 auto 20px auto;
+        }
+
+        .first-access-info {
+            background: #eef6ff;
+            border: 1px solid #dcecff;
+            border-radius: 12px;
+            padding: 13px 15px;
+            color: #566172;
+            font-family: Montserrat, sans-serif;
+            font-size: 12px;
+            line-height: 1.55;
+            margin-bottom: 18px;
+        }
+
+        .first-access-user {
+            text-align: center;
+            color: #0067fc;
+            font-family: Montserrat, sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    col_left, col_right = st.columns(
+        [1.05, 0.95],
+        gap="large",
+        vertical_alignment="center",
+    )
+
+    with col_left:
+        st.markdown(
+            '<div class="login-panel">'
+            '<div class="login-panel-badge">📦 PORTAL LEVES</div>'
+            '<div class="login-panel-title">Primeiro <span>acesso</span></div>'
+            '<div class="login-panel-text">'
+            'Para proteger sua conta, crie uma senha pessoal antes de acessar o portal.'
+            '</div>'
+            '<div class="login-feature"><div class="login-feature-icon">🔐</div>'
+            '<div>Senha pessoal e exclusiva</div></div>'
+            '<div class="login-feature"><div class="login-feature-icon">🛡️</div>'
+            '<div>Mais segurança para sua conta</div></div>'
+            '<div class="login-feature"><div class="login-feature-icon">📦</div>'
+            '<div>Acesso aos seus insumos</div></div>'
+            '</div>',
+            unsafe_allow_html=True,
+        )
+
+    with col_right:
+        st.markdown('<div class="login-right">', unsafe_allow_html=True)
+
+        base = os.path.dirname(os.path.abspath(__file__))
+        caminho_logo = os.path.join(base, LOGO_LOGIN_PATH)
+
+        logo_base64 = (
+            get_base64_image(caminho_logo)
+            if os.path.exists(caminho_logo)
+            else ""
+        )
+
+        if logo_base64:
+            st.markdown(
+                f'<div class="login-floating-logo">'
+                f'<img src="data:image/png;base64,{logo_base64}">'
+                f'</div>',
+                unsafe_allow_html=True,
+            )
+        else:
+            st.markdown(
+                '<div class="login-floating-logo">'
+                '<div style="color:#0067fc;font-size:32px;font-weight:800;'
+                'font-family:Montserrat,sans-serif;">loggi</div>'
+                '</div>',
+                unsafe_allow_html=True,
+            )
+
+        st.markdown(
+            '<div class="login-title">Portal LEVES</div>',
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            '<div class="first-access-title">Crie sua nova senha</div>',
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            '<div class="first-access-description">'
+            'A senha temporária usada no primeiro acesso deixará de funcionar '
+            'depois que você cadastrar sua nova senha.'
+            '</div>',
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            f'<div class="first-access-user">'
+            f'Usuário: {user.get("usuario", "")}'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            '<div class="first-access-info">'
+            '<strong>Requisitos:</strong><br>'
+            '• Mínimo de 6 caracteres<br>'
+            '• A confirmação precisa ser igual à nova senha'
+            '</div>',
+            unsafe_allow_html=True,
+        )
+
+        with st.form("primeiro_acesso"):
+            nova_senha = st.text_input(
+                "Nova senha",
+                type="password",
+                placeholder="Digite sua nova senha",
+            )
+
+            confirmar_senha = st.text_input(
+                "Confirmar nova senha",
+                type="password",
+                placeholder="Digite novamente sua nova senha",
+            )
+
+            salvar = st.form_submit_button(
+                "Criar nova senha",
+                type="primary",
+                width="stretch",
+            )
+
+        if salvar:
+            if not nova_senha:
+                st.error("Digite uma nova senha.")
+                return
+
+            if len(nova_senha) < 6:
+                st.error("A senha deve ter pelo menos 6 caracteres.")
+                return
+
+            if nova_senha != confirmar_senha:
+                st.error("As senhas não são iguais.")
+                return
+
+            try:
+                ok, mensagem = auth.alterar_senha(
+                    user["usuario"],
+                    nova_senha,
+                )
+            except Exception as e:  # noqa: BLE001
+                st.error(f"Erro ao alterar a senha: {e}")
+                return
+
+            if ok:
+                novo_usuario = auth.buscar_usuario(user["usuario"])
+
+                if not novo_usuario:
+                    st.error(
+                        "A senha foi alterada, mas não foi possível "
+                        "atualizar sua sessão. Faça o login novamente."
+                    )
+                    logout()
+                    return
+
+                st.session_state["usuario"] = novo_usuario
+                st.session_state["tentativas"] = 0
+
+                st.success(
+                    "Senha criada com sucesso! Seu acesso foi liberado."
+                )
+                st.rerun()
+            else:
+                st.error(mensagem)
+
+        st.markdown(
+            '<div class="login-footer">Portal LEVES · Loggi</div>',
+            unsafe_allow_html=True,
+        )
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
+
+def tela_recuperacao_senha():
+    """Fluxo de recuperação de senha por código enviado ao e-mail cadastrado."""
+    st.markdown(
+        """
+        <style>
+        .recovery-title {
+            text-align: center;
+            color: #172033;
+            font-family: Montserrat, sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            margin: 8px 0 8px 0;
+        }
+        .recovery-description {
+            text-align: center;
+            color: #788292;
+            font-family: Montserrat, sans-serif;
+            font-size: 13px;
+            line-height: 1.5;
+            max-width: 390px;
+            margin: 0 auto 20px auto;
+        }
+        .recovery-info {
+            background: #eef6ff;
+            border: 1px solid #dcecff;
+            border-radius: 12px;
+            padding: 13px 15px;
+            color: #566172;
+            font-family: Montserrat, sans-serif;
+            font-size: 12px;
+            line-height: 1.55;
+            margin-bottom: 18px;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    col_left, col_right = st.columns(
+        [1.05, 0.95],
+        gap="large",
+        vertical_alignment="center",
+    )
+
+    with col_left:
+        st.markdown(
+            '<div class="login-panel">'
+            '<div class="login-panel-badge">📦 PORTAL LEVES</div>'
+            '<div class="login-panel-title">Recuperar <span>senha</span></div>'
+            '<div class="login-panel-text">'
+            'Recupere o acesso à sua conta usando o e-mail cadastrado no portal.'
+            '</div>'
+            '<div class="login-feature"><div class="login-feature-icon">📧</div>'
+            '<div>Código enviado por e-mail</div></div>'
+            '<div class="login-feature"><div class="login-feature-icon">⏱️</div>'
+            '<div>Código válido por 15 minutos</div></div>'
+            '<div class="login-feature"><div class="login-feature-icon">🔐</div>'
+            '<div>Crie uma nova senha pessoal</div></div>'
+            '</div>',
+            unsafe_allow_html=True,
+        )
+
+    with col_right:
+        st.markdown('<div class="login-right">', unsafe_allow_html=True)
+
+        base = os.path.dirname(os.path.abspath(__file__))
+        caminho_logo = os.path.join(base, LOGO_LOGIN_PATH)
+        logo_base64 = (
+            get_base64_image(caminho_logo)
+            if os.path.exists(caminho_logo)
+            else ""
+        )
+        if logo_base64:
+            st.markdown(
+                f'<div class="login-floating-logo"><img src="data:image/png;base64,{logo_base64}"></div>',
+                unsafe_allow_html=True,
+            )
+
+        st.markdown('<div class="recovery-title">Esqueci minha senha</div>', unsafe_allow_html=True)
+        st.markdown(
+            '<div class="recovery-description">Informe seu usuário para receber um código de recuperação no e-mail cadastrado.</div>',
+            unsafe_allow_html=True,
+        )
+
+        etapa = st.session_state.get("recuperacao_etapa", "solicitar")
+        usuario_rec = st.session_state.get("recuperacao_usuario", "")
+
+        if etapa == "solicitar":
+            with st.form("recuperar_senha_form"):
+                usuario = st.text_input("Usuário", placeholder="Digite seu usuário")
+                enviar = st.form_submit_button(
+                    "Enviar código por e-mail",
+                    type="primary",
+                    width="stretch",
+                )
+
+            if enviar:
+                usuario = (usuario or "").strip().lower()
+                if not usuario:
+                    st.error("Informe seu usuário.")
+                else:
+                    try:
+                        _, mensagem = auth.solicitar_recuperacao(usuario)
+                        st.session_state["recuperacao_usuario"] = usuario
+                        st.session_state["recuperacao_etapa"] = "codigo"
+                        st.success(mensagem)
+                        st.rerun()
+                    except Exception as e:  # noqa: BLE001
+                        st.error(f"Não foi possível enviar o código de recuperação: {e}")
+
+        else:
+            st.markdown(
+                '<div class="recovery-info">'
+                'Digite o código de 6 dígitos enviado para o e-mail cadastrado e escolha sua nova senha.'
+                '</div>',
+                unsafe_allow_html=True,
+            )
+
+            with st.form("redefinir_senha_form"):
+                codigo = st.text_input("Código de recuperação", max_chars=6, placeholder="000000")
+                nova_senha = st.text_input("Nova senha", type="password", placeholder="Mínimo de 6 caracteres")
+                confirmar = st.text_input("Confirmar nova senha", type="password", placeholder="Repita a nova senha")
+                redefinir = st.form_submit_button(
+                    "Redefinir senha",
+                    type="primary",
+                    width="stretch",
+                )
+
+            if redefinir:
+                if nova_senha != confirmar:
+                    st.error("As senhas não coincidem.")
+                else:
+                    try:
+                        ok, mensagem = auth.redefinir_senha_com_codigo(
+                            usuario_rec,
+                            codigo,
+                            nova_senha,
+                        )
+                        if ok:
+                            st.success(mensagem)
+                            st.session_state["recuperacao"] = False
+                            st.session_state["recuperacao_etapa"] = "solicitar"
+                            st.session_state["recuperacao_usuario"] = ""
+                            st.session_state["tentativas"] = 0
+                            st.session_state["mensagem_login"] = "Senha redefinida com sucesso. Faça login com sua nova senha."
+                            st.rerun()
+                        else:
+                            st.error(mensagem)
+                    except Exception as e:  # noqa: BLE001
+                        st.error(f"Não foi possível redefinir a senha: {e}")
+
+            if st.button("← Voltar para o login", width="stretch"):
+                st.session_state["recuperacao"] = False
+                st.session_state["recuperacao_etapa"] = "solicitar"
+                st.session_state["recuperacao_usuario"] = ""
+                st.rerun()
+
+        st.markdown('<div class="login-footer">Portal LEVES · Loggi</div>', unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
 
 def tela_login():
+    if st.session_state.get("recuperacao", False):
+        tela_recuperacao_senha()
+        return
+
     # -----------------------------------------------------------------------
     # CSS exclusivo da tela de login.
     # O restante do portal continua usando o PageStyler normalmente.
@@ -603,6 +980,16 @@ div[data-testid="column"]:nth-child(2) > div {
                 st.session_state["tentativas"] += 1
                 st.error("Usuário ou senha inválidos.")
 
+        mensagem_login = st.session_state.pop("mensagem_login", None)
+        if mensagem_login:
+            st.success(mensagem_login)
+
+        if st.button("Esqueci minha senha", width="stretch"):
+            st.session_state["recuperacao"] = True
+            st.session_state["recuperacao_etapa"] = "solicitar"
+            st.session_state["recuperacao_usuario"] = ""
+            st.rerun()
+
         if manual.disponivel():
             st.markdown(
                 '<div class="login-manual">',
@@ -640,6 +1027,13 @@ def main():
         return
 
     user = st.session_state["usuario"]
+
+    # Primeiro acesso: o usuário deve criar sua senha pessoal
+    # antes de acessar qualquer funcionalidade do portal.
+    if user.get("primeiro_acesso", False):
+        tela_primeiro_acesso()
+        return
+
     perfil = user.get("perfil")
     eh_admin = perfil == "admin"
     eh_receb = perfil == "recebimento"
