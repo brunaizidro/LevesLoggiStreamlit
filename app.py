@@ -661,19 +661,20 @@ div[data-testid="column"]:nth-child(2) > div {
 
 .login-floating-logo {
     position: fixed;
-    top: 28px !important;
-    right: 38px !important;
+    top: 22px !important;
+    right: 30px !important;
     z-index: 1000;
-    width: 128px;
+    width: 90px !important;
+    max-width: 90px !important;
     text-align: center;
 }
 
 .login-floating-logo img {
-    display: block;
-    width: 128px;
-    max-width: 100%;
-    height: auto;
-    margin: 0;
+    display: block !important;
+    width: 90px !important;
+    max-width: 90px !important;
+    height: auto !important;
+    margin: 0 !important;
 }
 
 .login-logo {
