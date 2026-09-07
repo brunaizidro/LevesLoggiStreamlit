@@ -29,7 +29,20 @@ ABA_COBRANCAS = "Cobrancas"
 ABA_CONFIG = "Config"
 
 CAB_ENVIOS = ["DATA", "tipo", "destino", "total"]
-CAB_USUARIOS = ["usuario", "senha_hash", "salt", "destino", "nome", "perfil", "ativo", "criado_em", "email"]
+CAB_USUARIOS = [
+    "usuario",
+    "senha_hash",
+    "salt",
+    "destino",
+    "nome",
+    "perfil",
+    "ativo",
+    "criado_em",
+    "email",
+    "primeiro_acesso",
+    "codigo_recuperacao_hash",
+    "codigo_expira_em",
+]
 CAB_CONFIG = ["chave", "valor"]
 CAB_DEVOLUCOES = [
     "id", "token", "data_criacao", "usuario", "destino", "status",
@@ -165,7 +178,7 @@ def ler_usuarios() -> list[dict]:
     for i, row in enumerate(valores):
         if i == 0 or not any(row):
             continue
-        row = (row + [""] * 9)[:9]
+        row = (row + [""] * 12)[:12]
         linhas.append(
             {
                 "linha": i + 1,
@@ -177,6 +190,11 @@ def ler_usuarios() -> list[dict]:
                 "perfil": (str(row[5]).strip().lower() or "operacao"),
                 "ativo": str(row[6]).strip().lower() in ("true", "1", "sim", "verdadeiro"),
                 "email": str(row[8]).strip(),
+                "primeiro_acesso": str(row[9]).strip().lower() in (
+                    "true", "1", "sim", "verdadeiro"
+                ),
+                "codigo_recuperacao_hash": str(row[10]).strip(),
+                "codigo_expira_em": str(row[11]).strip(),
             }
         )
     return linhas
@@ -368,8 +386,20 @@ def limpar_cache():
 def inserir_usuario(usuario, senha_hash, salt, destino, nome, perfil, ativo=True, email=""):
     ws = _aba(ABA_USUARIOS, CAB_USUARIOS)
     ws.append_row(
-        [usuario, senha_hash, salt, destino, nome, perfil, "TRUE" if ativo else "FALSE",
-         datetime.now().strftime("%Y-%m-%d %H:%M:%S"), email],
+        [
+            usuario,
+            senha_hash,
+            salt,
+            destino,
+            nome,
+            perfil,
+            "TRUE" if ativo else "FALSE",
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            email,
+            "TRUE",
+            "",
+            "",
+        ],
         value_input_option="USER_ENTERED",
     )
     limpar_cache()
@@ -388,4 +418,28 @@ def definir_ativo(linha: int, ativo: bool):
     """Atualiza a coluna 'ativo' (7ª) de uma linha específica."""
     ws = _aba(ABA_USUARIOS, CAB_USUARIOS)
     ws.update_cell(linha, 7, "TRUE" if ativo else "FALSE")
+    limpar_cache()
+
+def atualizar_senha_usuario(linha: int, senha_hash: str, salt: str):
+    """Atualiza hash, salt e marca o primeiro acesso como concluído."""
+    ws = _aba(ABA_USUARIOS, CAB_USUARIOS)
+    ws.update_cell(linha, 2, senha_hash)
+    ws.update_cell(linha, 3, salt)
+    ws.update_cell(linha, 10, "FALSE")
+    limpar_cache()
+
+
+def salvar_codigo_recuperacao(linha: int, codigo_hash: str, expira_em: str):
+    """Salva o hash do código de recuperação e sua validade."""
+    ws = _aba(ABA_USUARIOS, CAB_USUARIOS)
+    ws.update_cell(linha, 11, codigo_hash)
+    ws.update_cell(linha, 12, expira_em)
+    limpar_cache()
+
+
+def limpar_codigo_recuperacao(linha: int):
+    """Invalida o código de recuperação usado/expirado."""
+    ws = _aba(ABA_USUARIOS, CAB_USUARIOS)
+    ws.update_cell(linha, 11, "")
+    ws.update_cell(linha, 12, "")
     limpar_cache()
