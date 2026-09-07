@@ -19,14 +19,8 @@ class PageStyler:
             """
             <link rel="preconnect" href="https://fonts.googleapis.com">
             <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-            <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap"
-                  rel="stylesheet">
+            <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
             <style>
-            /* ============================================================
-               PORTAL LEVES — PADRÃO VISUAL GLOBAL V8
-               Baseado no layout aprovado da página de Envios V7.
-               ============================================================ */
-
             :root {
                 --leves-azul: #0067fc;
                 --leves-fundo: #f7f9fc;
@@ -56,7 +50,6 @@ class PageStyler:
                 padding-right: 50px !important;
             }
 
-            /* Tipografia */
             body, p, li, span, input, textarea, label, small,
             button, select, [data-baseweb], [data-testid="stMarkdownContainer"] {
                 font-family: Montserrat, sans-serif !important;
@@ -67,7 +60,6 @@ class PageStyler:
                 color: var(--leves-cinza);
             }
 
-            /* Título padrão das páginas */
             h2, .stSubheader {
                 color: var(--leves-texto) !important;
                 font-family: Montserrat, sans-serif !important;
@@ -110,12 +102,10 @@ class PageStyler:
                 margin: 4px 0 10px 0 !important;
             }
 
-            /* Espaçamento dos blocos */
             div[data-testid="stHorizontalBlock"] {
                 gap: 16px;
             }
 
-            /* Inputs */
             [data-baseweb="input"] > div,
             [data-baseweb="textarea"] > div,
             [data-baseweb="select"] > div {
@@ -144,7 +134,6 @@ class PageStyler:
                 font-weight: 600 !important;
             }
 
-            /* Botões */
             [data-testid="stButton"] button,
             [data-testid="stDownloadButton"] button,
             [data-testid="stFormSubmitButton"] button {
@@ -160,7 +149,6 @@ class PageStyler:
                 border-color: var(--leves-azul) !important;
             }
 
-            /* Cards nativos: st.container(border=True) */
             [data-testid="stVerticalBlockBorderWrapper"] {
                 background: #ffffff !important;
                 border: 1px solid var(--leves-borda) !important;
@@ -168,7 +156,6 @@ class PageStyler:
                 box-shadow: 0 5px 18px rgba(23, 32, 51, .035) !important;
             }
 
-            /* Formulários */
             [data-testid="stForm"] {
                 background: #ffffff !important;
                 border: 1px solid var(--leves-borda) !important;
@@ -177,7 +164,6 @@ class PageStyler:
                 box-shadow: 0 5px 18px rgba(23, 32, 51, .035) !important;
             }
 
-            /* Expander */
             [data-testid="stExpander"] {
                 border: 1px solid var(--leves-borda) !important;
                 border-radius: 14px !important;
@@ -191,7 +177,6 @@ class PageStyler:
                 font-weight: 700 !important;
             }
 
-            /* Métricas nativas */
             [data-testid="stMetric"] {
                 background: #ffffff !important;
                 border: 1px solid var(--leves-borda) !important;
@@ -219,7 +204,6 @@ class PageStyler:
                 font-size: 10px !important;
             }
 
-            /* Tabelas */
             [data-testid="stDataFrame"] {
                 border: 1px solid var(--leves-borda) !important;
                 border-radius: 14px !important;
@@ -227,32 +211,27 @@ class PageStyler:
                 background: #ffffff !important;
             }
 
-            /* Alertas */
             [data-testid="stAlert"] {
                 border-radius: 12px !important;
                 font-family: Montserrat, sans-serif !important;
             }
 
-            /* Divisores */
             hr {
                 border-color: var(--leves-borda) !important;
             }
 
-            /* Upload */
             [data-testid="stFileUploader"] section {
                 border: 1px dashed #cfd8e5 !important;
                 border-radius: 12px !important;
                 background: #ffffff !important;
             }
 
-            /* Checkbox */
             [data-testid="stCheckbox"] label p {
                 color: #536074 !important;
                 font-size: 13px !important;
                 font-weight: 500 !important;
             }
 
-            /* Sidebar permanece com a identidade azul */
             [data-testid="stSidebar"] {
                 background-color: var(--leves-azul) !important;
             }
@@ -278,7 +257,7 @@ class PageStyler:
             </style>
             """
         )
-        st.markdown(css, unsafe_allow_html=True)
+        st.html(css)
 
     def apply_sidebar_css(self, image_base64):
         """Mantém a assinatura usada pelo sidebar, com fundo azul."""
@@ -298,4 +277,4 @@ class PageStyler:
             </style>
             """
         )
-        st.markdown(css, unsafe_allow_html=True)
+        st.html(css)
