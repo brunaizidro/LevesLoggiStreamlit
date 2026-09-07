@@ -18,9 +18,19 @@ import emailer
 COOLDOWN_SEG = 60
 
 
+def _suporte_disponivel() -> bool:
+    """Verifica o canal de suporte sem derrubar a tela caso a Config ainda não esteja acessível."""
+    try:
+        return bool(emailer.email_suporte() and emailer.smtp_configurado())
+    except Exception:  # noqa: BLE001
+        # A tela de login não deve quebrar apenas porque a configuração de e-mail
+        # ou a conexão com a planilha ainda não está disponível.
+        return False
+
+
 def form_contato(key: str, nome: str = "", email: str = ""):
     """Renderiza o formulário de dúvidas. `key` deve ser único por local de uso."""
-    if not emailer.email_suporte() or not emailer.smtp_configurado():
+    if not _suporte_disponivel():
         st.caption("Canal de dúvidas indisponível no momento.")
         return
 
@@ -29,10 +39,17 @@ def form_contato(key: str, nome: str = "", email: str = ""):
     with st.form(f"contato_{key}", clear_on_submit=True):
         c1, c2 = st.columns(2)
         nome_in = c1.text_input("Seu nome", value=nome, key=f"ct_nome_{key}")
-        email_in = c2.text_input("Seu e-mail", value=email, key=f"ct_mail_{key}",
-                                 placeholder="para retornarmos")
-        msg_in = st.text_area("Sua dúvida ou mensagem", key=f"ct_msg_{key}",
-                              placeholder="Descreva sua dúvida...")
+        email_in = c2.text_input(
+            "Seu e-mail",
+            value=email,
+            key=f"ct_mail_{key}",
+            placeholder="para retornarmos",
+        )
+        msg_in = st.text_area(
+            "Sua dúvida ou mensagem",
+            key=f"ct_msg_{key}",
+            placeholder="Descreva sua dúvida...",
+        )
         enviar = st.form_submit_button("Enviar dúvida", type="primary", width="stretch")
 
     if enviar:
