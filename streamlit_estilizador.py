@@ -65,7 +65,7 @@ class PageStyler:
             color: var(--leves-cinza);
         }
 
-        /* Título padrão das páginas */
+        /* Título padrão das páginas — mesma hierarquia da página Envios */
         h2, .stSubheader {
             color: var(--leves-texto) !important;
             font-family: Montserrat, sans-serif !important;
@@ -77,18 +77,36 @@ class PageStyler:
             margin-bottom: 7px !important;
         }
 
+        /* Breadcrumb visual para os títulos nativos das páginas 2–9 */
+        h2::before,
+        .stSubheader::before {
+            content: "PORTAL LEVES / ÁREA INTERNA";
+            display: block;
+            color: #8a95a5;
+            font-family: Montserrat, sans-serif;
+            font-size: 11px;
+            line-height: 1.2;
+            font-weight: 700;
+            letter-spacing: .7px;
+            margin-bottom: 9px;
+        }
+
         h3 {
             color: var(--leves-texto) !important;
             font-family: Montserrat, sans-serif !important;
             font-size: 20px !important;
             font-weight: 700 !important;
+            margin-top: 18px !important;
         }
 
         h4 {
             color: #253044 !important;
             font-family: Montserrat, sans-serif !important;
-            font-size: 15px !important;
+            font-size: 14px !important;
             font-weight: 700 !important;
+            letter-spacing: .1px !important;
+            margin-top: 22px !important;
+            margin-bottom: 10px !important;
         }
 
         .custom-text {
