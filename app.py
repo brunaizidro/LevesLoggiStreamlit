@@ -58,22 +58,22 @@ def tela_primeiro_acesso():
         """
         <style>
         .login-floating-logo {
-    position: fixed !important;
-    top: 22px !important;
-    right: 30px !important;
-    z-index: 1000 !important;
-    width: 90px !important;
-    max-width: 90px !important;
-    text-align: center !important;
-}
+            position: fixed !important;
+            top: 22px !important;
+            right: 30px !important;
+            z-index: 1000 !important;
+            width: 90px !important;
+            max-width: 90px !important;
+            text-align: center !important;
+        }
 
-.login-floating-logo img {
-    display: block !important;
-    width: 90px !important;
-    max-width: 90px !important;
-    height: auto !important;
-    margin: 0 !important;
-}
+        .login-floating-logo img {
+            display: block !important;
+            width: 90px !important;
+            max-width: 90px !important;
+            height: auto !important;
+            margin: 0 !important;
+        }
         .first-access-title {
             text-align: center;
             color: #172033;
@@ -156,8 +156,8 @@ def tela_primeiro_acesso():
 
         if logo_base64:
             st.markdown(
-                f'<div class="login-floating-logo">'
-                f'<img src="data:image/png;base64,{logo_base64}">'
+                f'<div class="login-floating-logo" style="width:90px !important; max-width:90px !important;">'
+                f'<img src="data:image/png;base64,{logo_base64}" style="display:block !important; width:90px !important; max-width:90px !important; height:auto !important;">'
                 f'</div>',
                 unsafe_allow_html=True,
             )
@@ -279,6 +279,24 @@ def tela_recuperacao_senha():
     st.markdown(
         """
         <style>
+        .login-floating-logo {
+            position: fixed !important;
+            top: 22px !important;
+            right: 30px !important;
+            z-index: 1000 !important;
+            width: 90px !important;
+            max-width: 90px !important;
+            text-align: center !important;
+        }
+
+        .login-floating-logo img {
+            display: block !important;
+            width: 90px !important;
+            max-width: 90px !important;
+            height: auto !important;
+            margin: 0 !important;
+        }
+
         .recovery-title {
             text-align: center;
             color: #172033;
@@ -348,7 +366,7 @@ def tela_recuperacao_senha():
         )
         if logo_base64:
             st.markdown(
-                f'<div class="login-floating-logo"><img src="data:image/png;base64,{logo_base64}"></div>',
+                f'<div class="login-floating-logo" style="width:90px !important; max-width:90px !important;"><img src="data:image/png;base64,{logo_base64}" style="display:block !important; width:90px !important; max-width:90px !important; height:auto !important;"></div>',
                 unsafe_allow_html=True,
             )
 
