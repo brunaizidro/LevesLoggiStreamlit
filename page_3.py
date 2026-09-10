@@ -187,8 +187,8 @@ def page_3():
             for _, r in saldo.iterrows()
         )
         st.markdown(
-            f"<div style='margin-top:30px; padding-top:4px;'>"
-            f"<strong>Valor total a devolver:</strong> {dp.fmt_brl(total_val)}"
+            f"<div style='margin-top:38px; padding-top:10px; font-size:1.18rem; line-height:1.4;'>"
+            f"<strong>Valor total a devolver:</strong> <strong>{dp.fmt_brl(total_val)}</strong>"
             f"</div>",
             unsafe_allow_html=True,
         )
