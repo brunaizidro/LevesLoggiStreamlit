@@ -19,6 +19,7 @@ from email.mime.text import MIMEText
 import data_extraction as dados
 
 CAMPOS_OBRIGATORIOS = ["smtp_host", "smtp_port", "smtp_user", "smtp_from"]
+LOGO_URL = "https://raw.githubusercontent.com/brunaizidro/LevesLoggiStreamlit/master/image_simbolo_lebre.png"
 
 
 def config_smtp() -> dict:
@@ -130,17 +131,17 @@ def _tabela_itens(itens: list[dict], qtd_key: str, rot_qtd: str, precos: dict | 
         if usa_valor:
             v = q * float((precos or {}).get(str(it["tipo"]).upper(), 0))
             valor_total += v
-            col_val = f"<td style='padding:6px 12px;border-bottom:1px solid #eee;text-align:right'>{_brl(v)}</td>"
-        linhas += (f"<tr><td style='padding:6px 12px;border-bottom:1px solid #eee'>{it['tipo'].title()}</td>"
-                   f"<td style='padding:6px 12px;border-bottom:1px solid #eee;text-align:right'>{_fmt(q)}</td>{col_val}</tr>")
-    th_val = "<th style='padding:8px 12px;text-align:right'>Valor</th>" if usa_valor else ""
-    td_val_total = (f"<td style='padding:8px 12px;font-weight:700;text-align:right'>{_brl(valor_total)}</td>"
+            col_val = f"<td style='padding:6px 12px;border-bottom:1px solid #eee;text-align:center'>{_brl(v)}</td>"
+        linhas += (f"<tr><td style='padding:6px 12px;border-bottom:1px solid #eee;text-align:center'>{it['tipo'].title()}</td>"
+                   f"<td style='padding:6px 12px;border-bottom:1px solid #eee;text-align:center'>{_fmt(q)}</td>{col_val}</tr>")
+    th_val = "<th style='padding:8px 12px;text-align:center'>Valor</th>" if usa_valor else ""
+    td_val_total = (f"<td style='padding:8px 12px;font-weight:700;text-align:center'>{_brl(valor_total)}</td>"
                     if usa_valor else "")
-    cabecalho = (f"<tr style='background:#f1f5fb'><th style='padding:8px 12px;text-align:left'>Tipo de ativo</th>"
-                 f"<th style='padding:8px 12px;text-align:right'>{rot_qtd}</th>{th_val}</tr>")
-    rodape = (f"<tr><td style='padding:8px 12px;font-weight:700'>Total</td>"
-              f"<td style='padding:8px 12px;font-weight:700;text-align:right'>{_fmt(total_qtd)}</td>{td_val_total}</tr>")
-    html = f"<table style='border-collapse:collapse;width:100%;margin:12px 0'>{cabecalho}{linhas}{rodape}</table>"
+    cabecalho = (f"<tr style='background:#f1f5fb'><th style='padding:8px 12px;text-align:center'>Tipo de insumo</th>"
+                 f"<th style='padding:8px 12px;text-align:center'>{rot_qtd}</th>{th_val}</tr>")
+    rodape = (f"<tr><td style='padding:8px 12px;font-weight:700;text-align:center'>Total</td>"
+              f"<td style='padding:8px 12px;font-weight:700;text-align:center'>{_fmt(total_qtd)}</td>{td_val_total}</tr>")
+    html = f"<table style='border-collapse:collapse;width:100%;max-width:770px;margin:16px auto;text-align:center'>{cabecalho}{linhas}{rodape}</table>"
     return html, valor_total
 
 
@@ -148,11 +149,13 @@ def corpo_pendencia(operacao: str, itens: list[dict], total: int, precos: dict |
     """HTML do lembrete de pendência de devolução (itens ainda em aberto)."""
     tabela, _ = _tabela_itens(itens, "pendente", "Pendente", precos)
     return f"""
-    <div style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;max-width:560px">
-      <div style="font-size:26px;font-weight:800;color:#0067fc">loggi</div>
-      <div style="color:#6e6e6e;letter-spacing:2px;text-transform:uppercase;font-size:11px;margin-bottom:16px">Portal LEVES</div>
+    <div style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;max-width:770px;margin:0 auto">
+      <div style="text-align:center;margin-bottom:8px">
+        <img src="{LOGO_URL}" alt="Loggi" width="110" style="display:block;margin:0 auto;height:auto">
+      </div>
+      <div style="color:#6e6e6e;letter-spacing:2px;text-transform:uppercase;font-size:11px;margin-bottom:16px;text-align:center">Portal LEVES</div>
       <p>Olá, <b>{operacao}</b>.</p>
-      <p>Consta a seguinte <b>pendência de devolução</b> de ativos com a sua operação.
+      <p>Consta a seguinte <b>pendência de devolução</b> de insumos com a sua operação.
       Por favor, programe a devolução o quanto antes:</p>
       {tabela}
       <p style="color:#6e6e6e;font-size:13px">Aviso automático do Portal LEVES. Em caso de dúvida, responda a este e-mail.</p>
@@ -172,11 +175,13 @@ def corpo_cobranca(operacao: str, competencia_label: str, prazo: str,
     """Monta o HTML da cobrança (padrão visual Loggi)."""
     tabela, _ = _tabela_itens(itens, "qtd", "Quantidade", precos)
     return f"""
-    <div style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;max-width:560px">
-      <div style="font-size:26px;font-weight:800;color:#0067fc">loggi</div>
-      <div style="color:#6e6e6e;letter-spacing:2px;text-transform:uppercase;font-size:11px;margin-bottom:16px">Portal LEVES</div>
+    <div style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;max-width:770px;margin:0 auto">
+      <div style="text-align:center;margin-bottom:8px">
+        <img src="{LOGO_URL}" alt="Loggi" width="110" style="display:block;margin:0 auto;height:auto">
+      </div>
+      <div style="color:#6e6e6e;letter-spacing:2px;text-transform:uppercase;font-size:11px;margin-bottom:16px;text-align:center">Portal LEVES</div>
       <p>Olá, <b>{operacao}</b>.</p>
-      <p>Referente à competência <b>{competencia_label}</b>, identificamos ativos enviados que
+      <p>Referente à competência <b>{competencia_label}</b>, identificamos insumos enviados que
       <b>não foram devolvidos até o prazo</b> ({prazo}). Segue o detalhamento para acerto:</p>
       {tabela}
       <p style="color:#6e6e6e;font-size:13px">Este é um aviso automático do Portal LEVES.
