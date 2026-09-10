@@ -48,10 +48,50 @@ def _fmt(n) -> str:
     return f"{int(n):,}".replace(",", ".")
 
 
+def _operacoes_destinos_envios() -> dict[str, dict]:
+    """Lê Operação (coluna C) e Destino (coluna E) da aba Envios.
+
+    Mantém `destino` como a operação no restante da regra de devoluções,
+    preservando a compatibilidade com o portal, e usa a coluna E somente
+    para definir o local/CD físico da devolução.
+    """
+    try:
+        ws = dados._aba(
+            dados.ABA_ENVIOS,
+            ["DATA", "tipo", "operacao", "total", "destino"],
+        )
+        valores = ws.get_all_values()
+    except Exception:  # noqa: BLE001
+        return {}
+
+    mapa = {}
+    for i, row in enumerate(valores):
+        if i == 0 or not any(row):
+            continue
+        row = (row + [""] * 5)[:5]
+        operacao = str(row[2]).strip()
+        destino_fisico = str(row[4]).strip()
+        if not operacao:
+            continue
+
+        chave = dp._normalizar(operacao)
+        item = mapa.setdefault(
+            chave,
+            {"operacao": operacao, "destinos": []},
+        )
+        if destino_fisico and dp._normalizar(destino_fisico) not in {
+            dp._normalizar(x) for x in item["destinos"]
+        }:
+            item["destinos"].append(destino_fisico)
+
+    return mapa
+
+
 def page_3():
     user = st.session_state.get("usuario") or {}
     eh_admin = user.get("perfil") == "admin"
     destino = user.get("destino", "")
+    destino_fisico_fixo = ""
 
     st.subheader("Devoluções")
     if eh_admin:
@@ -61,18 +101,13 @@ def page_3():
             unsafe_allow_html=True,
         )
 
-        env = dp.envios_df()
-        if env.empty:
-            st.info("Nenhum envio registrado ainda.")
+        mapa_operacoes = _operacoes_destinos_envios()
+        if not mapa_operacoes:
+            st.info("Nenhuma operação encontrada na aba Envios.")
             return
 
-        operacoes = sorted(
-            env["destino"].dropna().astype(str).loc[lambda s: s.str.strip() != ""].unique().tolist(),
-            key=str.lower,
-        )
-        if not operacoes:
-            st.info("Nenhuma operação encontrada para registrar devoluções.")
-            return
+        chaves = sorted(mapa_operacoes, key=lambda k: mapa_operacoes[k]["operacao"].lower())
+        operacoes = [mapa_operacoes[k]["operacao"] for k in chaves]
 
         destino = st.selectbox(
             "Operação",
@@ -80,7 +115,24 @@ def page_3():
             key="devolucao_operacao_admin",
             help="Selecione a operação em nome da qual a devolução será registrada.",
         )
-        st.caption(f"Devolução manual sendo registrada para **{destino}**.")
+
+        chave_op = dp._normalizar(destino)
+        destinos_fisicos = mapa_operacoes.get(chave_op, {}).get("destinos", [])
+        if len(destinos_fisicos) == 1:
+            destino_fisico_fixo = destinos_fisicos[0]
+            st.caption(
+                f"Devolução manual sendo registrada para **{destino}**. "
+                f"Destino fixado pela aba Envios: **{destino_fisico_fixo}**."
+            )
+        elif len(destinos_fisicos) > 1:
+            st.error(
+                f"A operação **{destino}** possui mais de um destino na coluna E da aba Envios. "
+                "A devolução não pode ser registrada até que exista apenas um destino para a operação."
+            )
+        else:
+            st.error(
+                f"Não foi encontrado destino na coluna E da aba Envios para a operação **{destino}**."
+            )
     else:
         st.markdown(
             "<p class='custom-text'>Declare o que está devolvendo, gere o romaneio com "
@@ -148,13 +200,27 @@ def page_3():
                     min_value=0, max_value=int(q), step=1, value=0,
                 )
             placa = st.text_input("Placa do veículo", placeholder="ex.: ABC1D23")
-            destinos_cfg = dp.destinos_devolucao()
-            if destinos_cfg:
-                local = st.selectbox("Devolvendo para (local/CD de destino)",
-                                     [""] + destinos_cfg)
+
+            if eh_admin:
+                local = st.text_input(
+                    "Devolvendo para (local/CD de destino)",
+                    value=destino_fisico_fixo,
+                    disabled=True,
+                    help="Destino definido automaticamente pela coluna E da aba Envios para a operação selecionada.",
+                )
             else:
-                local = st.text_input("Devolvendo para (local/CD de destino)",
-                                      placeholder="ex.: CD Cajamar")
+                destinos_cfg = dp.destinos_devolucao()
+                if destinos_cfg:
+                    local = st.selectbox(
+                        "Devolvendo para (local/CD de destino)",
+                        [""] + destinos_cfg,
+                    )
+                else:
+                    local = st.text_input(
+                        "Devolvendo para (local/CD de destino)",
+                        placeholder="ex.: CD Cajamar",
+                    )
+
             obs = st.text_input("Observação (opcional)")
             enviar = st.form_submit_button("Gerar devolução", type="primary")
 
@@ -168,6 +234,8 @@ def page_3():
                 st.error("Informe a placa do veículo.")
             elif not local_norm:
                 st.error("Informe para onde está devolvendo.")
+            elif eh_admin and not destino_fisico_fixo:
+                st.error("A operação selecionada não possui um destino fixado na coluna E da aba Envios.")
             else:
                 total = sum(it["qtd_declarada"] for it in itens)
                 id_dev = dados.proximo_codigo_devolucao()
