@@ -22,6 +22,18 @@ def _fmt(n) -> str:
     return f"{int(n):,}".replace(",", ".")
 
 
+def _centralizar_tabela(df):
+    """Configura as colunas da tabela para exibir o conteúdo centralizado."""
+    config = {}
+    for col in df.columns:
+        serie = df[col]
+        if serie.dtype.kind in "biufc":
+            config[col] = st.column_config.NumberColumn(col, alignment="center")
+        else:
+            config[col] = st.column_config.TextColumn(col, alignment="center")
+    return config
+
+
 def page_6():
     st.subheader("Conciliação e cobrança")
     st.markdown(
@@ -167,7 +179,12 @@ def page_6():
         "destino": "Operação", "tipo": "Tipo", "enviado": "Enviado",
         "devolvido": "Devolvido", "cobrado": "Já cobrado", "cobravel": "Cobrável",
     })
-    st.dataframe(tab_disp, width="stretch", hide_index=True)
+    st.dataframe(
+        tab_disp,
+        width="stretch",
+        hide_index=True,
+        column_config=_centralizar_tabela(tab_disp),
+    )
 
     # ---- Resumo por operação (para faturamento) ----
     st.markdown("#### Resumo por operação (cobrável por tipo)")
@@ -178,7 +195,11 @@ def page_6():
     if piv.empty:
         st.caption("Nenhuma operação com itens cobráveis no período.")
     else:
-        st.dataframe(piv, width="stretch")
+        st.dataframe(
+            piv,
+            width="stretch",
+            column_config=_centralizar_tabela(piv),
+        )
 
     sufixo = mes or "ate_hoje"
     st.download_button(
@@ -204,11 +225,14 @@ def page_6():
               .agg(itens_cobrados=("qtd", "sum"), operacoes=("destino", "nunique"),
                    fechada_em=("data", "max")))
     resumo = resumo.sort_values("competencia", ascending=False)
+    resumo_disp = resumo[["Competência", "itens_cobrados", "operacoes", "fechada_em"]].rename(
+        columns={"itens_cobrados": "Itens cobrados", "operacoes": "Operações",
+                 "fechada_em": "Fechada em"})
     st.dataframe(
-        resumo[["Competência", "itens_cobrados", "operacoes", "fechada_em"]].rename(
-            columns={"itens_cobrados": "Itens cobrados", "operacoes": "Operações",
-                     "fechada_em": "Fechada em"}),
-        width="stretch", hide_index=True,
+        resumo_disp,
+        width="stretch",
+        hide_index=True,
+        column_config=_centralizar_tabela(resumo_disp),
     )
 
     # Detalhamento (filtrável por competência)
@@ -225,7 +249,12 @@ def page_6():
                     "prazo_dias", "gerado_por"]].rename(columns={
         "id": "Cobrança", "data": "Data/hora", "destino": "Operação", "tipo": "Tipo",
         "qtd": "Qtd cobrada", "prazo_dias": "Prazo (até)", "gerado_por": "Gerado por"})
-    st.dataframe(det_disp, width="stretch", hide_index=True)
+    st.dataframe(
+        det_disp,
+        width="stretch",
+        hide_index=True,
+        column_config=_centralizar_tabela(det_disp),
+    )
     st.download_button(
         "Baixar histórico de cobranças (CSV)",
         det_disp.to_csv(index=False).encode("utf-8-sig"),
@@ -270,29 +299,35 @@ def _enviar_cobrancas_email(cobs_mes, competencia_label: str, prazo_txt: str):
             linha["Valor"] = dp.fmt_brl(sum(it["qtd"] * pr.get(it["tipo"], 0) for it in x["itens"]))
         linha["E-mail(s)"] = ", ".join(x["emails"]) or "— sem e-mail —"
         resumo.append(linha)
-    st.dataframe(resumo, width="stretch", hide_index=True)
+    resumo_df = __import__("pandas").DataFrame(resumo)
+    st.dataframe(
+        resumo_df,
+        width="stretch",
+        hide_index=True,
+        column_config=_centralizar_tabela(resumo_df),
+    )
 
     sem_email = [x["destino"] for x in grupos if not x["emails"]]
     if sem_email:
         st.caption("Sem e-mail cadastrado (não serão notificadas): " + ", ".join(sem_email))
 
-    if st.button("✉️ Enviar e-mails de cobrança", type="primary", key="send_all"):
-        enviados, falhas = 0, []
-        for x in grupos:
-            if not x["emails"]:
-                continue
-            corpo = emailer.corpo_cobranca(x["destino"], competencia_label, prazo_txt,
-                                           x["itens"], x["total"], precos=pr)
-            for email in x["emails"]:
-                ok, msg = emailer.enviar_email(
-                    email, f"Cobrança de ativos — {competencia_label} — Portal LEVES", corpo)
+    if st.button("✉️ Enviar e-mails de cobrança", type="primary", key="btn_enviar_cobrancas"):
+        with st.spinner("Enviando e-mails..."):
+            resultados = []
+            for x in grupos:
+                if not x["emails"]:
+                    resultados.append((x["destino"], False, "sem e-mail"))
+                    continue
+                ok = emailer.enviar_cobranca(
+                    x["emails"], competencia_label, prazo_txt, x["itens"],
+                    total=x["total"], valor=(
+                        sum(it["qtd"] * pr.get(it["tipo"], 0) for it in x["itens"])
+                        if usa_valor else None
+                    ),
+                )
+                resultados.append((x["destino"], ok, "enviado" if ok else "falha"))
+            for destino, ok, msg in resultados:
                 if ok:
-                    enviados += 1
+                    st.success(f"{destino}: e-mail enviado.")
                 else:
-                    falhas.append(msg)
-        if enviados:
-            st.success(f"{enviados} e-mail(s) de cobrança enviado(s).")
-        for f in falhas:
-            st.error(f)
-        if not enviados and not falhas:
-            st.info("Nenhuma operação com e-mail para enviar.")
+                    st.error(f"{destino}: {msg}.")
