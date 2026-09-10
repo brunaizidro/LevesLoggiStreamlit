@@ -166,12 +166,23 @@ def page_3():
         if valor_unitario > 0:
             ajuda += f" · {dp.fmt_brl(valor_total_insumo)}"
 
-        cols[i].metric(tipo.title(), _fmt(qtd_saldo), help=ajuda)
-        if valor_unitario > 0:
-            cols[i].caption(
-                f"Valor: **{dp.fmt_brl(valor_total_insumo)}** "
-                f"({dp.fmt_brl(valor_unitario)}/un.)"
-            )
+        with cols[i]:
+            st.metric(tipo.title(), _fmt(qtd_saldo), help=ajuda)
+            if valor_unitario > 0:
+                st.markdown(
+                    f"""
+                    <div style="margin-top:-8px; padding-top:2px;">
+                        <div style="font-size:0.78rem; color:#7a7f87; margin-bottom:2px;">Valor do saldo</div>
+                        <div style="font-size:1.02rem; font-weight:600; color:#343840;">
+                            {dp.fmt_brl(valor_total_insumo)}
+                        </div>
+                        <div style="font-size:0.76rem; color:#8b9098; margin-top:1px;">
+                            {dp.fmt_brl(valor_unitario)} por unidade
+                        </div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
 
     if dp.tem_precos():
         total_val = sum(
