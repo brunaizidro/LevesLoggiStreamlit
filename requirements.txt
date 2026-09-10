@@ -2,6 +2,7 @@ streamlit>=1.36
 gspread>=6.0
 google-auth>=2.30
 pandas>=2.0
+openpyxl>=3.1
 plotly>=5.20
 pytz>=2024.1
 qrcode[pil]>=7.4
