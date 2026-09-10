@@ -1,9 +1,5 @@
 """
 emailer.py — envio de e-mail via SMTP (configurado pelo admin no app).
-
-Observação: para ENVIAR e-mail usa-se SMTP (IMAP serve apenas para LER a caixa
-de entrada). As credenciais ficam na aba Config (chave/valor), preenchidas pelo
-admin na tela de Configurações.
 """
 
 from __future__ import annotations
@@ -48,13 +44,14 @@ def _abrir_conexao(c: dict):
 
 def enviar_email(destinatario: str, assunto: str, corpo_html: str,
                  reply_to: str | None = None) -> tuple[bool, str]:
-    """Envia um e-mail HTML. materiais@loggi.com fica sempre em cópia."""
+    """Envia HTML para a operação e sempre inclui materiais@loggi.com no CC e no envelope SMTP."""
     destinatario = (destinatario or "").strip()
     if not destinatario:
         return False, "Destinatário vazio."
     c = config_smtp()
     if not smtp_configurado():
         return False, "SMTP não configurado. Preencha em Configurações."
+
     remetente = str(c.get("smtp_from", "")).strip() or str(c.get("smtp_user", "")).strip()
     msg = MIMEMultipart("alternative")
     msg["Subject"] = assunto
@@ -64,15 +61,26 @@ def enviar_email(destinatario: str, assunto: str, corpo_html: str,
     if reply_to:
         msg["Reply-To"] = reply_to
     msg.attach(MIMEText(corpo_html, "html", "utf-8"))
+
+    # O CC precisa estar também na lista de destinatários do SMTP.
+    destinatarios_smtp = [destinatario]
+    if EMAIL_COPIA_FIXA.lower() != destinatario.lower():
+        destinatarios_smtp.append(EMAIL_COPIA_FIXA)
+
+    server = None
     try:
         server = _abrir_conexao(c)
-        destinatarios = [destinatario]
-        if EMAIL_COPIA_FIXA.lower() != destinatario.lower():
-            destinatarios.append(EMAIL_COPIA_FIXA)
-        server.sendmail(remetente, destinatarios, msg.as_string())
+        resultado = server.sendmail(remetente, destinatarios_smtp, msg.as_string())
         server.quit()
+        if resultado:
+            return False, f"SMTP não aceitou todos os destinatários: {resultado}"
         return True, f"E-mail enviado para {destinatario}, com cópia para {EMAIL_COPIA_FIXA}."
     except Exception as e:
+        if server is not None:
+            try:
+                server.quit()
+            except Exception:
+                pass
         return False, f"Falha ao enviar para {destinatario}: {e}"
 
 
