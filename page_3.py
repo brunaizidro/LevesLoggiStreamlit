@@ -176,9 +176,6 @@ def page_3():
                         <div style="font-size:1.28rem; line-height:1.2; font-weight:650; color:#343840;">
                             {dp.fmt_brl(valor_total_insumo)}
                         </div>
-                        <div style="font-size:0.88rem; color:#7f858e; margin-top:4px;">
-                            {dp.fmt_brl(valor_unitario)} por unidade
-                        </div>
                     </div>
                     """,
                     unsafe_allow_html=True,
