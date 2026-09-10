@@ -4,6 +4,8 @@ page_3.py — Devoluções (operação).
 Mostra o saldo a devolver (enviado − devolvido), permite declarar uma nova
 devolução (limitada ao saldo) e gerar o Romaneio em PDF com QR. Lista as
 devoluções da operação com status, reimpressão e cancelamento (em trânsito).
+Para o perfil admin, permite selecionar a operação e registrar a devolução
+manualmente em nome dela.
 """
 
 from __future__ import annotations
@@ -20,20 +22,72 @@ import manual
 import romaneio
 
 
+# O app já possui a rota "Devoluções", mas atualmente o menu do perfil admin
+# não a inclui. Como page_3 é importada pelo app antes da montagem da sidebar,
+# adicionamos a opção somente ao radio de navegação quando o usuário é admin.
+_radio_original = st.radio
+
+
+def _radio_com_devolucao_admin(label, options, *args, **kwargs):
+    opcoes = list(options)
+    user = st.session_state.get("usuario") or {}
+    if label == "Navegação" and user.get("perfil") == "admin":
+        if "↩️ Devoluções" not in opcoes:
+            try:
+                pos = opcoes.index("🔔 Pendências")
+            except ValueError:
+                pos = len(opcoes)
+            opcoes.insert(pos, "↩️ Devoluções")
+    return _radio_original(label, opcoes, *args, **kwargs)
+
+
+st.radio = _radio_com_devolucao_admin
+
+
 def _fmt(n) -> str:
     return f"{int(n):,}".replace(",", ".")
 
 
 def page_3():
     user = st.session_state.get("usuario") or {}
+    eh_admin = user.get("perfil") == "admin"
     destino = user.get("destino", "")
 
     st.subheader("Devoluções")
-    st.markdown(
-        "<p class='custom-text'>Declare o que está devolvendo, gere o romaneio com "
-        "QR e envie impresso junto com os itens.</p>",
-        unsafe_allow_html=True,
-    )
+    if eh_admin:
+        st.markdown(
+            "<p class='custom-text'>Selecione a operação e registre uma devolução manual "
+            "em nome dela. O saldo e a competência serão calculados para a operação selecionada.</p>",
+            unsafe_allow_html=True,
+        )
+
+        env = dp.envios_df()
+        if env.empty:
+            st.info("Nenhum envio registrado ainda.")
+            return
+
+        operacoes = sorted(
+            env["destino"].dropna().astype(str).loc[lambda s: s.str.strip() != ""].unique().tolist(),
+            key=str.lower,
+        )
+        if not operacoes:
+            st.info("Nenhuma operação encontrada para registrar devoluções.")
+            return
+
+        destino = st.selectbox(
+            "Operação",
+            operacoes,
+            key="devolucao_operacao_admin",
+            help="Selecione a operação em nome da qual a devolução será registrada.",
+        )
+        st.caption(f"Devolução manual sendo registrada para **{destino}**.")
+    else:
+        st.markdown(
+            "<p class='custom-text'>Declare o que está devolvendo, gere o romaneio com "
+            "QR e envie impresso junto com os itens.</p>",
+            unsafe_allow_html=True,
+        )
+
     if manual.disponivel():
         with st.expander("📘 Manual de devolução (treinamento)"):
             manual.botao_manual(key="manual_page3")
@@ -41,11 +95,13 @@ def page_3():
     # ---- Saldo a devolver ----
     saldo = dp.saldo_por_tipo(destino)
     if saldo.empty or saldo["enviado"].sum() == 0:
-        st.info("Nenhum ativo enviado para a sua operação até o momento.")
+        if eh_admin:
+            st.info(f"Nenhum ativo enviado para a operação **{destino}** até o momento.")
+        else:
+            st.info("Nenhum ativo enviado para a sua operação até o momento.")
         return
 
     st.markdown("#### Saldo a devolver")
-    tipos_com_saldo = saldo[saldo["saldo"] > 0]
     pr = dp.precos()
     cols = st.columns(max(len(saldo), 1))
     for i, (_, r) in enumerate(saldo.iterrows()):
@@ -64,14 +120,16 @@ def page_3():
     elegiveis = dp.competencias_elegiveis(destino)
     if not elegiveis:
         st.info("Nenhuma competência aberta para devolução (prazos encerrados).")
-        _minhas_devolucoes(destino)
+        _minhas_devolucoes(destino, eh_admin=eh_admin)
         return
 
     # Competência (mês) — fora do form para recalcular a pendência ao trocar.
     rot_mes = {m: dp.rotulo_mes(m) for m in elegiveis}
-    escolha_mes = st.selectbox("Mês de referência (competência)",
-                               [rot_mes[m] for m in elegiveis],
-                               help="Você pode devolver retroativo, dentro do prazo (até o dia 5 do mês seguinte).")
+    escolha_mes = st.selectbox(
+        "Mês de referência (competência)",
+        [rot_mes[m] for m in elegiveis],
+        help="Você pode devolver retroativo, dentro do prazo (até o dia 5 do mês seguinte).",
+    )
     mes_ref = next(m for m, r in rot_mes.items() if r == escolha_mes)
     prazo_txt = dp.prazo_devolucao(mes_ref).strftime("%d/%m/%Y")
     st.caption(f"Devoluções de {escolha_mes} aceitas até **{prazo_txt}**.")
@@ -132,11 +190,11 @@ def page_3():
                     mime="application/pdf", key=f"dl_{id_dev}", type="primary",
                 )
 
-    _minhas_devolucoes(destino)
+    _minhas_devolucoes(destino, eh_admin=eh_admin)
 
 
-def _minhas_devolucoes(destino: str):
-    st.markdown("#### Minhas devoluções")
+def _minhas_devolucoes(destino: str, eh_admin: bool = False):
+    st.markdown("#### Devoluções da operação" if eh_admin else "#### Minhas devoluções")
     devs = dp.devolucoes_df()
     if devs.empty:
         st.caption("Nenhuma devolução registrada ainda.")
