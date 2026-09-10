@@ -57,18 +57,36 @@ def page_6():
         st.warning("Sem envios nesta competência.")
         return
 
+    # ---- Filtro de operação ----
+    operacoes = sorted(df["destino"].dropna().astype(str).unique().tolist(), key=str.lower)
+    op_escolhida = st.selectbox(
+        "Operação",
+        ["Todas as operações"] + operacoes,
+        index=0,
+        key="concil_operacao",
+        help="Filtra a visão da conciliação para uma operação específica. O fechamento da competência continua considerando todas as operações.",
+    )
+
+    df_view = df
+    if op_escolhida != "Todas as operações":
+        df_view = df[df["destino"].astype(str) == op_escolhida].copy()
+
+    if df_view.empty:
+        st.info(f"Nenhum registro encontrado para a operação **{op_escolhida}** nesta competência.")
+        return
+
     # ---- Totais ----
     pr = dp.precos()
     usa_valor = dp.tem_precos()
     rot_cobravel = "Cobrável" if fechavel else "Em aberto"
     ncols = 5 if usa_valor else 4
     cs = st.columns(ncols)
-    cs[0].metric("Enviado no mês", _fmt(df["enviado"].sum()))
-    cs[1].metric("Devolvido", _fmt(df["devolvido"].sum()))
-    cs[2].metric("Já cobrado", _fmt(df["cobrado"].sum()))
-    cs[3].metric(rot_cobravel, _fmt(df["cobravel"].sum()))
+    cs[0].metric("Enviado no mês", _fmt(df_view["enviado"].sum()))
+    cs[1].metric("Devolvido", _fmt(df_view["devolvido"].sum()))
+    cs[2].metric("Já cobrado", _fmt(df_view["cobrado"].sum()))
+    cs[3].metric(rot_cobravel, _fmt(df_view["cobravel"].sum()))
     if usa_valor:
-        valor_cobravel = sum(int(r["cobravel"]) * pr.get(r["tipo"], 0) for _, r in df.iterrows())
+        valor_cobravel = sum(int(r["cobravel"]) * pr.get(r["tipo"], 0) for _, r in df_view.iterrows())
         cs[4].metric(f"Valor {rot_cobravel.lower()}", dp.fmt_brl(valor_cobravel))
 
     st.markdown("---")
@@ -76,6 +94,7 @@ def page_6():
     # ---- Fechar cobrança (baixa definitiva) ----
     with st.container(border=True):
         st.markdown("#### Fechar cobrança da competência")
+        # IMPORTANTE: usa o df completo, sem o filtro de operação.
         total_cobravel = int(df["cobravel"].sum())
         if dados.competencia_ja_fechada(mes):
             st.success(f"A competência **{escolha}** já foi fechada. "
@@ -112,7 +131,7 @@ def page_6():
     # ---- Cobrável por tipo (gráfico) ----
     g1, g2 = st.columns([1, 1.3])
     with g1:
-        tdf = df.groupby("tipo", as_index=False)["cobravel"].sum()
+        tdf = df_view.groupby("tipo", as_index=False)["cobravel"].sum()
         fig = px.bar(
             tdf, x="tipo", y="cobravel", color="tipo",
             color_discrete_map=dp.CORES_TIPO, title="Cobrável por tipo",
@@ -122,8 +141,12 @@ def page_6():
         st.plotly_chart(fig, width="stretch")
 
     with g2:
-        st.markdown("**Cobrável por operação (top 15)**")
-        rank = (df.groupby("destino", as_index=False)["cobravel"].sum()
+        titulo_rank = (
+            f"Cobrável por operação — {op_escolhida}" if op_escolhida != "Todas as operações"
+            else "Cobrável por operação (top 15)"
+        )
+        st.markdown(f"**{titulo_rank}**")
+        rank = (df_view.groupby("destino", as_index=False)["cobravel"].sum()
                 .query("cobravel > 0").sort_values("cobravel", ascending=True).tail(15))
         if rank.empty:
             st.caption("Nenhum item cobrável no período. 🎉")
@@ -137,7 +160,7 @@ def page_6():
     # ---- Tabela detalhada (destino × tipo) ----
     st.markdown("#### Detalhamento por operação × tipo")
     so_cobravel = st.checkbox("Mostrar apenas com cobrável > 0", value=False)
-    tab = df.copy()
+    tab = df_view.copy()
     if so_cobravel:
         tab = tab[tab["cobravel"] > 0]
     tab_disp = tab.drop(columns=["em_aberto"]).rename(columns={
