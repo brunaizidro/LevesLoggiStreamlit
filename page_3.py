@@ -171,12 +171,12 @@ def page_3():
             if valor_unitario > 0:
                 st.markdown(
                     f"""
-                    <div style="margin-top:-8px; padding-top:2px;">
-                        <div style="font-size:0.78rem; color:#7a7f87; margin-bottom:2px;">Valor do saldo</div>
-                        <div style="font-size:1.02rem; font-weight:600; color:#343840;">
+                    <div style="margin-top:-6px; padding-top:3px;">
+                        <div style="font-size:0.86rem; color:#6f747c; margin-bottom:4px;">Valor do saldo</div>
+                        <div style="font-size:1.28rem; line-height:1.2; font-weight:650; color:#343840;">
                             {dp.fmt_brl(valor_total_insumo)}
                         </div>
-                        <div style="font-size:0.76rem; color:#8b9098; margin-top:1px;">
+                        <div style="font-size:0.88rem; color:#7f858e; margin-top:4px;">
                             {dp.fmt_brl(valor_unitario)} por unidade
                         </div>
                     </div>
