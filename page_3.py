@@ -186,7 +186,12 @@ def page_3():
             int(r["saldo"]) * pr.get(r["tipo"], 0)
             for _, r in saldo.iterrows()
         )
-        st.markdown(f"**Valor total a devolver:** {dp.fmt_brl(total_val)}")
+        st.markdown(
+            f"<div style='margin-top:30px; padding-top:4px;'>"
+            f"<strong>Valor total a devolver:</strong> {dp.fmt_brl(total_val)}"
+            f"</div>",
+            unsafe_allow_html=True,
+        )
 
     st.markdown("<hr class='sb-sep' style='border-top-color:#e6e6e6;'>", unsafe_allow_html=True)
 
