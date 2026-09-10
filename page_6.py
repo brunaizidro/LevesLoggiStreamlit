@@ -3,7 +3,7 @@ page_6.py — Conciliação enviado × devolvido (cobrança).
 
 Confronta, por operação × tipo, o que foi enviado e o que já foi devolvido
 (recebido), destacando o que está em aberto e o que é cobrável (parado há mais
-que o prazo). Aging FIFO. Somente quantidades (o valor R$ é aplicado fora).
+que o prazo). Aging FIFO. Quantidades e valores quando houver preço configurado.
 """
 
 from __future__ import annotations
@@ -48,10 +48,8 @@ def page_6():
         st.info("Nenhum envio registrado ainda.")
         return
 
-    # ---- Competência ----
     meses = sorted(env["mes"].unique(), reverse=True)
     rotulos = {m: dp.rotulo_mes(m) for m in meses}
-    # Padrão: a competência mais recente que já passou do prazo (fechável); senão a mais recente.
     idx = next((i for i, m in enumerate(meses) if dp.competencia_fechavel(m)), 0)
     escolha = st.selectbox("Competência", [rotulos[m] for m in meses], index=idx)
     mes = next(m for m, r in rotulos.items() if r == escolha)
@@ -62,8 +60,7 @@ def page_6():
     if fechavel:
         st.caption(f"Prazo de devolução encerrado em **{prazo_txt}** — competência pronta para fechar.")
     else:
-        st.caption(f"⏳ Devoluções desta competência são aceitas até **{prazo_txt}** "
-                   "— feche a cobrança após essa data.")
+        st.caption(f"⏳ Devoluções desta competência são aceitas até **{prazo_txt}** — feche a cobrança após essa data.")
 
     df = dp.conciliacao(mes)
     if df.empty:
@@ -88,9 +85,11 @@ def page_6():
         st.info(f"Nenhum registro encontrado para a operação **{op_escolhida}** nesta competência.")
         return
 
-    # ---- Totais ----
+    # ---- Preços ----
     pr = dp.precos()
     usa_valor = dp.tem_precos()
+
+    # ---- Totais ----
     rot_cobravel = "Cobrável" if fechavel else "Em aberto"
     ncols = 5 if usa_valor else 4
     cs = st.columns(ncols)
@@ -110,17 +109,17 @@ def page_6():
         # IMPORTANTE: usa o df completo, sem o filtro de operação.
         total_cobravel = int(df["cobravel"].sum())
         if dados.competencia_ja_fechada(mes):
-            st.success(f"A competência **{escolha}** já foi fechada. "
-                       "Os itens cobrados foram baixados (não são recobrados nem aceitam devolução).")
+            st.success(f"A competência **{escolha}** já foi fechada. Os itens cobrados foram baixados (não são recobrados nem aceitam devolução).")
         elif not fechavel:
-            st.info(f"Ainda dentro do prazo de devolução (até {prazo_txt}). "
-                    "O fechamento fica disponível a partir do dia 6.")
+            st.info(f"Ainda dentro do prazo de devolução (até {prazo_txt}). O fechamento fica disponível a partir do dia 6.")
         elif total_cobravel == 0:
             st.caption("Nenhum item cobrável nesta competência. Nada a fechar.")
         else:
+            total_valor = sum(int(r["cobravel"]) * pr.get(r["tipo"], 0) for _, r in df.iterrows()) if usa_valor else 0
+            aviso_valor = f" ({dp.fmt_brl(total_valor)})" if usa_valor else ""
             st.warning(
                 f"Ao fechar, **{_fmt(total_cobravel)}** itens não devolvidos até {prazo_txt} serão "
-                "registrados como cobrados e recebem **baixa definitiva** — saem do saldo e não aceitam mais devolução."
+                f"registrados como cobrados e recebem **baixa definitiva** — saem do saldo e não aceitam mais devolução.{aviso_valor}"
             )
             confirma = st.checkbox("Confirmo o fechamento desta competência (ação irreversível).")
             if st.button("💰 Registrar cobrança e dar baixa", type="primary", disabled=not confirma):
@@ -141,7 +140,7 @@ def page_6():
 
     st.markdown("---")
 
-    # ---- Cobrável por tipo (gráfico) ----
+    # ---- Gráficos ----
     g1, g2 = st.columns([1, 1.3])
     with g1:
         tdf = df_view.groupby("tipo", as_index=False)["cobravel"].sum()
@@ -176,10 +175,19 @@ def page_6():
     tab = df_view.copy()
     if so_cobravel:
         tab = tab[tab["cobravel"] > 0]
+
+    if usa_valor:
+        tab["Valor unitário"] = tab["tipo"].map(pr).fillna(0.0)
+        tab["Valor cobrável"] = tab["cobravel"].astype(int) * tab["Valor unitário"]
+
     tab_disp = tab.drop(columns=["em_aberto"]).rename(columns={
         "destino": "Operação", "tipo": "Tipo", "enviado": "Enviado",
         "devolvido": "Devolvido", "cobrado": "Já cobrado", "cobravel": "Cobrável",
     })
+    if usa_valor:
+        tab_disp["Valor unitário"] = tab_disp["Valor unitário"].map(dp.fmt_brl)
+        tab_disp["Valor cobrável"] = tab_disp["Valor cobrável"].map(dp.fmt_brl)
+
     st.dataframe(
         tab_disp,
         width="stretch",
@@ -187,19 +195,24 @@ def page_6():
         column_config=_centralizar_tabela(tab_disp),
     )
 
-    # ---- Resumo por operação (para faturamento) ----
+    # ---- Resumo por operação ----
     st.markdown("#### Resumo por operação (cobrável por tipo)")
-    piv = tab.pivot_table(index="destino", columns="tipo", values="cobravel",
-                          aggfunc="sum", fill_value=0)
+    piv = tab.pivot_table(index="destino", columns="tipo", values="cobravel", aggfunc="sum", fill_value=0)
     piv["TOTAL"] = piv.sum(axis=1)
+    if usa_valor:
+        valores_op = tab.groupby("destino")["Valor cobrável"].sum()
+        piv["VALOR TOTAL"] = valores_op
     piv = piv[piv["TOTAL"] > 0].sort_values("TOTAL", ascending=False)
     if piv.empty:
         st.caption("Nenhuma operação com itens cobráveis no período.")
     else:
+        piv_disp = piv.copy()
+        if usa_valor:
+            piv_disp["VALOR TOTAL"] = piv_disp["VALOR TOTAL"].map(dp.fmt_brl)
         st.dataframe(
-            piv,
+            piv_disp,
             width="stretch",
-            column_config=_centralizar_tabela(piv),
+            column_config=_centralizar_tabela(piv_disp),
         )
 
     # ---- Exportação Excel ----
@@ -207,7 +220,7 @@ def page_6():
     excel_buffer = io.BytesIO()
     with __import__("pandas").ExcelWriter(excel_buffer, engine="openpyxl") as writer:
         tab_disp.to_excel(writer, index=False, sheet_name="Conciliação")
-        piv.to_excel(writer, sheet_name="Resumo por operação")
+        piv_disp.to_excel(writer, sheet_name="Resumo por operação")
     excel_buffer.seek(0)
 
     st.download_button(
@@ -218,7 +231,7 @@ def page_6():
         key="dl_concil",
     )
 
-    # ---- Histórico de cobranças fechadas (auditoria) ----
+    # ---- Histórico de cobranças fechadas ----
     st.markdown("---")
     st.markdown("#### Histórico de cobranças fechadas")
     cobs = dp.cobrancas_df()
@@ -230,14 +243,12 @@ def page_6():
     cobs["Competência"] = cobs["competencia"].map(
         lambda m: dp.rotulo_mes(m) if len(str(m)) == 7 else str(m))
 
-    # Resumo por competência
     resumo = (cobs.groupby(["competencia", "Competência"], as_index=False)
               .agg(itens_cobrados=("qtd", "sum"), operacoes=("destino", "nunique"),
                    fechada_em=("data", "max")))
     resumo = resumo.sort_values("competencia", ascending=False)
     resumo_disp = resumo[["Competência", "itens_cobrados", "operacoes", "fechada_em"]].rename(
-        columns={"itens_cobrados": "Itens cobrados", "operacoes": "Operações",
-                 "fechada_em": "Fechada em"})
+        columns={"itens_cobrados": "Itens cobrados", "operacoes": "Operações", "fechada_em": "Fechada em"})
     st.dataframe(
         resumo_disp,
         width="stretch",
@@ -245,18 +256,16 @@ def page_6():
         column_config=_centralizar_tabela(resumo_disp),
     )
 
-    # Detalhamento (filtrável por competência)
+    # ---- Detalhamento histórico ----
     comps = list(dict.fromkeys(cobs["competencia"]))
     rot_comp = {c: (dp.rotulo_mes(c) if len(str(c)) == 7 else str(c)) for c in comps}
-    fcomp = st.selectbox("Detalhar competência", ["Todas"] + [rot_comp[c] for c in comps],
-                         key="hist_comp")
+    fcomp = st.selectbox("Detalhar competência", ["Todas"] + [rot_comp[c] for c in comps], key="hist_comp")
     det = cobs
     if fcomp != "Todas":
         alvo = next(c for c, r in rot_comp.items() if r == fcomp)
         det = cobs[cobs["competencia"] == alvo]
 
-    det_disp = det[["id", "data", "Competência", "destino", "tipo", "qtd",
-                    "prazo_dias", "gerado_por"]].rename(columns={
+    det_disp = det[["id", "data", "Competência", "destino", "tipo", "qtd", "prazo_dias", "gerado_por"]].rename(columns={
         "id": "Cobrança", "data": "Data/hora", "destino": "Operação", "tipo": "Tipo",
         "qtd": "Qtd cobrada", "prazo_dias": "Prazo (até)", "gerado_por": "Gerado por"})
     st.dataframe(
@@ -271,7 +280,7 @@ def page_6():
         file_name="cobrancas_fechadas.csv", mime="text/csv", key="dl_cobs",
     )
 
-    # ---- Enviar cobrança por e-mail (competência selecionada) ----
+    # ---- Enviar cobrança por e-mail ----
     st.markdown("---")
     st.markdown("#### Enviar cobrança por e-mail")
     cobs_mes = cobs[cobs["competencia"] == mes] if not cobs.empty else cobs
@@ -292,7 +301,6 @@ def _emails_do_destino(destino: str) -> list[str]:
 
 
 def _enviar_cobrancas_email(cobs_mes, competencia_label: str, prazo_txt: str):
-    # Agrupa por operação (destino).
     grupos = []
     for destino, g in cobs_mes.groupby("destino"):
         itens = [{"tipo": r["tipo"], "qtd": int(r["qtd"])} for _, r in g.iterrows()]
