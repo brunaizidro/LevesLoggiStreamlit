@@ -157,12 +157,27 @@ def page_3():
     pr = dp.precos()
     cols = st.columns(max(len(saldo), 1))
     for i, (_, r) in enumerate(saldo.iterrows()):
+        tipo = r["tipo"]
+        qtd_saldo = int(r["saldo"])
+        valor_unitario = pr.get(tipo, 0)
+        valor_total_insumo = qtd_saldo * valor_unitario
+
         ajuda = f"Enviado: {_fmt(r['enviado'])} · Já devolvido: {_fmt(r['devolvido'])}"
-        if pr.get(r["tipo"], 0) > 0:
-            ajuda += f" · {dp.fmt_brl(int(r['saldo']) * pr[r['tipo']])}"
-        cols[i].metric(r["tipo"].title(), _fmt(r["saldo"]), help=ajuda)
+        if valor_unitario > 0:
+            ajuda += f" · {dp.fmt_brl(valor_total_insumo)}"
+
+        cols[i].metric(tipo.title(), _fmt(qtd_saldo), help=ajuda)
+        if valor_unitario > 0:
+            cols[i].caption(
+                f"Valor: **{dp.fmt_brl(valor_total_insumo)}** "
+                f"({dp.fmt_brl(valor_unitario)}/un.)"
+            )
+
     if dp.tem_precos():
-        total_val = sum(int(r["saldo"]) * pr.get(r["tipo"], 0) for _, r in saldo.iterrows())
+        total_val = sum(
+            int(r["saldo"]) * pr.get(r["tipo"], 0)
+            for _, r in saldo.iterrows()
+        )
         st.markdown(f"**Valor total a devolver:** {dp.fmt_brl(total_val)}")
 
     st.markdown("<hr class='sb-sep' style='border-top-color:#e6e6e6;'>", unsafe_allow_html=True)
