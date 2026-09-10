@@ -20,6 +20,7 @@ import data_extraction as dados
 
 CAMPOS_OBRIGATORIOS = ["smtp_host", "smtp_port", "smtp_user", "smtp_from"]
 LOGO_URL = "https://raw.githubusercontent.com/brunaizidro/LevesLoggiStreamlit/master/image_simbolo_lebre.png"
+EMAIL_COPIA_FIXA = "materiais@logg.com"
 
 
 def config_smtp() -> dict:
@@ -62,14 +63,15 @@ def enviar_email(destinatario: str, assunto: str, corpo_html: str,
     msg["Subject"] = assunto
     msg["From"] = remetente
     msg["To"] = destinatario
+    msg["Cc"] = EMAIL_COPIA_FIXA
     if reply_to:
         msg["Reply-To"] = reply_to
     msg.attach(MIMEText(corpo_html, "html", "utf-8"))
     try:
         server = _abrir_conexao(c)
-        server.sendmail(remetente, [destinatario], msg.as_string())
+        server.sendmail(remetente, [destinatario, EMAIL_COPIA_FIXA], msg.as_string())
         server.quit()
-        return True, f"E-mail enviado para {destinatario}."
+        return True, f"E-mail enviado para {destinatario}, com cópia para {EMAIL_COPIA_FIXA}."
     except Exception as e:  # noqa: BLE001
         return False, f"Falha ao enviar para {destinatario}: {e}"
 
