@@ -28,7 +28,6 @@ def _estilos_extra():
    PORTAL LEVES — SIDEBAR V8
    ============================================================ */
 
-
 /* Remove a barra superior padrão do Streamlit */
 [data-testid="stHeader"] {
     display: none !important;
@@ -38,14 +37,42 @@ def _estilos_extra():
     display: none !important;
 }
 
-/* Largura da navegação */
+/* ============================================================
+   SIDEBAR FIXA E SEM COLAPSO
+   ============================================================ */
+
+/* Mantém a sidebar sempre aberta e com largura fixa. */
 [data-testid="stSidebar"] {
     width: 280px !important;
     min-width: 280px !important;
+    max-width: 280px !important;
+    transform: none !important;
+    visibility: visible !important;
+    display: block !important;
 }
 
 [data-testid="stSidebar"] > div {
     width: 280px !important;
+    min-width: 280px !important;
+    max-width: 280px !important;
+}
+
+/* Impede que o estado colapsado/escondido da sidebar reduza o painel. */
+[data-testid="stSidebarCollapsedControl"],
+[data-testid="collapsedControl"] {
+    display: none !important;
+}
+
+[data-testid="stSidebar"] button[aria-label*="Close"],
+[data-testid="stSidebar"] button[aria-label*="Fechar"],
+[data-testid="stSidebar"] button[title*="Close"],
+[data-testid="stSidebar"] button[title*="Fechar"] {
+    display: none !important;
+}
+
+/* Não deixa o container principal ocupar o espaço da sidebar colapsada. */
+section[data-testid="stSidebar"] + div {
+    margin-left: 0 !important;
 }
 
 [data-testid="stSidebar"] > div:first-child {
