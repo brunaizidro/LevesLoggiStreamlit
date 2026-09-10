@@ -151,10 +151,10 @@ def corpo_pendencia(operacao: str, itens: list[dict], total: int, precos: dict |
     tabela, _ = _tabela_itens(itens, "pendente", "Pendente", precos)
     return f"""
     <div style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;max-width:770px;margin:0 auto">
-      <div style="text-align:left;margin-bottom:8px">
-        <img src="{LOGO_URL}" alt="Loggi" width="110" style="display:block;height:auto">
+      <div style="text-align:center;margin-bottom:8px">
+        <img src="{LOGO_URL}" alt="Loggi" width="110" style="display:block;margin:0 auto;height:auto">
       </div>
-      <div style="color:#6e6e6e;letter-spacing:2px;text-transform:uppercase;font-size:11px;margin-bottom:16px;text-align:left">Portal LEVES</div>
+      <div style="color:#6e6e6e;letter-spacing:2px;text-transform:uppercase;font-size:11px;margin-bottom:16px;text-align:center">Portal LEVES</div>
       <p>Olá, <b>{operacao}</b>.</p>
       <p>Consta a seguinte <b>pendência de devolução</b> de insumos com a sua operação.
       Por favor, programe a devolução o quanto antes:</p>
@@ -177,10 +177,10 @@ def corpo_cobranca(operacao: str, competencia_label: str, prazo: str,
     tabela, _ = _tabela_itens(itens, "qtd", "Quantidade", precos)
     return f"""
     <div style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;max-width:770px;margin:0 auto">
-      <div style="text-align:left;margin-bottom:8px">
-        <img src="{LOGO_URL}" alt="Loggi" width="110" style="display:block;height:auto">
+      <div style="text-align:center;margin-bottom:8px">
+        <img src="{LOGO_URL}" alt="Loggi" width="110" style="display:block;margin:0 auto;height:auto">
       </div>
-      <div style="color:#6e6e6e;letter-spacing:2px;text-transform:uppercase;font-size:11px;margin-bottom:16px;text-align:left">Portal LEVES</div>
+      <div style="color:#6e6e6e;letter-spacing:2px;text-transform:uppercase;font-size:11px;margin-bottom:16px;text-align:center">Portal LEVES</div>
       <p>Olá, <b>{operacao}</b>.</p>
       <p>Referente à competência <b>{competencia_label}</b>, identificamos insumos enviados que
       <b>não foram devolvidos até o prazo</b> ({prazo}). Segue o detalhamento para acerto:</p>
