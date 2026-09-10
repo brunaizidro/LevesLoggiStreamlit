@@ -9,6 +9,7 @@ que o prazo). Aging FIFO. Somente quantidades (o valor R$ é aplicado fora).
 from __future__ import annotations
 
 from datetime import datetime
+import io
 
 import plotly.express as px
 import streamlit as st
@@ -201,11 +202,20 @@ def page_6():
             column_config=_centralizar_tabela(piv),
         )
 
+    # ---- Exportação Excel ----
     sufixo = mes or "ate_hoje"
+    excel_buffer = io.BytesIO()
+    with __import__("pandas").ExcelWriter(excel_buffer, engine="openpyxl") as writer:
+        tab_disp.to_excel(writer, index=False, sheet_name="Conciliação")
+        piv.to_excel(writer, sheet_name="Resumo por operação")
+    excel_buffer.seek(0)
+
     st.download_button(
-        "Baixar conciliação (CSV)",
-        tab_disp.to_csv(index=False).encode("utf-8-sig"),
-        file_name=f"conciliacao_{sufixo}.csv", mime="text/csv", key="dl_concil",
+        "Baixar conciliação (Excel)",
+        excel_buffer.getvalue(),
+        file_name=f"conciliacao_{sufixo}.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        key="dl_concil",
     )
 
     # ---- Histórico de cobranças fechadas (auditoria) ----
