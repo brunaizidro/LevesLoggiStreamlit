@@ -84,69 +84,71 @@ def page_5():
     # ============================================================
     # Percentual de devolução no período
     # ============================================================
-    col_esq, col_centro, col_dir = st.columns([1, 2.4, 1])
-    with col_centro:
-        st.markdown("#### Percentual de devolução no período")
-        st.caption("Percentual = total recebido no período ÷ total enviado no período.")
+    st.markdown("#### Percentual de devolução no período")
+    st.caption("Percentual = total recebido no período ÷ total enviado no período.")
 
-        meses = _meses_relatorio(envios, devs)
-        periodo_opts = ["Todo o período"] + [dp.rotulo_mes(m) for m in meses]
-        periodo_sel = st.selectbox("Período", periodo_opts, index=1 if meses else 0, key="rel_periodo")
+    meses = _meses_relatorio(envios, devs)
+    periodo_opts = ["Todo o período"] + [dp.rotulo_mes(m) for m in meses]
+    periodo_sel = st.selectbox("Período", periodo_opts, index=1 if meses else 0, key="rel_periodo")
 
-        env_periodo = envios.copy()
-        if periodo_sel != "Todo o período":
-            mes_sel = next(m for m in meses if dp.rotulo_mes(m) == periodo_sel)
-            env_periodo = env_periodo[env_periodo["mes"] == mes_sel]
-        else:
-            mes_sel = None
+    env_periodo = envios.copy()
+    if periodo_sel != "Todo o período":
+        mes_sel = next(m for m in meses if dp.rotulo_mes(m) == periodo_sel)
+        env_periodo = env_periodo[env_periodo["mes"] == mes_sel]
+    else:
+        mes_sel = None
 
-        enviados_tipo = {}
-        if not env_periodo.empty:
-            env_periodo["tipo"] = env_periodo["tipo"].astype(str).str.upper().str.strip()
-            env_periodo["total"] = env_periodo["total"].fillna(0)
-            enviados_tipo = env_periodo.groupby("tipo")["total"].sum().astype(int).to_dict()
+    enviados_tipo = {}
+    if not env_periodo.empty:
+        env_periodo["tipo"] = env_periodo["tipo"].astype(str).str.upper().str.strip()
+        env_periodo["total"] = env_periodo["total"].fillna(0)
+        enviados_tipo = env_periodo.groupby("tipo")["total"].sum().astype(int).to_dict()
 
-        recebidos_tipo = {}
-        if mes_sel:
-            recebidos_tipo = _recebidos_no_periodo(devs, its, mes_sel)
-        elif not devs.empty and not its.empty:
-            import pandas as pd
+    recebidos_tipo = {}
+    if mes_sel:
+        recebidos_tipo = _recebidos_no_periodo(devs, its, mes_sel)
+    elif not devs.empty and not its.empty:
+        import pandas as pd
 
-            d = devs[devs["status"].isin(dp.STATUS_RECEBIDOS)].copy()
-            if not d.empty and "data_recebimento" in d.columns:
-                d["dt_receb"] = pd.to_datetime(d["data_recebimento"], errors="coerce")
-                d = d[d["dt_receb"].notna()]
-                mapa = d.set_index("id").index
-                it = its[its["id_devolucao"].isin(set(mapa))].copy()
-                if not it.empty:
-                    it["qtd_recebida"] = pd.to_numeric(it["qtd_recebida"], errors="coerce")
-                    it["qtd_declarada"] = pd.to_numeric(it["qtd_declarada"], errors="coerce").fillna(0)
-                    it["q"] = it["qtd_recebida"].fillna(it["qtd_declarada"]).fillna(0)
-                    it["tipo"] = it["tipo"].astype(str).str.upper().str.strip()
-                    recebidos_tipo = it.groupby("tipo")["q"].sum().astype(int).to_dict()
+        d = devs[devs["status"].isin(dp.STATUS_RECEBIDOS)].copy()
+        if not d.empty and "data_recebimento" in d.columns:
+            d["dt_receb"] = pd.to_datetime(d["data_recebimento"], errors="coerce")
+            d = d[d["dt_receb"].notna()]
+            mapa = d.set_index("id").index
+            it = its[its["id_devolucao"].isin(set(mapa))].copy()
+            if not it.empty:
+                it["qtd_recebida"] = pd.to_numeric(it["qtd_recebida"], errors="coerce")
+                it["qtd_declarada"] = pd.to_numeric(it["qtd_declarada"], errors="coerce").fillna(0)
+                it["q"] = it["qtd_recebida"].fillna(it["qtd_declarada"]).fillna(0)
+                it["tipo"] = it["tipo"].astype(str).str.upper().str.strip()
+                recebidos_tipo = it.groupby("tipo")["q"].sum().astype(int).to_dict()
 
-        sacas_env = int(enviados_tipo.get("SACA", 0))
-        sacas_rec = int(recebidos_tipo.get("SACA", 0))
-        gay_env = int(enviados_tipo.get("GAYLORD", 0))
-        gay_rec = int(recebidos_tipo.get("GAYLORD", 0))
+    sacas_env = int(enviados_tipo.get("SACA", 0))
+    sacas_rec = int(recebidos_tipo.get("SACA", 0))
+    gay_env = int(enviados_tipo.get("GAYLORD", 0))
+    gay_rec = int(recebidos_tipo.get("GAYLORD", 0))
 
-        total_env = sacas_env + gay_env
-        total_rec = sacas_rec + gay_rec
+    total_env = sacas_env + gay_env
+    total_rec = sacas_rec + gay_rec
 
-        c1, c2, c3 = st.columns(3)
-        c1.metric("Sacas", f"{_pct(sacas_rec, sacas_env):.1f}%", help=f"Recebidas: {_fmt(sacas_rec)} | Enviadas: {_fmt(sacas_env)}")
-        c2.metric("Gaylords", f"{_pct(gay_rec, gay_env):.1f}%", help=f"Recebidos: {_fmt(gay_rec)} | Enviados: {_fmt(gay_env)}")
-        c3.metric("Total", f"{_pct(total_rec, total_env):.1f}%", help=f"Recebidos: {_fmt(total_rec)} | Enviados: {_fmt(total_env)}")
+    c1, c2, c3 = st.columns(3)
+    c1.metric("Sacas", f"{_pct(sacas_rec, sacas_env):.1f}%", help=f"Recebidas: {_fmt(sacas_rec)} | Enviadas: {_fmt(sacas_env)}")
+    c2.metric("Gaylords", f"{_pct(gay_rec, gay_env):.1f}%", help=f"Recebidos: {_fmt(gay_rec)} | Enviados: {_fmt(gay_env)}")
+    c3.metric("Total", f"{_pct(total_rec, total_env):.1f}%", help=f"Recebidos: {_fmt(total_rec)} | Enviados: {_fmt(total_env)}")
 
-        resumo_pct = __import__("pandas").DataFrame([
-            {"Tipo": "SACA", "Enviado": sacas_env, "Recebido": sacas_rec, "% Devolução": _pct(sacas_rec, sacas_env)},
-            {"Tipo": "GAYLORD", "Enviado": gay_env, "Recebido": gay_rec, "% Devolução": _pct(gay_rec, gay_env)},
-            {"Tipo": "TOTAL", "Enviado": total_env, "Recebido": total_rec, "% Devolução": _pct(total_rec, total_env)},
-        ])
-        resumo_pct["Enviado"] = resumo_pct["Enviado"].map(_fmt)
-        resumo_pct["Recebido"] = resumo_pct["Recebido"].map(_fmt)
-        resumo_pct["% Devolução"] = resumo_pct["% Devolução"].map(lambda x: f"{x:.1f}%")
-        st.dataframe(resumo_pct, width="stretch", hide_index=True)
+    resumo_pct = __import__("pandas").DataFrame([
+        {"Tipo": "SACA", "Enviado": sacas_env, "Recebido": sacas_rec, "% Devolução": _pct(sacas_rec, sacas_env)},
+        {"Tipo": "GAYLORD", "Enviado": gay_env, "Recebido": gay_rec, "% Devolução": _pct(gay_rec, gay_env)},
+        {"Tipo": "TOTAL", "Enviado": total_env, "Recebido": total_rec, "% Devolução": _pct(total_rec, total_env)},
+    ])
+    resumo_pct["Enviado"] = resumo_pct["Enviado"].map(_fmt)
+    resumo_pct["Recebido"] = resumo_pct["Recebido"].map(_fmt)
+    resumo_pct["% Devolução"] = resumo_pct["% Devolução"].map(lambda x: f"{x:.1f}%")
+
+    resumo_pct = resumo_pct.style.set_properties(**{"text-align": "center"}).set_table_styles([
+        {"selector": "th", "props": [("text-align", "center")]}
+    ])
+    st.dataframe(resumo_pct, width="stretch", hide_index=True)
 
     st.markdown("---")
 
