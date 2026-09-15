@@ -23,7 +23,6 @@ CINZA = "#6f7b8c"
 def _fmt(n) -> str:
     return f"{int(n):,}".replace(",", ".")
 
-
 def _icone_tipo(tipo: str) -> str:
     mapa = {
         "gaylord": "📦",
@@ -42,7 +41,6 @@ def _injetar_css():
 /* ============================================================
    PORTAL LEVES — ÁREA INTERNA V7
    ============================================================ */
-
 /* Remove a barra superior padrão do Streamlit */
 [data-testid="stHeader"] {
     display: none !important;
@@ -60,7 +58,6 @@ def _injetar_css():
     padding-top: 12px !important;
     padding-bottom: 40px !important;
 }
-
 /* Cabeçalho */
 .leves-breadcrumb {
     color: #8a95a5;
@@ -84,7 +81,6 @@ def _injetar_css():
 .leves-page-title span {
     color: #0067fc;
 }
-
 .leves-page-description {
     color: #697587;
     font-family: Montserrat, sans-serif;
@@ -102,7 +98,6 @@ def _injetar_css():
     font-weight: 700;
     margin: 4px 0 10px 0;
 }
-
 /* KPIs */
 .leves-kpi {
     background: #ffffff;
@@ -125,7 +120,6 @@ def _injetar_css():
     text-transform: uppercase;
     letter-spacing: .45px;
 }
-
 .leves-kpi-icon {
     width: 25px;
     height: 25px;
@@ -152,7 +146,6 @@ def _injetar_css():
     font-size: 10px;
     margin-top: 5px;
 }
-
 /* Espaçamento dos widgets */
 div[data-testid="stHorizontalBlock"] {
     gap: 16px;
@@ -168,7 +161,6 @@ div[data-testid="stHorizontalBlock"] {
 [data-baseweb="select"] > div:hover {
     border-color: #b9c7d8 !important;
 }
-
 [data-testid="stWidgetLabel"] p {
     color: #536074 !important;
     font-family: Montserrat, sans-serif !important;
@@ -185,7 +177,6 @@ div[data-testid="stHorizontalBlock"] {
     box-shadow: 0 5px 18px rgba(23, 32, 51, .035);
     min-height: 345px;
 }
-
 .leves-chart-title {
     color: #253044;
     font-family: Montserrat, sans-serif;
@@ -206,7 +197,6 @@ div[data-testid="stHorizontalBlock"] {
     font-family: Montserrat, sans-serif !important;
     font-weight: 600 !important;
 }
-
 /* Avisos */
 [data-testid="stAlert"] {
     border-radius: 12px !important;
@@ -228,7 +218,7 @@ def page_1():
 
     user = st.session_state.get("usuario") or {}
     eh_admin = user.get("perfil") == "admin"
-
+    eh_gdl = user.get("perfil") == "gdl"
     # ============================================================
     # Cabeçalho
     # ============================================================
@@ -237,12 +227,11 @@ def page_1():
         unsafe_allow_html=True,
     )
 
-    titulo = "Visão geral dos envios" if eh_admin else "Insumos enviados para você"
+    titulo = "Visão geral dos envios" if (eh_admin or eh_gdl) else "Insumos enviados para você"
     st.markdown(
         f'<div class="leves-page-title">{html.escape(titulo)}</div>',
         unsafe_allow_html=True,
     )
-
     st.markdown(
         '<div class="leves-page-description">'
         "Consulte e acompanhe os insumos enviados para sua operação. "
@@ -255,21 +244,19 @@ def page_1():
     if df.empty:
         st.info(
             "Nenhum envio encontrado."
-            if eh_admin
+            if (eh_admin or eh_gdl)
             else "Nenhum envio encontrado para a sua operação."
         )
         return
-
     # ============================================================
     # Filtros
     # ============================================================
     st.markdown('<div class="leves-section-label">Filtros</div>', unsafe_allow_html=True)
 
-    fcol1, fcol2 = st.columns([1, 1.4])
+    fcol1, fcol2, fcol3 = st.columns([1, 1.1, 1.4])
     meses = sorted(df["mes"].unique(), reverse=True)
     rotulos = {m: dp.rotulo_mes(m) for m in meses}
     opcoes = ["Todo o período"] + [rotulos[m] for m in meses]
-
     escolha = fcol1.selectbox(
         "Período",
         opcoes,
@@ -283,13 +270,25 @@ def page_1():
         default=tipos_disp,
     )
 
+    if eh_admin or eh_gdl:
+        operacoes_disp = sorted(df["destino"].dropna().astype(str).unique())
+        sel_operacoes = fcol3.multiselect(
+            "Operação",
+            operacoes_disp,
+            default=operacoes_disp,
+        )
+    else:
+        sel_operacoes = []
+
     dfx = df.copy()
     if escolha != "Todo o período":
         mes_sel = next(m for m, r in rotulos.items() if r == escolha)
         dfx = dfx[dfx["mes"] == mes_sel]
     if sel_tipos:
         dfx = dfx[dfx["tipo"].isin(sel_tipos)]
-
+    if eh_admin or eh_gdl:
+        if sel_operacoes:
+            dfx = dfx[dfx["destino"].isin(sel_operacoes)]
     if dfx.empty:
         st.warning("Sem dados para os filtros selecionados.")
         return
@@ -301,12 +300,10 @@ def page_1():
 
     total_geral = int(dfx["total"].sum())
     por_tipo = dfx.groupby("tipo")["total"].sum().to_dict()
-
     kpis = [("Total de insumos", total_geral, "📦", "no período")]
     for t in tipos_disp:
         # Os cards individuais ficam sem emoji; apenas o total usa ícone.
         kpis.append((str(t).title(), por_tipo.get(t, 0), "", "enviados"))
-
     cols = st.columns(len(kpis))
     for col, (nome, valor, icone, subtitulo) in zip(cols, kpis):
         with col:
@@ -320,7 +317,6 @@ def page_1():
                 f'</div>',
                 unsafe_allow_html=True,
             )
-
     # ============================================================
     # Gráficos
     # ============================================================
@@ -332,7 +328,6 @@ def page_1():
         .sum()
         .sort_values("total", ascending=False)
     )
-
     fig_tipo = px.bar(
         tdf,
         x="tipo",
@@ -351,12 +346,10 @@ def page_1():
         xaxis=dict(showgrid=False, title=None),
         yaxis=dict(gridcolor="#edf0f4", title=None),
     )
-
     with g1:
         with st.container(border=True):
             st.markdown('<div class="leves-chart-title">Total por tipo de insumo</div>', unsafe_allow_html=True)
             st.plotly_chart(fig_tipo, width="stretch", config={"displayModeBar": False})
-
     ddf = dfx.groupby(["dia", "tipo"], as_index=False)["total"].sum()
     fig_dia = px.bar(
         ddf,
@@ -378,12 +371,10 @@ def page_1():
         yaxis=dict(gridcolor="#edf0f4", title=None),
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
     )
-
     with g2:
         with st.container(border=True):
             st.markdown('<div class="leves-chart-title">Envios por dia</div>', unsafe_allow_html=True)
             st.plotly_chart(fig_dia, width="stretch", config={"displayModeBar": False})
-
     # ============================================================
     # Admin — ranking
     # ============================================================
@@ -414,13 +405,12 @@ def page_1():
             yaxis=dict(title=None),
         )
         st.plotly_chart(fig_dest, width="stretch", config={"displayModeBar": False})
-
     # ============================================================
     # Tabela detalhada
     # ============================================================
     st.markdown('<div style="height:12px"></div>', unsafe_allow_html=True)
     with st.expander("Ver tabela detalhada"):
-        cols_tab = ["dt", "tipo", "destino", "total"] if eh_admin else ["dt", "tipo", "total"]
+        cols_tab = ["dt", "tipo", "destino", "total"] if (eh_admin or eh_gdl) else ["dt", "tipo", "total"]
         tab = dfx[cols_tab].sort_values("dt", ascending=False).copy()
         tab["dt"] = tab["dt"].dt.strftime("%d/%m/%Y")
         nomes = {
