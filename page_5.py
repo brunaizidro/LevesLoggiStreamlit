@@ -145,10 +145,10 @@ def page_5():
     resumo_pct["Recebido"] = resumo_pct["Recebido"].map(_fmt)
     resumo_pct["% Devolução"] = resumo_pct["% Devolução"].map(lambda x: f"{x:.1f}%")
 
-    resumo_pct = resumo_pct.style.set_properties(**{"text-align": "center"}).set_table_styles([
+    resumo_pct_styled = resumo_pct.style.set_properties(**{"text-align": "center"}).set_table_styles([
         {"selector": "th", "props": [("text-align", "center")]}
     ])
-    st.dataframe(resumo_pct, width="stretch", hide_index=True)
+    st.dataframe(resumo_pct_styled, width="stretch", hide_index=True)
 
     st.markdown("---")
 
