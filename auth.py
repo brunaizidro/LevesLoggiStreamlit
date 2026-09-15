@@ -31,11 +31,13 @@ import data_extraction as sheets
 PERFIL_ADM = "admin"
 PERFIL_OP = "operacao"
 PERFIL_RECEB = "recebimento"
+PERFIL_GDL = "gdl"
 
 PERFIS_VALIDOS = (
     PERFIL_ADM,
     PERFIL_OP,
     PERFIL_RECEB,
+    PERFIL_GDL,
 )
 
 
@@ -372,5 +374,8 @@ def normalizar_perfil(v) -> str:
 
     if s in ("recebimento", "recebedor"):
         return PERFIL_RECEB
+
+    if s in ("gdl", "g.d.l"):
+        return PERFIL_GDL
 
     return PERFIL_OP
