@@ -23,7 +23,7 @@ def _importar_massa():
     """Importação de usuários via CSV (com template, prévia e relatório)."""
     st.markdown("<p class='subtitle'>Importar em massa (CSV)</p>", unsafe_allow_html=True)
     st.caption("Colunas: nome, usuario, senha, destino, perfil, email. "
-               "Perfil aceita: operacao, admin ou recebimento (padrão operacao).")
+               "Perfil aceita: operacao, admin, recebimento ou gdl (padrão operacao).")
 
     modelo = pd.DataFrame([
         {"nome": "Base São Paulo", "usuario": "base_sp", "senha": "trocar123",
@@ -106,20 +106,21 @@ def page_2():
             usuario = st.text_input("Usuário (login)", placeholder="ex.: base_sp")
             senha = st.text_input("Senha", placeholder="mín. 6 caracteres")
             email = st.text_input("E-mail (para cobrança)", placeholder="ex.: base_sp@empresa.com")
-            perfil_lbl = st.selectbox("Perfil", ["Operação", "Administrador", "Recebimento"])
+            perfil_lbl = st.selectbox("Perfil", ["Operação", "Administrador", "Recebimento", "GDL"])
             if destinos:
                 destino = st.selectbox("Destino (da planilha)", options=[""] + destinos)
                 destino_livre = st.text_input("...ou digite um destino novo")
                 destino = destino_livre.strip() or destino
             else:
                 destino = st.text_input("Destino (exato da planilha)")
-            st.caption("Admin e Recebimento não usam destino (preenche com '*' automaticamente).")
+            st.caption("Admin e Recebimento não usam destino. GDL deve ser vinculado ao destino/base correspondente.")
             criar = st.form_submit_button("Criar usuário", type="primary", width="stretch")
 
         if criar:
             perfil = {
                 "Administrador": auth.PERFIL_ADM,
                 "Recebimento": auth.PERFIL_RECEB,
+                "GDL": auth.PERFIL_GDL,
             }.get(perfil_lbl, auth.PERFIL_OP)
             # Admin/Recebimento veem tudo — destino não é usado para filtro.
             if perfil in (auth.PERFIL_ADM, auth.PERFIL_RECEB) and not destino.strip():
