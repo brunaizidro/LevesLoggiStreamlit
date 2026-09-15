@@ -123,7 +123,8 @@ def page_2():
                 "GDL": auth.PERFIL_GDL,
             }.get(perfil_lbl, auth.PERFIL_OP)
             # Admin/Recebimento veem tudo — destino não é usado para filtro.
-            if perfil in (auth.PERFIL_ADM, auth.PERFIL_RECEB) and not destino.strip():
+            if perfil in (auth.PERFIL_ADM, auth.PERFIL_RECEB, auth.PERFIL_GDL,
+            ) and not destino.strip():
                 destino = "*"
             ok, msg = auth.criar_usuario(usuario, senha, destino, nome, perfil, email=email)
             (st.success if ok else st.error)(msg)
