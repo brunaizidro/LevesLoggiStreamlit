@@ -1073,6 +1073,7 @@ def main():
     perfil = user.get("perfil")
     eh_admin = perfil == "admin"
     eh_receb = perfil == "recebimento"
+    eh_gdl = perfil == "gdl"
 
     # Devolução aberta pelo QR (id + token na URL).
     scan_id = st.query_params.get("dev")
@@ -1081,7 +1082,7 @@ def main():
     sidebar()
 
     with st.sidebar:
-        papel = {"admin": "Administrador", "recebimento": "Recebimento"}.get(
+        papel = {"admin": "Administrador", "recebimento": "Recebimento","gdl": "GDL" }.get(
             perfil, f"Destino: {user['destino']}"
         )
 
@@ -1093,6 +1094,11 @@ def main():
 
         if eh_receb:
             opcoes = ["📥 Recebimento"]
+
+        elif eh_gdl:
+            opcoes = ["📦 Envios","🧾 Conciliação",
+            ]
+         
         elif eh_admin:
             opcoes = [
                 "📦 Envios",
@@ -1121,6 +1127,9 @@ def main():
                 index=idx,
                 label_visibility="collapsed",
             )
+        if eh_gdl and pagina not in ["📦 Envios", "🧾 Conciliação"]:
+                pagina = "📦 Envios"
+            
         else:
             pagina = opcoes[0]
 
