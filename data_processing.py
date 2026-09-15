@@ -95,14 +95,26 @@ def envios_df() -> pd.DataFrame:
 
 
 def envios_do_usuario(user: dict) -> pd.DataFrame:
-    """Aplica o multi-tenant: admin vê tudo; operação vê só o seu destino."""
+    """Admin e GDL visualizam envios de todas as bases.
+    Operação visualiza somente o próprio destino.
+    """
     df = envios_df()
+
     if df.empty:
         return df
-    if user.get("perfil") == "admin":
+
+    perfil = str(user.get("perfil", "")).strip().lower()
+
+    # Administrador e GDL visualizam todos os envios
+    if perfil in ("admin", "gdl"):
         return df
+
+    # Demais perfis visualizam somente sua própria base
     alvo = _normalizar(user.get("destino", ""))
-    return df[df["destino"].map(_normalizar) == alvo].copy()
+
+    return df[
+        df["destino"].map(_normalizar) == alvo
+    ].copy()
 
 
 def rotulo_mes(mes: str) -> str:
