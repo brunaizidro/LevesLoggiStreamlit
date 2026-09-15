@@ -1127,12 +1127,12 @@ def main():
                 index=idx,
                 label_visibility="collapsed",
             )
-            
-           if eh_gdl and pagina not in ["📦 Envios", "🧾 Conciliação"]:
+
+            if eh_gdl and pagina not in ["📦 Envios", "🧾 Conciliação"]:
                 pagina = "📦 Envios"
-            
-       else:
-           pagina = opcoes[0]
+
+        else:
+            pagina = opcoes[0]
 
         st.markdown("<hr class='sb-sep'>", unsafe_allow_html=True)
 
