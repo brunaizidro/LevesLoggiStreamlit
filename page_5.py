@@ -136,30 +136,58 @@ def page_5():
     c2.metric("Gaylords", f"{_pct(gay_rec, gay_env):.1f}%", help=f"Recebidos: {_fmt(gay_rec)} | Enviados: {_fmt(gay_env)}")
     c3.metric("Total", f"{_pct(total_rec, total_env):.1f}%", help=f"Recebidos: {_fmt(total_rec)} | Enviados: {_fmt(total_env)}")
 
-    resumo_pct = __import__("pandas").DataFrame([
-        {"Tipo": "SACA", "Enviado": sacas_env, "Recebido": sacas_rec, "% Devolução": _pct(sacas_rec, sacas_env)},
-        {"Tipo": "GAYLORD", "Enviado": gay_env, "Recebido": gay_rec, "% Devolução": _pct(gay_rec, gay_env)},
-        {"Tipo": "TOTAL", "Enviado": total_env, "Recebido": total_rec, "% Devolução": _pct(total_rec, total_env)},
-    ])
-    resumo_pct["Enviado"] = resumo_pct["Enviado"].map(_fmt)
-    resumo_pct["Recebido"] = resumo_pct["Recebido"].map(_fmt)
-    resumo_pct["% Devolução"] = resumo_pct["% Devolução"].map(lambda x: f"{x:.1f}%")
-
-    tabela_html = resumo_pct.to_html(index=False, border=0, classes="relatorio-percentual")
+    # Tabela somente para visualização; conteúdo centralizado.
     st.markdown(
         """
         <style>
-        .relatorio-percentual {
+        .tabela-percentual-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+        .tabela-percentual {
             width: 100%;
             border-collapse: collapse;
+            border: 1px solid #e6e6e6;
+            border-radius: 6px;
+            overflow: hidden;
+            font-size: 14px;
         }
-        .relatorio-percentual th,
-        .relatorio-percentual td {
-            text-align: center !important;
-            vertical-align: middle !important;
+        .tabela-percentual th,
+        .tabela-percentual td {
+            border: 1px solid #e6e6e6;
+            padding: 8px 10px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .tabela-percentual th {
+            background: #f7f7f7;
+            font-weight: 500;
         }
         </style>
-        """ + tabela_html,
+        """,
+        unsafe_allow_html=True,
+    )
+
+    linhas = "".join(
+        f"<tr><td>{tipo}</td><td>{enviado}</td><td>{recebido}</td><td>{percentual}</td></tr>"
+        for tipo, enviado, recebido, percentual in [
+            ("SACA", _fmt(sacas_env), _fmt(sacas_rec), f"{_pct(sacas_rec, sacas_env):.1f}%"),
+            ("GAYLORD", _fmt(gay_env), _fmt(gay_rec), f"{_pct(gay_rec, gay_env):.1f}%"),
+            ("TOTAL", _fmt(total_env), _fmt(total_rec), f"{_pct(total_rec, total_env):.1f}%"),
+        ]
+    )
+    st.markdown(
+        f"""
+        <div class="tabela-percentual-wrapper">
+            <table class="tabela-percentual">
+                <thead>
+                    <tr><th>Tipo</th><th>Enviado</th><th>Recebido</th><th>% Devolução</th></tr>
+                </thead>
+                <tbody>{linhas}</tbody>
+            </table>
+        </div>
+        """,
         unsafe_allow_html=True,
     )
 
