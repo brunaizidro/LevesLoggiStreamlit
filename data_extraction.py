@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import glob
 import os
+import threading
 from datetime import datetime
 
 import gspread
@@ -56,6 +57,10 @@ _SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive.readonly",
 ]
+
+# Lock do processo para proteger o trecho "ler maior ID -> gravar nova devolução".
+# O cache do Streamlit não participa da geração do ID.
+_DEVOLUCAO_ID_LOCK = threading.Lock()
 
 
 def _achar_json_local() -> str | None:
@@ -245,18 +250,15 @@ def _num(v) -> float:
         return 0
 
 
-def proximo_codigo_devolucao() -> str:
-    """Gera DEV-AAAA-NNNNNN sequencial sem usar o cache de devoluções."""
+def _proximo_codigo_devolucao_sem_cache() -> str:
+    """Calcula o próximo DEV-AAAA-NNNNNN lendo diretamente o Sheets."""
     ano = datetime.now().year
+    prefixo = f"DEV-{ano}-"
 
-    # IMPORTANTE: não usar ler_devolucoes() aqui. Essa função possui cache
-    # e pode devolver uma fotografia antiga da planilha quando várias bases
-    # registram devoluções próximas umas das outras.
     ws = _aba(ABA_DEVOLUCOES, CAB_DEVOLUCOES)
     valores = ws.get_all_values()
 
     maior = 0
-    prefixo = f"DEV-{ano}-"
     for row in valores[1:]:
         if not row:
             continue
@@ -272,18 +274,60 @@ def proximo_codigo_devolucao() -> str:
     return f"{prefixo}{maior + 1:06d}"
 
 
-def criar_devolucao(dev: dict, itens: list[dict]):
-    """Grava o cabeçalho e os itens de uma nova devolução."""
+def _id_devolucao_existe(id_dev: str) -> bool:
+    """Confere diretamente na planilha se o ID já foi gravado."""
     ws = _aba(ABA_DEVOLUCOES, CAB_DEVOLUCOES)
-    ws.append_row([dev.get(c, "") for c in CAB_DEVOLUCOES], value_input_option="USER_ENTERED")
+    valores = ws.get_all_values()
+    return any(
+        row and str(row[0]).strip() == str(id_dev).strip()
+        for row in valores[1:]
+    )
+
+
+def proximo_codigo_devolucao() -> str:
+    """Gera um próximo ID sem usar o cache de devoluções.
+
+    A gravação final também valida o ID novamente, pois apenas calcular o
+    próximo número não é suficiente quando duas sessões registram ao mesmo
+    tempo.
+    """
+    with _DEVOLUCAO_ID_LOCK:
+        return _proximo_codigo_devolucao_sem_cache()
+
+
+def criar_devolucao(dev: dict, itens: list[dict]):
+    """Grava uma nova devolução garantindo ID único e itens vinculados a ele."""
+    ws = _aba(ABA_DEVOLUCOES, CAB_DEVOLUCOES)
     wsi = _aba(ABA_DEV_ITENS, CAB_DEV_ITENS)
-    rows = [
-        [dev["id"], it["tipo"], it["qtd_declarada"], it.get("qtd_recebida", "")]
-        for it in itens
-    ]
-    if rows:
-        wsi.append_rows(rows, value_input_option="USER_ENTERED")
+
+    # A geração e a gravação ficam protegidas pelo mesmo lock.
+    # Isso evita que duas sessões leiam o mesmo maior ID e gravem o mesmo próximo ID.
+    with _DEVOLUCAO_ID_LOCK:
+        id_dev = str(dev.get("id", "")).strip()
+
+        # Se a tela já recebeu um ID calculado anteriormente e outra sessão
+        # gravou esse mesmo número antes desta gravação, gere outro agora.
+        if not id_dev or _id_devolucao_existe(id_dev):
+            id_dev = _proximo_codigo_devolucao_sem_cache()
+
+        # Atualiza o objeto usado pelo chamador e, principalmente, usa o mesmo
+        # ID no cabeçalho e em TODOS os itens desta devolução.
+        dev["id"] = id_dev
+
+        ws.append_row(
+            [dev.get(c, "") for c in CAB_DEVOLUCOES],
+            value_input_option="USER_ENTERED",
+        )
+
+        rows = [
+            [id_dev, it["tipo"], it["qtd_declarada"], it.get("qtd_recebida", "")]
+            for it in itens
+        ]
+        if rows:
+            wsi.append_rows(rows, value_input_option="USER_ENTERED")
+
     limpar_cache()
+    return id_dev
 
 
 def _col(cab, nome) -> int:
@@ -438,6 +482,7 @@ def definir_ativo(linha: int, ativo: bool):
     ws = _aba(ABA_USUARIOS, CAB_USUARIOS)
     ws.update_cell(linha, 7, "TRUE" if ativo else "FALSE")
     limpar_cache()
+
 
 def atualizar_senha_usuario(linha: int, senha_hash: str, salt: str):
     """Atualiza hash, salt e marca o primeiro acesso como concluído."""
