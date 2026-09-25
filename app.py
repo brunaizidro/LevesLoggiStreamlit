@@ -37,170 +37,40 @@ from page_9 import page_9  # noqa: E402
 def _init_state():
     st.session_state.setdefault("usuario", None)
     st.session_state.setdefault("tentativas", 0)
-    st.session_state.setdefault("recuperacao", False)
+    st.session_state.setdefault("usuario_primeiro_acesso", None)
 
 
 def logout():
     st.session_state["usuario"] = None
     st.session_state["tentativas"] = 0
-    st.session_state["recuperacao"] = False
 
 
-
-def tela_primeiro_acesso():
-    """Tela obrigatória para criação da senha definitiva no primeiro acesso."""
-    user = st.session_state.get("usuario")
-
-    if not user:
-        return
-
-    st.markdown(
-        """
-        <style>
-        .login-floating-logo {
-            position: fixed !important;
-            top: 22px !important;
-            right: 30px !important;
-            z-index: 1000 !important;
-            width: 90px !important;
-            max-width: 90px !important;
-            text-align: center !important;
-        }
-
-        .login-floating-logo img {
-            display: block !important;
-            width: 90px !important;
-            max-width: 90px !important;
-            height: auto !important;
-            margin: 0 !important;
-        }
-        .first-access-title {
-            text-align: center;
-            color: #172033;
-            font-family: Montserrat, sans-serif;
-            font-size: 24px;
-            font-weight: 800;
-            margin: 8px 0 8px 0;
-        }
-
-        .first-access-description {
-            text-align: center;
-            color: #788292;
-            font-family: Montserrat, sans-serif;
-            font-size: 13px;
-            line-height: 1.5;
-            max-width: 390px;
-            margin: 0 auto 20px auto;
-        }
-
-        .first-access-info {
-            background: #eef6ff;
-            border: 1px solid #dcecff;
-            border-radius: 12px;
-            padding: 13px 15px;
-            color: #566172;
-            font-family: Montserrat, sans-serif;
-            font-size: 12px;
-            line-height: 1.55;
-            margin-bottom: 18px;
-        }
-
-        .first-access-user {
-            text-align: center;
-            color: #0067fc;
-            font-family: Montserrat, sans-serif;
-            font-size: 12px;
-            font-weight: 700;
-            margin-bottom: 12px;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True,
+def tela_login():
+    # -----------------------------------------------------------------------
+    # Primeiro acesso: criação da nova senha
+    # -----------------------------------------------------------------------
+    usuario_primeiro_acesso = st.session_state.get(
+        "usuario_primeiro_acesso"
     )
 
-    col_left, col_right = st.columns(
-        [1.05, 0.95],
-        gap="large",
-        vertical_alignment="center",
-    )
-
-    with col_left:
+    if usuario_primeiro_acesso:
         st.markdown(
-            '<div class="login-panel">'
-            '<div class="login-panel-badge">📦 PORTAL LEVES</div>'
-            '<div class="login-panel-title">Primeiro <span>acesso</span></div>'
-            '<div class="login-panel-text">'
-            'Para proteger sua conta, crie uma senha pessoal antes de acessar o portal.'
-            '</div>'
-            '<div class="login-feature"><div class="login-feature-icon">🔐</div>'
-            '<div>Senha pessoal e exclusiva</div></div>'
-            '<div class="login-feature"><div class="login-feature-icon">🛡️</div>'
-            '<div>Mais segurança para sua conta</div></div>'
-            '<div class="login-feature"><div class="login-feature-icon">📦</div>'
-            '<div>Acesso aos seus insumos</div></div>'
-            '</div>',
-            unsafe_allow_html=True,
-        )
-
-    with col_right:
-        st.markdown('<div class="login-right">', unsafe_allow_html=True)
-
-        base = os.path.dirname(os.path.abspath(__file__))
-        caminho_logo = os.path.join(base, LOGO_LOGIN_PATH)
-
-        logo_base64 = (
-            get_base64_image(caminho_logo)
-            if os.path.exists(caminho_logo)
-            else ""
-        )
-
-        if logo_base64:
-            st.markdown(
-                f'<div class="login-floating-logo" style="width:90px !important; max-width:90px !important;">'
-                f'<img src="data:image/png;base64,{logo_base64}" style="display:block !important; width:90px !important; max-width:90px !important; height:auto !important;">'
-                f'</div>',
-                unsafe_allow_html=True,
-            )
-        else:
-            st.markdown(
-                '<div class="login-floating-logo">'
-                '<div style="color:#0067fc;font-size:32px;font-weight:800;'
-                'font-family:Montserrat,sans-serif;">loggi</div>'
-                '</div>',
-                unsafe_allow_html=True,
-            )
-
-        st.markdown(
-            '<div class="login-title">Portal LEVES</div>',
-            unsafe_allow_html=True,
-        )
-
-        st.markdown(
-            '<div class="first-access-title">Crie sua nova senha</div>',
-            unsafe_allow_html=True,
-        )
-
-        st.markdown(
-            '<div class="first-access-description">'
-            'A senha temporária usada no primeiro acesso deixará de funcionar '
-            'depois que você cadastrar sua nova senha.'
-            '</div>',
-            unsafe_allow_html=True,
-        )
-
-        st.markdown(
-            f'<div class="first-access-user">'
-            f'Usuário: {user.get("usuario", "")}'
-            f'</div>',
-            unsafe_allow_html=True,
-        )
-
-        st.markdown(
-            '<div class="first-access-info">'
-            '<strong>Requisitos:</strong><br>'
-            '• Mínimo de 6 caracteres<br>'
-            '• A confirmação precisa ser igual à nova senha'
-            '</div>',
+            """
+            <div style="
+                max-width: 520px;
+                margin: 80px auto 20px auto;
+                text-align: center;
+                font-family: Montserrat, sans-serif;
+            ">
+                <h2 style="color:#172033;margin-bottom:8px;">
+                    Crie sua nova senha
+                </h2>
+                <p style="color:#788292;font-size:14px;line-height:1.5;">
+                    Este é seu primeiro acesso ao Portal LEVES.
+                    Defina uma nova senha para continuar.
+                </p>
+            </div>
+            """,
             unsafe_allow_html=True,
         )
 
@@ -210,251 +80,59 @@ def tela_primeiro_acesso():
                 type="password",
                 placeholder="Digite sua nova senha",
             )
-
             confirmar_senha = st.text_input(
                 "Confirmar nova senha",
                 type="password",
-                placeholder="Digite novamente sua nova senha",
+                placeholder="Digite novamente sua senha",
             )
-
             salvar = st.form_submit_button(
-                "Criar nova senha",
+                "Salvar nova senha",
                 type="primary",
                 width="stretch",
             )
 
         if salvar:
-            if not nova_senha:
-                st.error("Digite uma nova senha.")
-                return
-
-            if len(nova_senha) < 6:
-                st.error("A senha deve ter pelo menos 6 caracteres.")
-                return
-
             if nova_senha != confirmar_senha:
                 st.error("As senhas não são iguais.")
-                return
-
-            try:
-                ok, mensagem = auth.alterar_senha(
-                    user["usuario"],
-                    nova_senha,
+            elif not hasattr(auth, "alterar_senha"):
+                st.error(
+                    "A função de alteração de senha não está disponível no auth.py."
                 )
-            except Exception as e:  # noqa: BLE001
-                st.error(f"Erro ao alterar a senha: {e}")
-                return
-
-            if ok:
-                novo_usuario = auth.buscar_usuario(user["usuario"])
-
-                if not novo_usuario:
-                    st.error(
-                        "A senha foi alterada, mas não foi possível "
-                        "atualizar sua sessão. Faça o login novamente."
+            else:
+                try:
+                    ok, mensagem = auth.alterar_senha(
+                        usuario_primeiro_acesso["usuario"],
+                        nova_senha,
                     )
-                    logout()
+                except Exception as e:
+                    st.error(f"Não foi possível alterar a senha: {e}")
                     return
 
-                st.session_state["usuario"] = novo_usuario
-                st.session_state["tentativas"] = 0
-
-                st.success(
-                    "Senha criada com sucesso! Seu acesso foi liberado."
-                )
-                st.rerun()
-            else:
-                st.error(mensagem)
-
-        st.markdown(
-            '<div class="login-footer">Portal LEVES · Loggi</div>',
-            unsafe_allow_html=True,
-        )
-
-        st.markdown("</div>", unsafe_allow_html=True)
-
-
-def tela_recuperacao_senha():
-    """Fluxo de recuperação de senha por código enviado ao e-mail cadastrado."""
-    st.markdown(
-        """
-        <style>
-        .login-floating-logo {
-            position: fixed !important;
-            top: 22px !important;
-            right: 30px !important;
-            z-index: 1000 !important;
-            width: 90px !important;
-            max-width: 90px !important;
-            text-align: center !important;
-        }
-
-        .login-floating-logo img {
-            display: block !important;
-            width: 90px !important;
-            max-width: 90px !important;
-            height: auto !important;
-            margin: 0 !important;
-        }
-
-        .recovery-title {
-            text-align: center;
-            color: #172033;
-            font-family: Montserrat, sans-serif;
-            font-size: 24px;
-            font-weight: 800;
-            margin: 8px 0 8px 0;
-        }
-        .recovery-description {
-            text-align: center;
-            color: #788292;
-            font-family: Montserrat, sans-serif;
-            font-size: 13px;
-            line-height: 1.5;
-            max-width: 390px;
-            margin: 0 auto 20px auto;
-        }
-        .recovery-info {
-            background: #eef6ff;
-            border: 1px solid #dcecff;
-            border-radius: 12px;
-            padding: 13px 15px;
-            color: #566172;
-            font-family: Montserrat, sans-serif;
-            font-size: 12px;
-            line-height: 1.55;
-            margin-bottom: 18px;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    col_left, col_right = st.columns(
-        [1.05, 0.95],
-        gap="large",
-        vertical_alignment="center",
-    )
-
-    with col_left:
-        st.markdown(
-            '<div class="login-panel">'
-            '<div class="login-panel-badge">📦 PORTAL LEVES</div>'
-            '<div class="login-panel-title">Recuperar <span>senha</span></div>'
-            '<div class="login-panel-text">'
-            'Recupere o acesso à sua conta usando o e-mail cadastrado no portal.'
-            '</div>'
-            '<div class="login-feature"><div class="login-feature-icon">📧</div>'
-            '<div>Código enviado por e-mail</div></div>'
-            '<div class="login-feature"><div class="login-feature-icon">⏱️</div>'
-            '<div>Código válido por 15 minutos</div></div>'
-            '<div class="login-feature"><div class="login-feature-icon">🔐</div>'
-            '<div>Crie uma nova senha pessoal</div></div>'
-            '</div>',
-            unsafe_allow_html=True,
-        )
-
-    with col_right:
-        st.markdown('<div class="login-right">', unsafe_allow_html=True)
-
-        base = os.path.dirname(os.path.abspath(__file__))
-        caminho_logo = os.path.join(base, LOGO_LOGIN_PATH)
-        logo_base64 = (
-            get_base64_image(caminho_logo)
-            if os.path.exists(caminho_logo)
-            else ""
-        )
-        if logo_base64:
-            st.markdown(
-                f'<div class="login-floating-logo" style="width:90px !important; max-width:90px !important;"><img src="data:image/png;base64,{logo_base64}" style="display:block !important; width:90px !important; max-width:90px !important; height:auto !important;"></div>',
-                unsafe_allow_html=True,
-            )
-
-        st.markdown('<div class="recovery-title">Esqueci minha senha</div>', unsafe_allow_html=True)
-        st.markdown(
-            '<div class="recovery-description">Informe seu usuário para receber um código de recuperação no e-mail cadastrado.</div>',
-            unsafe_allow_html=True,
-        )
-
-        etapa = st.session_state.get("recuperacao_etapa", "solicitar")
-        usuario_rec = st.session_state.get("recuperacao_usuario", "")
-
-        if etapa == "solicitar":
-            with st.form("recuperar_senha_form"):
-                usuario = st.text_input("Usuário", placeholder="Digite seu usuário")
-                enviar = st.form_submit_button(
-                    "Enviar código por e-mail",
-                    type="primary",
-                    width="stretch",
-                )
-
-            if enviar:
-                usuario = (usuario or "").strip().lower()
-                if not usuario:
-                    st.error("Informe seu usuário.")
-                else:
+                if ok:
                     try:
-                        _, mensagem = auth.solicitar_recuperacao(usuario)
-                        st.session_state["recuperacao_usuario"] = usuario
-                        st.session_state["recuperacao_etapa"] = "codigo"
-                        st.success(mensagem)
-                        st.rerun()
-                    except Exception as e:  # noqa: BLE001
-                        st.error(f"Não foi possível enviar o código de recuperação: {e}")
-
-        else:
-            st.markdown(
-                '<div class="recovery-info">'
-                'Digite o código de 6 dígitos enviado para o e-mail cadastrado e escolha sua nova senha.'
-                '</div>',
-                unsafe_allow_html=True,
-            )
-
-            with st.form("redefinir_senha_form"):
-                codigo = st.text_input("Código de recuperação", max_chars=6, placeholder="000000")
-                nova_senha = st.text_input("Nova senha", type="password", placeholder="Mínimo de 6 caracteres")
-                confirmar = st.text_input("Confirmar nova senha", type="password", placeholder="Repita a nova senha")
-                redefinir = st.form_submit_button(
-                    "Redefinir senha",
-                    type="primary",
-                    width="stretch",
-                )
-
-            if redefinir:
-                if nova_senha != confirmar:
-                    st.error("As senhas não coincidem.")
-                else:
-                    try:
-                        ok, mensagem = auth.redefinir_senha_com_codigo(
-                            usuario_rec,
-                            codigo,
+                        u = auth.autenticar(
+                            usuario_primeiro_acesso["usuario"],
                             nova_senha,
                         )
-                        if ok:
-                            st.success(mensagem)
-                            st.session_state["recuperacao"] = False
-                            st.session_state["recuperacao_etapa"] = "solicitar"
-                            st.session_state["recuperacao_usuario"] = ""
-                            st.session_state["tentativas"] = 0
-                            st.session_state["mensagem_login"] = "Senha redefinida com sucesso. Faça login com sua nova senha."
-                            st.rerun()
-                        else:
-                            st.error(mensagem)
-                    except Exception as e:  # noqa: BLE001
-                        st.error(f"Não foi possível redefinir a senha: {e}")
+                    except Exception as e:
+                        st.error(
+                            "Senha criada, mas não foi possível concluir "
+                            f"o login: {e}"
+                        )
+                        return
 
-            if st.button("← Voltar para o login", width="stretch"):
-                st.session_state["recuperacao"] = False
-                st.session_state["recuperacao_etapa"] = "solicitar"
-                st.session_state["recuperacao_usuario"] = ""
-                st.rerun()
+                    if u:
+                        st.session_state["usuario_primeiro_acesso"] = None
+                        st.session_state["usuario"] = u
+                        st.rerun()
+                    else:
+                        st.error(
+                            "A senha foi alterada, mas não foi possível "
+                            "validar o acesso. Tente entrar novamente."
+                        )
+                else:
+                    st.error(mensagem)
 
-        st.markdown('<div class="login-footer">Portal LEVES · Loggi</div>', unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
-
-def tela_login():
-    if st.session_state.get("recuperacao", False):
-        tela_recuperacao_senha()
         return
 
     # -----------------------------------------------------------------------
@@ -463,538 +141,274 @@ def tela_login():
     # -----------------------------------------------------------------------
     st.markdown(
         """
-<style>
-/* ============================================================
-   PORTAL LEVES — LOGIN
-   ============================================================ */
+        <style>
+        /* ===== LOGIN ===== */
 
-/* ============================================================
-   FUNDO + TOPO DO STREAMLIT
-   ============================================================ */
+        /* Fundo mais clean */
+        [data-testid="stAppViewContainer"] {
+            background: #f7f9fc;
+        }
 
-html,
-body,
-[data-testid="stApp"],
-[data-testid="stAppViewContainer"],
-section.main {
-    background: #f7f9fc !important;
-}
+        /* Remove o excesso de espaço lateral criado pelo CSS global */
+        [data-testid="stAppViewBlockContainer"] {
+            padding-left: 20px !important;
+            padding-right: 20px !important;
+            padding-top: 2.5rem !important;
+            padding-bottom: 2rem !important;
+            max-width: 100% !important;
+        }
 
-header[data-testid="stHeader"],
-[data-testid="stHeader"] {
-    display: none !important;
-    height: 0 !important;
-    min-height: 0 !important;
-    visibility: hidden !important;
-}
+        /* Esconde a barra de ferramentas do Streamlit na tela de login */
+        [data-testid="stToolbar"] {
+            display: none !important;
+        }
 
-[data-testid="stDecoration"] {
-    display: none !important;
-    height: 0 !important;
-}
+        /* Coluna central */
+        [data-testid="column"]:has([data-testid="stForm"]) {
+            max-width: 440px !important;
+            margin: 0 auto !important;
+        }
 
-#MainMenu,
-footer {
-    display: none !important;
-    visibility: hidden !important;
-}
+        /* Logo */
+        .login-logo {
+            text-align: center;
+            margin: 0 auto 6px auto;
+        }
 
-[data-testid="stAppViewContainer"] {
-    background: #f7f9fc !important;
-    top: 0 !important;
-    margin-top: 0 !important;
-}
+        .login-logo img {
+            display: block;
+            width: 155px;
+            max-width: 70%;
+            height: auto;
+            margin: 0 auto;
+        }
 
-section.main {
-    background: #f7f9fc !important;
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-}
+        /* Título */
+        .login-title {
+            text-align: center;
+            color: #0067fc;
+            font-family: Montserrat, sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            line-height: 1.2;
+            margin: 4px 0 8px 0;
+            text-transform: uppercase;
+        }
 
-section.main > div {
-    padding-top: 0 !important;
-}
+        /* Descrição */
+        .login-description {
+            text-align: center;
+            color: #6b7280;
+            font-family: Montserrat, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            max-width: 360px;
+            margin: 0 auto 22px auto;
+        }
 
-[data-testid="stAppViewBlockContainer"],
-[data-testid="stMainBlockContainer"] {
-    max-width: 1220px !important;
-    padding-top: 8px !important;
-    padding-bottom: 20px !important;
-}
+        /* Formulário/card */
+        [data-testid="stForm"] {
+            background: #ffffff !important;
+            border: 1px solid #e1e5eb !important;
+            border-radius: 16px !important;
+            padding: 25px 26px 22px 26px !important;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.07) !important;
+        }
 
-[data-testid="stToolbar"] {
-    display: none !important;
-}
+        /* Labels */
+        [data-testid="stForm"] label {
+            color: #374151 !important;
+            font-family: Montserrat, sans-serif !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+        }
 
-/* Não limitar a coluna que contém o formulário */
-.login-layout {
-    width: 100%;
-}
+        /* Inputs */
+        [data-testid="stForm"] input {
+            border-radius: 10px !important;
+            border: 1px solid #d8dee8 !important;
+            min-height: 44px !important;
+            font-family: Montserrat, sans-serif !important;
+            background: #ffffff !important;
+        }
 
-/* O vertical_alignment="center" do st.columns faz o alinhamento principal.
-   Esta regra só garante que o conteúdo do lado direito não herde altura extra. */
-div[data-testid="column"]:nth-child(2) > div {
-    min-height: auto !important;
-}
+        [data-testid="stForm"] input:focus {
+            border-color: #0067fc !important;
+            box-shadow: 0 0 0 2px rgba(0, 103, 252, 0.10) !important;
+        }
 
-/* ============================================================
-   PAINEL ESQUERDO
-   ============================================================ */
+        /* Espaçamento entre campos */
+        [data-testid="stForm"] [data-testid="stTextInput"] {
+            margin-bottom: 5px !important;
+        }
 
-.login-panel {
-    box-sizing: border-box;
-    width: 100%;
-    min-height: 480px;
-    padding: 38px 46px;
-    border-radius: 30px;
-    background: #eef6ff;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    font-family: Montserrat, sans-serif;
-}
+        /* Botão Entrar */
+        [data-testid="stFormSubmitButton"] button {
+            width: 100% !important;
+            min-height: 46px !important;
+            margin-top: 8px !important;
+            border-radius: 10px !important;
+            border: 0 !important;
+            background: #0067fc !important;
+            color: #ffffff !important;
+            font-family: Montserrat, sans-serif !important;
+            font-size: 15px !important;
+            font-weight: 700 !important;
+            transition: all 0.2s ease !important;
+        }
 
-.login-panel-badge {
-    color: #0067fc;
-    font-size: 14px;
-    font-weight: 800;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    margin-bottom: 20px;
-}
+        [data-testid="stFormSubmitButton"] button:hover {
+            background: #0056d6 !important;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(0, 103, 252, 0.20) !important;
+        }
 
-.login-panel-title {
-    color: #172033;
-    font-size: 43px;
-    line-height: 1.08;
-    font-weight: 800;
-    letter-spacing: -1.7px;
-    margin: 0 0 20px 0;
-    max-width: 540px;
-}
+        /* Mensagens de erro */
+        [data-testid="stAlert"] {
+            border-radius: 10px !important;
+            font-family: Montserrat, sans-serif !important;
+            font-size: 13px !important;
+        }
 
-.login-panel-title span {
-    color: #0067fc;
-}
+        /* Manual */
+        .login-manual {
+            margin-top: 14px;
+        }
 
-.login-panel-text {
-    color: #5d6675;
-    font-size: 16px;
-    line-height: 1.65;
-    max-width: 610px;
-    margin-bottom: 28px;
-}
+        /* Botão do manual */
+        [data-testid="stDownloadButton"] button {
+            border: 1px solid #e1e5eb !important;
+            border-radius: 12px !important;
+            background: #ffffff !important;
+            color: #374151 !important;
+            min-height: 46px !important;
+            font-family: Montserrat, sans-serif !important;
+            font-weight: 600 !important;
+            width: 100% !important;
+        }
 
-.login-feature {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    color: #303847;
-    font-size: 15px;
-    font-weight: 600;
-    margin: 9px 0;
-}
+        [data-testid="stDownloadButton"] button:hover {
+            border-color: #0067fc !important;
+            color: #0067fc !important;
+        }
 
-.login-feature-icon {
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
-    background: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 17px;
-    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
-}
+        /* Título da área de ajuda */
+        .login-help-title {
+            text-align: center;
+            color: #9ca3af;
+            font-family: Montserrat, sans-serif;
+            font-size: 12px;
+            margin: 18px 0 8px 0;
+        }
 
-.login-panel-bottom {
-    color: #8993a2;
-    font-size: 13px;
-    line-height: 1.55;
-    margin-top: 30px;
-}
+        /* Expander do suporte */
+        [data-testid="stExpander"] {
+            border: 1px solid #e1e5eb !important;
+            border-radius: 12px !important;
+            background: #ffffff !important;
+            overflow: hidden !important;
+        }
 
-/* Ilustração discreta, para aproximar do mockup */
-.login-visual {
-    position: relative;
-    height: 105px;
-    margin-top: 32px;
-    max-width: 460px;
-}
+        [data-testid="stExpander"] summary {
+            font-family: Montserrat, sans-serif !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            color: #374151 !important;
+        }
 
-.login-box {
-    position: absolute;
-    bottom: 0;
-    width: 105px;
-    height: 72px;
-    border-radius: 9px;
-    background: #ffffff;
-    border: 1px solid #dce8f5;
-    box-shadow: 0 12px 22px rgba(0, 75, 150, 0.08);
-}
+        /* Rodapé */
+        .login-footer {
+            text-align: center;
+            color: #a1a8b3;
+            font-family: Montserrat, sans-serif;
+            font-size: 11px;
+            margin-top: 20px;
+        }
 
-.login-box:before {
-    content: "";
-    position: absolute;
-    left: 17px;
-    right: 17px;
-    top: 16px;
-    height: 7px;
-    border-radius: 10px;
-    background: #dcecff;
-}
+        /* Responsivo */
+        @media (max-width: 600px) {
+            [data-testid="stAppViewBlockContainer"] {
+                padding-top: 1.5rem !important;
+                padding-left: 14px !important;
+                padding-right: 14px !important;
+            }
 
-.login-box:after {
-    content: "";
-    position: absolute;
-    left: 17px;
-    width: 48px;
-    top: 31px;
-    height: 7px;
-    border-radius: 10px;
-    background: #eef4fb;
-}
+            [data-testid="stForm"] {
+                padding: 22px 18px 20px 18px !important;
+            }
 
-.login-box.one {
-    left: 0;
-    transform: rotate(-4deg);
-}
-
-.login-box.two {
-    left: 85px;
-    bottom: 8px;
-    transform: rotate(4deg);
-}
-
-.login-visual-label {
-    position: absolute;
-    left: 245px;
-    bottom: 23px;
-    color: #9aa5b5;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 1.2px;
-}
-
-/* ============================================================
-   ÁREA DIREITA
-   ============================================================ */
-
-.login-right {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    font-family: Montserrat, sans-serif;
-}
-
-.login-brand-block {
-    width: 100%;
-    text-align: center;
-    margin: 10px auto 5px auto;
-}
-
-.login-floating-logo {
-    position: fixed;
-    top: 22px !important;
-    right: 30px !important;
-    z-index: 1000;
-    width: 90px !important;
-    max-width: 90px !important;
-    text-align: center;
-}
-
-.login-floating-logo img {
-    display: block !important;
-    width: 90px !important;
-    max-width: 90px !important;
-    height: auto !important;
-    margin: 0 !important;
-}
-
-.login-logo {
-    margin-bottom: 7px;
-}
-
-.login-brand-block .login-title {
-    margin-top: 0;
-    margin-bottom: 8px;
-}
-
-.login-logo {
-    text-align: center;
-    margin: 0 auto 5px auto;
-}
-
-.login-logo img {
-    display: block;
-    width: 128px;
-    max-width: 70%;
-    height: auto;
-    margin: 0 auto;
-}
-
-.login-title {
-    text-align: center;
-    color: #0067fc;
-    font-family: Montserrat, sans-serif;
-    font-size: 22px;
-    font-weight: 800;
-    letter-spacing: 1.8px;
-    line-height: 1.2;
-    margin: 3px 0 6px 0;
-    text-transform: uppercase;
-}
-
-.login-description {
-    text-align: center;
-    color: #788292;
-    font-family: Montserrat, sans-serif;
-    font-size: 13px;
-    line-height: 1.45;
-    max-width: 370px;
-    margin: 6px auto 22px auto;
-}
-
-/* Card do login */
-[data-testid="stForm"] {
-    background: #ffffff !important;
-    border: 1px solid #e0e5ec !important;
-    border-radius: 18px !important;
-    padding: 28px 28px 24px 28px !important;
-    box-shadow: 0 14px 38px rgba(15, 23, 42, 0.08) !important;
-}
-
-[data-testid="stForm"] label {
-    color: #3d4654 !important;
-    font-family: Montserrat, sans-serif !important;
-    font-size: 13px !important;
-    font-weight: 600 !important;
-}
-
-[data-testid="stForm"] input {
-    border-radius: 10px !important;
-    border: 1px solid #d8dee8 !important;
-    min-height: 44px !important;
-    font-family: Montserrat, sans-serif !important;
-    background: #ffffff !important;
-}
-
-[data-testid="stForm"] input:focus {
-    border-color: #0067fc !important;
-    box-shadow: 0 0 0 2px rgba(0, 103, 252, 0.10) !important;
-}
-
-[data-testid="stFormSubmitButton"] button {
-    width: 100% !important;
-    min-height: 46px !important;
-    margin-top: 8px !important;
-    border-radius: 10px !important;
-    border: 0 !important;
-    background: #0067fc !important;
-    color: #ffffff !important;
-    font-family: Montserrat, sans-serif !important;
-    font-size: 15px !important;
-    font-weight: 700 !important;
-}
-
-[data-testid="stFormSubmitButton"] button:hover {
-    background: #0056d6 !important;
-    box-shadow: 0 7px 18px rgba(0, 103, 252, 0.20) !important;
-}
-
-[data-testid="stAlert"] {
-    border-radius: 10px !important;
-    font-family: Montserrat, sans-serif !important;
-    font-size: 13px !important;
-}
-
-/* Manual */
-.login-manual {
-    margin-top: 12px;
-}
-
-[data-testid="stDownloadButton"] button {
-    border: 1px solid #e0e5ec !important;
-    border-radius: 12px !important;
-    background: #ffffff !important;
-    color: #566172 !important;
-    min-height: 47px !important;
-    font-family: Montserrat, sans-serif !important;
-    font-weight: 600 !important;
-    width: 100% !important;
-}
-
-[data-testid="stDownloadButton"] button:hover {
-    border-color: #0067fc !important;
-    color: #0067fc !important;
-}
-
-/* Suporte */
-.login-help-title {
-    text-align: center;
-    color: #a0a8b5;
-    font-family: Montserrat, sans-serif;
-    font-size: 12px;
-    margin: 16px 0 7px 0;
-}
-
-[data-testid="stExpander"] {
-    border: 1px solid #e0e5ec !important;
-    border-radius: 12px !important;
-    background: #ffffff !important;
-    overflow: hidden !important;
-}
-
-[data-testid="stExpander"] summary {
-    font-family: Montserrat, sans-serif !important;
-    font-size: 13px !important;
-    font-weight: 600 !important;
-    color: #566172 !important;
-}
-
-.login-footer {
-    text-align: center;
-    color: #a5adba;
-    font-family: Montserrat, sans-serif;
-    font-size: 11px;
-    margin-top: 16px;
-}
-
-/* ============================================================
-   RESPONSIVO
-   ============================================================ */
-
-@media (max-width: 900px) {
-    [data-testid="stAppViewBlockContainer"] {
-        padding: 4px 18px 16px 18px !important;
-    }
-
-    .login-panel {
-        min-height: 500px;
-        padding: 40px;
-    }
-
-    .login-panel-title {
-        font-size: 36px;
-    }
-
-
-}
-
-@media (max-width: 700px) {
-    .login-panel {
-        display: none;
-    }
-
-    .login-right {
-        min-height: auto;
-        padding: 20px 0;
-    }
-
-    [data-testid="stForm"] {
-        padding: 22px 18px 20px 18px !important;
-    }
-}
-</style>
+            .login-title {
+                font-size: 21px;
+            }
+        }
+        </style>
         """,
         unsafe_allow_html=True,
     )
 
-    # -----------------------------------------------------------------------
-    # Layout: painel de apresentação + login
-    # -----------------------------------------------------------------------
-    col_left, col_right = st.columns(
-        [1.05, 0.95],
-        gap="large",
-        vertical_alignment="center",
-    )
+    _, col, _ = st.columns([1, 1.1, 1])
 
-    # =======================================================================
-    # ESQUERDA
-    # =======================================================================
-    with col_left:
-        st.markdown(
-            '<div class="login-panel">'
-            '<div class="login-panel-badge">📦 PORTAL LEVES</div>'
-            '<div class="login-panel-title">Gestão de <span>Insumos</span></div>'
-            '<div class="login-panel-text">Consulte, acompanhe e gerencie os insumos enviados para sua operação em um único lugar.</div>'
-            '<div class="login-feature"><div class="login-feature-icon">📦</div><div>Controle de insumos</div></div>'
-            '<div class="login-feature"><div class="login-feature-icon">↩️</div><div>Acompanhamento de devoluções</div></div>'
-            '<div class="login-feature"><div class="login-feature-icon">📊</div><div>Informações de valores</div></div>'
-            '<div class="login-panel-bottom">Tenha as informações de forma rápida, organizada e centralizada.</div>'
-            '<div class="login-visual">'
-            '<div class="login-box one"></div>'
-            '<div class="login-box two"></div>'
-            '<div class="login-visual-label">LOGGI · LEVES</div>'
-            '</div>'
-            '</div>',
-            unsafe_allow_html=True,
-        )
-
-    # =======================================================================
-    # DIREITA — login original preservado
-    # =======================================================================
-    with col_right:
-        st.markdown('<div class="login-right">', unsafe_allow_html=True)
-
+    with col:
         base = os.path.dirname(os.path.abspath(__file__))
         caminho_logo = os.path.join(base, LOGO_LOGIN_PATH)
-
         logo_base64 = (
             get_base64_image(caminho_logo)
             if os.path.exists(caminho_logo)
             else ""
         )
 
-        # Logo institucional fixado no canto superior direito.
-        # O título Portal LEVES permanece centralizado sobre o login.
+        # Logo + título
         if logo_base64:
             st.markdown(
-                f'<div class="login-floating-logo">'
-                f'<img src="data:image/png;base64,{logo_base64}">'
-                f'</div>',
+                f"""
+                <div class="login-logo">
+                    <img src="data:image/png;base64,{logo_base64}">
+                </div>
+                <div class="login-title">Portal LEVES</div>
+                """,
                 unsafe_allow_html=True,
             )
         else:
             st.markdown(
-                '<div class="login-floating-logo">'
-                '<div style="color:#0067fc;font-size:32px;font-weight:800;'
-                'font-family:Montserrat,sans-serif;">loggi</div>'
-                '</div>',
+                """
+                <div class="login-logo">
+                    <div style="
+                        color:#0067fc;
+                        font-size:36px;
+                        font-weight:800;
+                        font-family:Montserrat,sans-serif;
+                    ">loggi</div>
+                </div>
+                <div class="login-title">Portal LEVES</div>
+                """,
                 unsafe_allow_html=True,
             )
 
         st.markdown(
-            '<div class="login-title">Portal LEVES</div>',
-            unsafe_allow_html=True,
-        )
-
-        st.markdown(
-            '<div class="login-description">'
-            "Acesse sua conta para consultar os insumos da sua operação."
-            "</div>",
+            """
+            <div class="login-description">
+                Acesse o portal para consultar os insumos
+                enviados para sua operação.
+            </div>
+            """,
             unsafe_allow_html=True,
         )
 
         if st.session_state["tentativas"] >= 5:
-            st.error(
-                "Muitas tentativas. Recarregue a página e tente novamente."
-            )
+            st.error("Muitas tentativas. Recarregue a página e tente novamente.")
 
-        # Login — autenticação original preservada.
+        # Login — a lógica de autenticação permanece exatamente igual.
         with st.form("login"):
             usuario = st.text_input(
                 "Usuário",
                 placeholder="Digite seu usuário",
             )
-
             senha = st.text_input(
                 "Senha",
                 type="password",
                 placeholder="Digite sua senha",
             )
-
             entrar = st.form_submit_button(
                 "Entrar",
                 type="primary",
@@ -1002,30 +416,44 @@ div[data-testid="column"]:nth-child(2) > div {
             )
 
         if entrar and st.session_state["tentativas"] < 5:
+            usuario = (usuario or "").strip()
+            senha = senha or ""
+
             try:
-                u = auth.autenticar(usuario, senha)
-            except Exception as e:  # noqa: BLE001
-                st.error(f"Erro ao acessar a planilha: {e}")
+                if hasattr(auth, "diagnosticar_login"):
+                    valido, mensagem, u = auth.diagnosticar_login(
+                        usuario,
+                        senha,
+                    )
+                else:
+                    u = auth.autenticar(usuario, senha)
+                    valido = bool(u)
+                    mensagem = (
+                        "Login validado com sucesso."
+                        if valido
+                        else "Usuário ou senha inválidos."
+                    )
+            except Exception as e:
+                st.error(
+                    "Não foi possível validar o login. "
+                    f"Detalhes: {e}"
+                )
                 return
 
-            if u:
-                st.session_state["usuario"] = u
-                st.session_state["tentativas"] = 0
-                st.rerun()
-            else:
+            if not valido:
                 st.session_state["tentativas"] += 1
-                st.error("Usuário ou senha inválidos.")
+                st.error(mensagem)
+            else:
+                st.session_state["tentativas"] = 0
 
-        mensagem_login = st.session_state.pop("mensagem_login", None)
-        if mensagem_login:
-            st.success(mensagem_login)
+                if u.get("primeiro_acesso"):
+                    st.session_state["usuario_primeiro_acesso"] = u
+                    st.rerun()
+                else:
+                    st.session_state["usuario"] = u
+                    st.rerun()
 
-        if st.button("Esqueci minha senha", width="stretch"):
-            st.session_state["recuperacao"] = True
-            st.session_state["recuperacao_etapa"] = "solicitar"
-            st.session_state["recuperacao_usuario"] = ""
-            st.rerun()
-
+        # Manual
         if manual.disponivel():
             st.markdown(
                 '<div class="login-manual">',
@@ -1034,6 +462,7 @@ div[data-testid="column"]:nth-child(2) > div {
             manual.botao_manual(key="manual_login")
             st.markdown("</div>", unsafe_allow_html=True)
 
+        # Suporte
         st.markdown(
             '<div class="login-help-title">Precisa de ajuda?</div>',
             unsafe_allow_html=True,
@@ -1043,11 +472,13 @@ div[data-testid="column"]:nth-child(2) > div {
             contato.form_contato(key="login")
 
         st.markdown(
-            '<div class="login-footer">Portal LEVES · Loggi</div>',
+            """
+            <div class="login-footer">
+                Portal LEVES · Loggi
+            </div>
+            """,
             unsafe_allow_html=True,
         )
-
-        st.markdown("</div>", unsafe_allow_html=True)
 
 
 # ---------------------------------------------------------------------------
@@ -1063,17 +494,9 @@ def main():
         return
 
     user = st.session_state["usuario"]
-
-    # Primeiro acesso: o usuário deve criar sua senha pessoal
-    # antes de acessar qualquer funcionalidade do portal.
-    if user.get("primeiro_acesso", False):
-        tela_primeiro_acesso()
-        return
-
     perfil = user.get("perfil")
     eh_admin = perfil == "admin"
     eh_receb = perfil == "recebimento"
-    eh_gdl = perfil == "gdl"
 
     # Devolução aberta pelo QR (id + token na URL).
     scan_id = st.query_params.get("dev")
@@ -1082,7 +505,7 @@ def main():
     sidebar()
 
     with st.sidebar:
-        papel = {"admin": "Administrador", "recebimento": "Recebimento","gdl": "GDL" }.get(
+        papel = {"admin": "Administrador", "recebimento": "Recebimento"}.get(
             perfil, f"Destino: {user['destino']}"
         )
 
@@ -1094,11 +517,6 @@ def main():
 
         if eh_receb:
             opcoes = ["📥 Recebimento"]
-
-        elif eh_gdl:
-            opcoes = ["📦 Envios","🧾 Conciliação",
-            ]
-         
         elif eh_admin:
             opcoes = [
                 "📦 Envios",
@@ -1127,10 +545,6 @@ def main():
                 index=idx,
                 label_visibility="collapsed",
             )
-
-            if eh_gdl and pagina not in ["📦 Envios", "🧾 Conciliação"]:
-                pagina = "📦 Envios"
-
         else:
             pagina = opcoes[0]
 
