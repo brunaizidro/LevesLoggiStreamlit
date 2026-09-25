@@ -91,7 +91,7 @@ def _cliente() -> gspread.Client:
     """Autentica via [gcp_service_account] do secrets OU via arquivo .json local."""
     if _secrets_validos():
         info = dict(st.secrets["gcp_service_account"])
-        # Corrige "\n" literais (erro comum ao colar). Seguro: PEM não contém "\n".
+        # Corrige "\\n" literais (erro comum ao colar). Seguro: PEM não contém "\\n".
         info["private_key"] = info["private_key"].replace("\\n", "\n")
         creds = Credentials.from_service_account_info(info, scopes=_SCOPES)
         return gspread.authorize(creds)
@@ -246,11 +246,30 @@ def _num(v) -> float:
 
 
 def proximo_codigo_devolucao() -> str:
-    """Gera DEV-AAAA-NNNNNN sequencial dentro do ano."""
+    """Gera DEV-AAAA-NNNNNN sequencial sem usar o cache de devoluções."""
     ano = datetime.now().year
-    devs = ler_devolucoes()
-    n = sum(1 for d in devs if str(d.get("id", "")).startswith(f"DEV-{ano}-")) + 1
-    return f"DEV-{ano}-{n:06d}"
+
+    # IMPORTANTE: não usar ler_devolucoes() aqui. Essa função possui cache
+    # e pode devolver uma fotografia antiga da planilha quando várias bases
+    # registram devoluções próximas umas das outras.
+    ws = _aba(ABA_DEVOLUCOES, CAB_DEVOLUCOES)
+    valores = ws.get_all_values()
+
+    maior = 0
+    prefixo = f"DEV-{ano}-"
+    for row in valores[1:]:
+        if not row:
+            continue
+        id_dev = str(row[0]).strip() if len(row) > 0 else ""
+        if not id_dev.startswith(prefixo):
+            continue
+        try:
+            numero = int(id_dev[len(prefixo):])
+        except (TypeError, ValueError):
+            continue
+        maior = max(maior, numero)
+
+    return f"{prefixo}{maior + 1:06d}"
 
 
 def criar_devolucao(dev: dict, itens: list[dict]):
