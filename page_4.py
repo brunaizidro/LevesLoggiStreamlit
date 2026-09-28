@@ -22,26 +22,41 @@ def _fmt(n) -> str:
     return f"{int(n):,}".replace(",", ".")
 
 
-def _confirmar(dev: dict, itens: list[dict], recebidos: dict, quem: str):
-    """Grava o recebimento. recebidos=None => aceita o declarado (sem contar)."""
+def _confirmar(dev: dict, itens: list[dict], recebidos: dict | None, quem: str):
+    """Grava o recebimento.
+
+    No "Confirmar sem contar", a quantidade recebida é exatamente a quantidade
+    declarada. No "Contar e confirmar", a quantidade recebida é a informada
+    pelo time de recebimento.
+    """
     agora = datetime.now(dp.TZ).strftime("%Y-%m-%d %H:%M:%S")
-    if recebidos is None:
-        recebidos = {it["tipo"]: int(it["qtd_declarada"]) for it in itens}
+    sem_contar = recebidos is None
+
+    if sem_contar:
+        # Aceita integralmente o que foi declarado pela operação.
+        recebidos = {
+            it["tipo"]: int(it["qtd_declarada"])
+            for it in itens
+        }
         divergente = False
     else:
         divergente = any(
-            int(recebidos.get(it["tipo"], 0)) != int(it["qtd_declarada"]) for it in itens
+            int(recebidos.get(it["tipo"], 0)) != int(it["qtd_declarada"])
+            for it in itens
         )
+
     total_receb = sum(int(v) for v in recebidos.values())
     status = dp.STATUS_DIVERGENTE if divergente else dp.STATUS_CONFERIDO
-    if recebidos is None:
-        status = dp.STATUS_RECEBIDO
 
     dados.atualizar_itens_recebidos(dev["id"], recebidos)
     dados.atualizar_devolucao(
         dev["id"],
-        {"status": status, "total_recebido": total_receb,
-         "data_recebimento": agora, "recebido_por": quem},
+        {
+            "status": status,
+            "total_recebido": total_receb,
+            "data_recebimento": agora,
+            "recebido_por": quem,
+        },
     )
     return status
 
