@@ -7,7 +7,7 @@ o DataFrame canônico de envios usado pelas páginas.
 Schema canônico de envios:
   data (str) | tipo | destino | total | dt (datetime) | mes ("AAAA-MM") | dia (date)
 
-Obs.: este painel é de ATIVOS a devolver (SACA/GAYLORD/ROLLCONTAINER), não usa as
+Obs.: este painel é de ATIVOS a devolver (SACA/GAYLORD/PALLET), não usa as
 regras de expedição/status (AT/NP/AD) do DLE clássico.
 """
 
@@ -33,11 +33,11 @@ MESES_PT = {
 CORES_TIPO = {
     "SACA": "#0067fc",
     "GAYLORD": "#00baff",
-    "ROLLCONTAINER": "#FFD580",
     "PALLET": "#B5651D",  # derivado 1:1 do GAYLORD
 }
 
 # Tipos derivados: para cada GAYLORD enviado, vai 1 PALLET (critério).
+TIPOS_OCULTOS_PORTAL = {"ROLLCONTAINER"}
 TIPO_ORIGEM_DERIVADO = "GAYLORD"
 TIPO_DERIVADO = "PALLET"
 
@@ -78,6 +78,7 @@ def envios_df() -> pd.DataFrame:
 )
     df = df.dropna(subset=["dt"]).copy()
     df["tipo"] = df["tipo"].astype(str).str.upper().str.strip()
+    df = df[~df["tipo"].isin(TIPOS_OCULTOS_PORTAL)].copy()
     df["destino"] = df["destino"].astype(str).str.strip()
     df["total"] = pd.to_numeric(df["total"], errors="coerce").fillna(0)
 
@@ -202,6 +203,7 @@ def itens_df() -> pd.DataFrame:
     if df.empty:
         return df
     df["tipo"] = df["tipo"].astype(str).str.upper().str.strip()
+    df = df[~df["tipo"].isin(TIPOS_OCULTOS_PORTAL)].copy()
     df["qtd_declarada"] = pd.to_numeric(df["qtd_declarada"], errors="coerce").fillna(0)
     return df
 
