@@ -38,6 +38,9 @@ def _init_state():
     st.session_state.setdefault("usuario", None)
     st.session_state.setdefault("tentativas", 0)
     st.session_state.setdefault("usuario_primeiro_acesso", None)
+    st.session_state.setdefault("recuperacao_senha", False)
+    st.session_state.setdefault("recuperacao_codigo_enviado", False)
+    st.session_state.setdefault("recuperacao_usuario", "")
 
 
 def logout():
@@ -452,6 +455,64 @@ def tela_login():
                 else:
                     st.session_state["usuario"] = u
                     st.rerun()
+
+        if st.button("Esqueci minha senha", width="stretch", key="btn_esqueci_senha"):
+            st.session_state["recuperacao_senha"] = True
+            st.session_state["recuperacao_codigo_enviado"] = False
+            st.rerun()
+
+        if st.session_state.get("recuperacao_senha"):
+            st.markdown("### Redefinir senha")
+
+            if not st.session_state.get("recuperacao_codigo_enviado"):
+                with st.form("solicitar_recuperacao"):
+                    usuario_rec = st.text_input("Usuário", placeholder="Digite seu usuário")
+                    enviar_codigo = st.form_submit_button("Enviar código de recuperação", type="primary", width="stretch")
+
+                if enviar_codigo:
+                    try:
+                        ok, mensagem = auth.solicitar_recuperacao(usuario_rec)
+                        if ok:
+                            st.session_state["recuperacao_usuario"] = (usuario_rec or "").strip().lower()
+                            st.session_state["recuperacao_codigo_enviado"] = True
+                            st.success("Se o usuário estiver cadastrado com e-mail, o código foi enviado.")
+                            st.rerun()
+                        else:
+                            st.error(mensagem)
+                    except Exception as e:
+                        st.error(f"Não foi possível enviar o código: {e}")
+            else:
+                st.info("Digite o código de 6 dígitos recebido por e-mail.")
+                with st.form("redefinir_senha"):
+                    codigo = st.text_input("Código de recuperação", max_chars=6)
+                    nova_senha = st.text_input("Nova senha", type="password")
+                    confirmar = st.text_input("Confirmar nova senha", type="password")
+                    redefinir = st.form_submit_button("Redefinir senha", type="primary", width="stretch")
+
+                if redefinir:
+                    if nova_senha != confirmar:
+                        st.error("As senhas não são iguais.")
+                    else:
+                        try:
+                            ok, mensagem = auth.redefinir_senha_com_codigo(
+                                st.session_state["recuperacao_usuario"], codigo, nova_senha
+                            )
+                            if ok:
+                                st.success("Senha redefinida com sucesso. Você já pode entrar com a nova senha.")
+                                st.session_state["recuperacao_senha"] = False
+                                st.session_state["recuperacao_codigo_enviado"] = False
+                                st.session_state["recuperacao_usuario"] = ""
+                                st.rerun()
+                            else:
+                                st.error(mensagem)
+                        except Exception as e:
+                            st.error(f"Não foi possível redefinir a senha: {e}")
+
+            if st.button("← Voltar para o login", width="stretch", key="btn_voltar_login"):
+                st.session_state["recuperacao_senha"] = False
+                st.session_state["recuperacao_codigo_enviado"] = False
+                st.session_state["recuperacao_usuario"] = ""
+                st.rerun()
 
         # Manual
         if manual.disponivel():
