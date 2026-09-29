@@ -19,11 +19,11 @@ import data_processing as dp
 TEMPLATE_COLS = ["nome", "usuario", "senha", "destino", "perfil", "email"]
 
 
-def _importar_massa():
+def _importar_massa(eh_gdl: bool = False):
     """Importação de usuários via CSV (com template, prévia e relatório)."""
     st.markdown("<p class='subtitle'>Importar em massa (CSV)</p>", unsafe_allow_html=True)
     st.caption("Colunas: nome, usuario, senha, destino, perfil, email. "
-               "Perfil aceita: operacao, admin, recebimento ou gdl (padrão operacao).")
+               + ("Para GDL, o perfil deve ser Operação." if eh_gdl else "Perfil aceita: operacao, admin, recebimento ou gdl (padrão operacao)."))
 
     modelo = pd.DataFrame([
         {"nome": "Base São Paulo", "usuario": "base_sp", "senha": "trocar123",
@@ -69,6 +69,9 @@ def _importar_massa():
         rows, erros = [], []
         for i, r in df.iterrows():
             perfil = auth.normalizar_perfil(r.get("perfil", ""))
+            if eh_gdl and perfil != auth.PERFIL_OP:
+                erros.append({"linha": int(i) + 2, "usuario": r.get("usuario", ""), "motivo": "GDL só pode cadastrar usuários com perfil Operação."})
+                continue
             row, err = auth.preparar_usuario_row(
                 r.get("usuario", ""), r.get("senha", ""), r.get("destino", ""),
                 r.get("nome", ""), perfil, r.get("email", ""), ocupados)
@@ -89,10 +92,20 @@ def _importar_massa():
 
 
 def page_2():
-    st.subheader("Administração de usuários")
+    user = st.session_state.get("usuario") or {}
+    eh_admin = user.get("perfil") == auth.PERFIL_ADM
+    eh_gdl = user.get("perfil") == auth.PERFIL_GDL
+
+    if not (eh_admin or eh_gdl):
+        st.error("Acesso não autorizado.")
+        return
+
+    st.subheader("Administração de usuários" if eh_admin else "Usuários de Operação")
+    if eh_gdl:
+        st.info("Perfil GDL: você pode cadastrar e ativar/desativar apenas usuários com perfil Operação.")
 
     with st.expander("📥 Importar usuários em massa (CSV)"):
-        _importar_massa()
+        _importar_massa(eh_gdl=eh_gdl)
 
     esq, dir_ = st.columns([1, 1.4])
 
@@ -106,7 +119,7 @@ def page_2():
             usuario = st.text_input("Usuário (login)", placeholder="ex.: base_sp")
             senha = st.text_input("Senha", placeholder="mín. 6 caracteres")
             email = st.text_input("E-mail (para cobrança)", placeholder="ex.: base_sp@empresa.com")
-            perfil_lbl = st.selectbox("Perfil", ["Operação", "Administrador", "Recebimento", "GDL"])
+            perfil_lbl = st.selectbox("Perfil", ["Operação"] if eh_gdl else ["Operação", "Administrador", "Recebimento", "GDL"])
             if destinos:
                 destino = st.selectbox("Destino (da planilha)", options=[""] + destinos)
                 destino_livre = st.text_input("...ou digite um destino novo")
@@ -131,14 +144,16 @@ def page_2():
 
     with dir_:
         st.markdown("<p class='subtitle'>Usuários cadastrados</p>", unsafe_allow_html=True)
-        _tabela_usuarios()
+        _tabela_usuarios(eh_gdl=eh_gdl)
 
 
 PERFIL_LABEL = {"admin": "Admin", "recebimento": "Recebimento", "operacao": "Operação"}
 
 
-def _tabela_usuarios():
+def _tabela_usuarios(eh_gdl: bool = False):
     usuarios = dados.ler_usuarios()
+    if eh_gdl:
+        usuarios = [u for u in usuarios if u.get("perfil") == auth.PERFIL_OP]
     if not usuarios:
         st.info("Nenhum usuário cadastrado.")
         return
