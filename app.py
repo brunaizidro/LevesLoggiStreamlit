@@ -583,10 +583,17 @@ def main():
                 "📦 Envios",
                 "📥 Recebimento",
                 "🧾 Conciliação",
+                "↩️ Devoluções",
                 "🔔 Pendências",
                 "👥 Usuários",
                 "📊 Relatórios",
                 "⚙️ Configurações",
+            ]
+        elif user.get("perfil") == "gdl":
+            opcoes = [
+                "📦 Envios",
+                "🧾 Conciliação",
+                "↩️ Devoluções",
             ]
         else:
             opcoes = ["📦 Envios", "↩️ Devoluções", "💰 Cobranças"]
