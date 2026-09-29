@@ -183,7 +183,7 @@ def page_3():
 
     # ---- Nova devolução ----
     if eh_gdl:
-        _minhas_devolucoes(destino, eh_admin=False)
+        _minhas_devolucoes(destino, eh_admin=False, eh_gdl=True)
         return
 
     st.markdown("#### Nova devolução")
@@ -253,7 +253,7 @@ def page_3():
     _minhas_devolucoes(destino, eh_admin=eh_admin)
 
 
-def _minhas_devolucoes(destino: str, eh_admin: bool = False):
+def _minhas_devolucoes(destino: str, eh_admin: bool = False, eh_gdl: bool = False):
     st.markdown("#### Devoluções da operação" if (eh_admin or eh_gdl) else "#### Minhas devoluções")
     devs = dp.devolucoes_df()
     if devs.empty:
