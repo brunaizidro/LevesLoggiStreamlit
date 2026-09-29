@@ -591,7 +591,6 @@ def main():
             ]
         elif user.get("perfil") == "gdl":
             opcoes = [
-                "📦 Envios",
                 "🧾 Conciliação",
                 "↩️ Devoluções",
             ]
