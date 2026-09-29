@@ -90,10 +90,11 @@ def _operacoes_destinos_envios() -> dict[str, dict]:
 def page_3():
     user = st.session_state.get("usuario") or {}
     eh_admin = user.get("perfil") == "admin"
+    eh_gdl = user.get("perfil") == "gdl"
     destino = user.get("destino", "")
 
     st.subheader("Devoluções")
-    if eh_admin:
+    if eh_admin or eh_gdl:
         st.markdown(
             "<p class='custom-text'>Selecione a operação e registre uma devolução manual "
             "em nome dela. O saldo e a competência serão calculados para a operação selecionada.</p>",
@@ -112,8 +113,11 @@ def page_3():
             "Operação",
             operacoes,
             key="devolucao_operacao_admin",
-            help="Selecione a operação em nome da qual a devolução será registrada.",
+            help=("Selecione a operação para visualizar as devoluções." if eh_gdl else "Selecione a operação em nome da qual a devolução será registrada."),
         )
+
+        if eh_gdl:
+            st.info("Perfil GDL: visualização das devoluções. O registro de novas devoluções é exclusivo do administrador.")
 
     else:
         st.markdown(
@@ -178,6 +182,10 @@ def page_3():
     st.markdown("<hr class='sb-sep' style='border-top-color:#e6e6e6;'>", unsafe_allow_html=True)
 
     # ---- Nova devolução ----
+    if eh_gdl:
+        _minhas_devolucoes(destino, eh_admin=False)
+        return
+
     st.markdown("#### Nova devolução")
     elegiveis = dp.competencias_elegiveis(destino)
     if not elegiveis:
@@ -246,7 +254,7 @@ def page_3():
 
 
 def _minhas_devolucoes(destino: str, eh_admin: bool = False):
-    st.markdown("#### Devoluções da operação" if eh_admin else "#### Minhas devoluções")
+    st.markdown("#### Devoluções da operação" if (eh_admin or eh_gdl) else "#### Minhas devoluções")
     devs = dp.devolucoes_df()
     if devs.empty:
         st.caption("Nenhuma devolução registrada ainda.")
