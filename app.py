@@ -594,7 +594,6 @@ def main():
                 "📦 Envios",
                 "🧾 Conciliação",
                 "↩️ Devoluções",
-                "👥 Usuários",
             ]
         else:
             opcoes = ["📦 Envios", "↩️ Devoluções", "💰 Cobranças"]
