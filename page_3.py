@@ -143,6 +143,18 @@ def page_3():
         if len(elegiveis) > 1:
             st.info("Marque o mês de competência ao qual os itens devolvidos pertencem.")
 
+        st.markdown(
+            """
+            <style>
+            div[role="radiogroup"] label p {
+                font-size: 18px !important;
+                font-weight: 600 !important;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True,
+        )
+
         escolha_mes = st.radio(
             "Selecione a competência da devolução",
             options=[rot_mes[m] for m in elegiveis],
