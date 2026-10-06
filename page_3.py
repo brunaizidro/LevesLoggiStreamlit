@@ -139,7 +139,7 @@ def page_3():
             return
 
         rot_mes = {m: dp.rotulo_mes(m) for m in elegiveis}
-        st.markdown("#### 📅 Qual mês você está devolvendo?")
+        st.markdown("#### 📅 Devolução referente ao saldo de qual mês?")
         if len(elegiveis) > 1:
             st.info("Marque o mês de competência ao qual os itens devolvidos pertencem.")
 
