@@ -226,13 +226,7 @@ def page_3():
         return
 
     st.markdown("#### Nova devolução")
-    elegiveis = dp.competencias_elegiveis(destino)
-    if not elegiveis:
-        st.info("Nenhuma competência aberta para devolução (prazos encerrados).")
-        _minhas_devolucoes(destino, eh_admin=eh_admin)
-        return
-
-        pend = {t: q for t, q in dp.pending_mes_tipo(destino, mes_ref).items() if q > 0}
+    pend = {t: q for t, q in dp.pending_mes_tipo(destino, mes_ref).items() if q > 0}
     if not pend:
         st.success(f"Sem pendência de devolução para {escolha_mes}. 🎉")
     else:
