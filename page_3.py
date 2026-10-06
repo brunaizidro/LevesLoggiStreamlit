@@ -193,16 +193,38 @@ def page_3():
         _minhas_devolucoes(destino, eh_admin=eh_admin)
         return
 
-    # Competência (mês) — fora do form para recalcular a pendência ao trocar.
+    # Competência (mês) — seleção explícita antes de informar os itens.
+    # Quando há mais de uma competência aberta, a operação precisa marcar
+    # visualmente qual mês está sendo devolvido. Não fazemos escolha automática.
     rot_mes = {m: dp.rotulo_mes(m) for m in elegiveis}
-    escolha_mes = st.selectbox(
-        "Mês de referência (competência)",
-        [rot_mes[m] for m in elegiveis],
-        help="Você pode devolver retroativo, dentro do prazo (até o dia 5 do mês seguinte).",
+
+    st.markdown("#### 📅 Qual mês você está devolvendo?")
+    if len(elegiveis) > 1:
+        st.info(
+            "Esta devolução precisa ser vinculada a uma competência. "
+            "Marque abaixo o mês ao qual os itens que você está devolvendo pertencem."
+        )
+
+    escolha_mes = st.radio(
+        "Selecione a competência da devolução",
+        options=[rot_mes[m] for m in elegiveis],
+        index=None,
+        horizontal=True,
+        key="competencia_devolucao",
+        label_visibility="collapsed",
     )
+
+    if not escolha_mes:
+        st.warning("⚠️ Marque o **mês de competência** desta devolução para continuar.")
+        _minhas_devolucoes(destino, eh_admin=eh_admin)
+        return
+
     mes_ref = next(m for m, r in rot_mes.items() if r == escolha_mes)
     prazo_txt = dp.prazo_devolucao(mes_ref).strftime("%d/%m/%Y")
-    st.caption(f"Devoluções de {escolha_mes} aceitas até **{prazo_txt}**.")
+
+    st.success(
+        f"Competência selecionada: **{escolha_mes}** · prazo para devolução: **{prazo_txt}**"
+    )
 
     pend = {t: q for t, q in dp.pending_mes_tipo(destino, mes_ref).items() if q > 0}
     if not pend:
