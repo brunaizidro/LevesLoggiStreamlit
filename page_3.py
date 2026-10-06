@@ -130,8 +130,47 @@ def page_3():
         with st.expander("📘 Manual de devolução (treinamento)"):
             manual.botao_manual(key="manual_page3")
 
+    # ---- Competência selecionada (antes do saldo) ----
+    if not eh_gdl:
+        elegiveis = dp.competencias_elegiveis(destino)
+        if not elegiveis:
+            st.info("Nenhuma competência aberta para devolução (prazos encerrados).")
+            _minhas_devolucoes(destino, eh_admin=eh_admin)
+            return
+
+        rot_mes = {m: dp.rotulo_mes(m) for m in elegiveis}
+        st.markdown("#### 📅 Qual mês você está devolvendo?")
+        if len(elegiveis) > 1:
+            st.info("Marque o mês de competência ao qual os itens devolvidos pertencem.")
+
+        escolha_mes = st.radio(
+            "Selecione a competência da devolução",
+            options=[rot_mes[m] for m in elegiveis],
+            index=None,
+            horizontal=True,
+            key="competencia_devolucao",
+            label_visibility="collapsed",
+        )
+        if not escolha_mes:
+            st.warning("⚠️ Marque o **mês de competência** desta devolução para continuar.")
+            _minhas_devolucoes(destino, eh_admin=eh_admin)
+            return
+
+        mes_ref = next(m for m, r in rot_mes.items() if r == escolha_mes)
+        prazo_txt = dp.prazo_devolucao(mes_ref).strftime("%d/%m/%Y")
+        st.success(f"Competência selecionada: **{escolha_mes}** · prazo: **{prazo_txt}**")
+
     # ---- Saldo a devolver ----
-    saldo = dp.saldo_por_tipo(destino)
+    if eh_gdl:
+        saldo = dp.saldo_por_tipo(destino)
+    else:
+        conc = dp.conciliacao(mes_ref)
+        if not conc.empty:
+            conc = conc[conc["destino"].map(dp._normalizar) == dp._normalizar(destino)].copy()
+            conc["saldo"] = conc["em_aberto"].astype(int)
+            saldo = conc[conc["saldo"] > 0][["tipo", "enviado", "devolvido", "saldo"]].copy()
+        else:
+            saldo = pd.DataFrame(columns=["tipo", "enviado", "devolvido", "saldo"])
     if saldo.empty or saldo["enviado"].sum() == 0:
         if eh_admin:
             st.info(f"Nenhum ativo enviado para a operação **{destino}** até o momento.")
@@ -139,7 +178,7 @@ def page_3():
             st.info("Nenhum ativo enviado para a sua operação até o momento.")
         return
 
-    st.markdown("#### Saldo a devolver")
+    st.markdown("#### Saldo a devolver" if eh_gdl else f"#### Saldo a devolver — {escolha_mes}")
     pr = dp.precos()
     cols = st.columns(max(len(saldo), 1))
     for i, (_, r) in enumerate(saldo.iterrows()):
@@ -193,40 +232,7 @@ def page_3():
         _minhas_devolucoes(destino, eh_admin=eh_admin)
         return
 
-    # Competência (mês) — seleção explícita antes de informar os itens.
-    # Quando há mais de uma competência aberta, a operação precisa marcar
-    # visualmente qual mês está sendo devolvido. Não fazemos escolha automática.
-    rot_mes = {m: dp.rotulo_mes(m) for m in elegiveis}
-
-    st.markdown("#### 📅 Qual mês você está devolvendo?")
-    if len(elegiveis) > 1:
-        st.info(
-            "Esta devolução precisa ser vinculada a uma competência. "
-            "Marque abaixo o mês ao qual os itens que você está devolvendo pertencem."
-        )
-
-    escolha_mes = st.radio(
-        "Selecione a competência da devolução",
-        options=[rot_mes[m] for m in elegiveis],
-        index=None,
-        horizontal=True,
-        key="competencia_devolucao",
-        label_visibility="collapsed",
-    )
-
-    if not escolha_mes:
-        st.warning("⚠️ Marque o **mês de competência** desta devolução para continuar.")
-        _minhas_devolucoes(destino, eh_admin=eh_admin)
-        return
-
-    mes_ref = next(m for m, r in rot_mes.items() if r == escolha_mes)
-    prazo_txt = dp.prazo_devolucao(mes_ref).strftime("%d/%m/%Y")
-
-    st.success(
-        f"Competência selecionada: **{escolha_mes}** · prazo para devolução: **{prazo_txt}**"
-    )
-
-    pend = {t: q for t, q in dp.pending_mes_tipo(destino, mes_ref).items() if q > 0}
+        pend = {t: q for t, q in dp.pending_mes_tipo(destino, mes_ref).items() if q > 0}
     if not pend:
         st.success(f"Sem pendência de devolução para {escolha_mes}. 🎉")
     else:
