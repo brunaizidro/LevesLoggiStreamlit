@@ -261,14 +261,27 @@ def itens_da_devolucao(id_dev: str) -> pd.DataFrame:
 # Conciliação enviado × devolvido (cobrança)
 # ---------------------------------------------------------------------------
 
+def _quinto_dia_util_mes_seguinte(mes: str) -> pd.Timestamp:
+    """Retorna o 5º dia útil do mês seguinte, considerando segunda a sexta."""
+    primeiro = (pd.Period(mes, freq="M") + 1).start_time
+    dias_uteis = 0
+    atual = primeiro
+
+    while True:
+        if atual.weekday() < 5:  # segunda (0) a sexta (4)
+            dias_uteis += 1
+            if dias_uteis == 5:
+                return atual + pd.Timedelta(hours=23, minutes=59, seconds=59)
+        atual += pd.Timedelta(days=1)
+
+
 def prazo_devolucao(mes: str) -> pd.Timestamp:
-    """Prazo de devolução da competência: dia 5 do mês seguinte (fim do dia)."""
-    prox = (pd.Period(mes, freq="M") + 1).start_time  # 1º dia do mês seguinte
-    return prox + pd.Timedelta(days=4, hours=23, minutes=59, seconds=59)  # dia 5, 23:59
+    """Prazo de devolução da competência: 5º dia útil do mês seguinte (fim do dia)."""
+    return _quinto_dia_util_mes_seguinte(mes)
 
 
 def competencia_fechavel(mes: str) -> bool:
-    """True quando já passou o prazo (dia 5 do mês seguinte) e a competência pode ser fechada."""
+    """True quando já passou o prazo (5º dia útil do mês seguinte) e a competência pode ser fechada."""
     return pd.Timestamp.now() > prazo_devolucao(mes)
 
 
@@ -492,7 +505,7 @@ def conciliacao(mes: str) -> pd.DataFrame:
 
     Colunas: destino, tipo, enviado, devolvido, cobrado, em_aberto, cobravel
       - enviado: enviado NO mês `mes`
-      - devolvido: recebido de devoluções cuja competência == mes (até o dia 5 do mês seguinte)
+      - devolvido: recebido de devoluções cuja competência == mes (até o 5º dia útil do mês seguinte)
       - cobrado: já baixado por cobrança desta competência
       - em_aberto / cobravel: enviado do mês ainda não devolvido nem cobrado
     """
