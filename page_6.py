@@ -148,7 +148,9 @@ def page_6():
         tdf["valor_cobravel"] = tdf.apply(
             lambda r: int(r["cobravel"]) * pr.get(r["tipo"], 0), axis=1
         )
-        tdf["valor_label"] = tdf["valor_cobravel"].map(dp.fmt_brl)
+        tdf["valor_label"] = tdf["valor_cobravel"].map(
+            lambda v: f"<b>{dp.fmt_brl(v)}</b>"
+        )
 
         fig = px.bar(
             tdf,
@@ -163,10 +165,11 @@ def page_6():
         fig.update_traces(
             text=tdf["valor_label"],
             textposition="outside",
+            textfont=dict(size=13),
             hovertemplate=(
                 "<b>%{x}</b><br>"
                 "Cobrável: %{y:,.0f}<br>"
-                "Valor: R$ %{customdata[0]:,.2f}"
+                "Valor da cobrança: R$ %{customdata[0]:,.2f}"
                 "<extra></extra>"
             ),
         )
@@ -174,6 +177,7 @@ def page_6():
             showlegend=False,
             height=330,
             font_family="Montserrat",
+            bargap=0.28,
         )
         fig.update_xaxes(showgrid=False)
         fig.update_yaxes(showgrid=False)
@@ -185,15 +189,68 @@ def page_6():
             else "Cobrável por operação (top 15)"
         )
         st.markdown(f"**{titulo_rank}**")
-        rank = (df_view.groupby("destino", as_index=False)["cobravel"].sum()
-                .query("cobravel > 0").sort_values("cobravel", ascending=True).tail(15))
+        rank = (
+            df_view.groupby("destino", as_index=False)["cobravel"].sum()
+            .query("cobravel > 0")
+            .sort_values("cobravel", ascending=False)
+            .head(5)
+            .sort_values("cobravel", ascending=True)
+        )
         if rank.empty:
             st.caption("Nenhum item cobrável no período. 🎉")
         else:
-            figd = px.bar(rank, x="cobravel", y="destino", orientation="h",
-                          labels={"cobravel": "Cobrável", "destino": "Operação"})
-            figd.update_traces(marker_color="#F08080")
-            figd.update_layout(height=330, font_family="Montserrat")
+            rank["valor_cobravel"] = rank.apply(
+                lambda r: int(r["cobravel"]) * pr.get(
+                    "SACA", 0
+                ), axis=1
+            )
+
+            # Valor por operação precisa considerar cada tipo cobrável.
+            valores_por_operacao = (
+                df_view.assign(
+                    valor_cobravel=df_view.apply(
+                        lambda r: int(r["cobravel"]) * pr.get(r["tipo"], 0),
+                        axis=1
+                    )
+                )
+                .groupby("destino", as_index=False)["valor_cobravel"]
+                .sum()
+            )
+            rank = rank.drop(columns=["valor_cobravel"]).merge(
+                valores_por_operacao, on="destino", how="left"
+            )
+            rank["valor_label"] = rank["valor_cobravel"].map(
+                lambda v: f"<b>{dp.fmt_brl(v)}</b>"
+            )
+
+            figd = px.bar(
+                rank,
+                x="cobravel",
+                y="destino",
+                orientation="h",
+                labels={"cobravel": "Cobrável", "destino": "Operação"},
+                custom_data=["valor_cobravel"],
+            )
+            figd.update_traces(
+                marker_color="#F08080",
+                text=rank["valor_label"],
+                textposition="outside",
+                textfont=dict(size=12),
+                hovertemplate=(
+                    "<b>%{y}</b><br>"
+                    "Cobrável: %{x:,.0f}<br>"
+                    "Valor da cobrança: R$ %{customdata[0]:,.2f}"
+                    "<extra></extra>"
+                ),
+            )
+            figd.update_layout(
+                height=330,
+                font_family="Montserrat",
+                bargap=0.18,
+                margin=dict(l=10, r=80, t=50, b=40),
+            )
+            figd.update_xaxes(showgrid=False)
+            figd.update_yaxes(showgrid=False)
             st.plotly_chart(figd, width="stretch")
 
     # ---- Tabela detalhada (destino × tipo) ----
