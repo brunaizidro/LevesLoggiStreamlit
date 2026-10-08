@@ -162,17 +162,24 @@ def page_6():
             labels={"tipo": "Tipo", "cobravel": "Cobrável"},
             custom_data=["valor_cobravel"],
         )
-        fig.update_traces(
-            text=tdf["valor_label"],
-            textposition="outside",
-            textfont=dict(size=13),
-            hovertemplate=(
-                "<b>%{x}</b><br>"
-                "Cobrável: %{y:,.0f}<br>"
-                "Valor da cobrança: R$ %{customdata[0]:,.2f}"
-                "<extra></extra>"
-            ),
-        )
+        # Como o gráfico tem uma série por tipo, cada trace recebe somente
+        # o valor financeiro do seu próprio tipo.
+        for trace in fig.data:
+            tipo_trace = str(trace.name).strip().upper()
+            linha = tdf[tdf["tipo"].astype(str).str.upper() == tipo_trace]
+            if not linha.empty:
+                valor = float(linha.iloc[0]["valor_cobravel"])
+                qtd = int(linha.iloc[0]["cobravel"])
+                trace.text = [f"<b>{dp.fmt_brl(valor)}</b>"]
+                trace.customdata = [[valor]]
+                trace.hovertemplate = (
+                    f"<b>{tipo_trace}</b><br>"
+                    f"Cobrável: {qtd:,.0f}<br>"
+                    "Valor da cobrança: R$ %{customdata[0]:,.2f}"
+                    "<extra></extra>"
+                )
+                trace.textposition = "outside"
+                trace.textfont = dict(size=13)
         fig.update_layout(
             showlegend=False,
             height=330,
@@ -186,7 +193,7 @@ def page_6():
     with g2:
         titulo_rank = (
             f"Cobrável por operação — {op_escolhida}" if op_escolhida != "Todas as operações"
-            else "Cobrável por operação (top 15)"
+            else "Cobrável por operação (top 5)"
         )
         st.markdown(f"**{titulo_rank}**")
         rank = (
@@ -199,13 +206,7 @@ def page_6():
         if rank.empty:
             st.caption("Nenhum item cobrável no período. 🎉")
         else:
-            rank["valor_cobravel"] = rank.apply(
-                lambda r: int(r["cobravel"]) * pr.get(
-                    "SACA", 0
-                ), axis=1
-            )
-
-            # Valor por operação precisa considerar cada tipo cobrável.
+            # Valor total da operação: soma de cada tipo cobrável × seu preço.
             valores_por_operacao = (
                 df_view.assign(
                     valor_cobravel=df_view.apply(
@@ -247,7 +248,9 @@ def page_6():
                 height=330,
                 font_family="Montserrat",
                 bargap=0.18,
-                margin=dict(l=10, r=80, t=50, b=40),
+                margin=dict(l=10, r=150, t=50, b=40),
+                uniformtext_minsize=10,
+                uniformtext_mode="show",
             )
             figd.update_xaxes(showgrid=False)
             figd.update_yaxes(showgrid=False)
