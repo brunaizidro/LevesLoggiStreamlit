@@ -217,7 +217,7 @@ def page_6():
                 .groupby("destino", as_index=False)["valor_cobravel"]
                 .sum()
             )
-            rank = rank.drop(columns=["valor_cobravel"]).merge(
+            rank = rank.merge(
                 valores_por_operacao, on="destino", how="left"
             )
             rank["valor_label"] = rank["valor_cobravel"].map(
