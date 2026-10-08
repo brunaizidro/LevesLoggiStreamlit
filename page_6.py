@@ -143,13 +143,40 @@ def page_6():
     # ---- Gráficos ----
     g1, g2 = st.columns([1, 1.3])
     with g1:
+        # Quantidade cobrável + valor financeiro aparente por tipo.
         tdf = df_view.groupby("tipo", as_index=False)["cobravel"].sum()
-        fig = px.bar(
-            tdf, x="tipo", y="cobravel", color="tipo",
-            color_discrete_map=dp.CORES_TIPO, title="Cobrável por tipo",
-            labels={"tipo": "Tipo", "cobravel": "Cobrável"},
+        tdf["valor_cobravel"] = tdf.apply(
+            lambda r: int(r["cobravel"]) * pr.get(r["tipo"], 0), axis=1
         )
-        fig.update_layout(showlegend=False, height=330, font_family="Montserrat")
+        tdf["valor_label"] = tdf["valor_cobravel"].map(dp.fmt_brl)
+
+        fig = px.bar(
+            tdf,
+            x="tipo",
+            y="cobravel",
+            color="tipo",
+            color_discrete_map=dp.CORES_TIPO,
+            title="Cobrável por tipo",
+            labels={"tipo": "Tipo", "cobravel": "Cobrável"},
+            custom_data=["valor_cobravel"],
+        )
+        fig.update_traces(
+            text=tdf["valor_label"],
+            textposition="outside",
+            hovertemplate=(
+                "<b>%{x}</b><br>"
+                "Cobrável: %{y:,.0f}<br>"
+                "Valor: R$ %{customdata[0]:,.2f}"
+                "<extra></extra>"
+            ),
+        )
+        fig.update_layout(
+            showlegend=False,
+            height=330,
+            font_family="Montserrat",
+        )
+        fig.update_xaxes(showgrid=False)
+        fig.update_yaxes(showgrid=False)
         st.plotly_chart(fig, width="stretch")
 
     with g2:
