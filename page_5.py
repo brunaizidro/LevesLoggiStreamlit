@@ -103,7 +103,7 @@ def page_5():
     # Percentual de devolução no período
     # ============================================================
     st.markdown("#### Percentual de devolução no período")
-    st.caption("Percentual = total recebido no período ÷ total enviado no período.")
+    st.caption("Percentual = total recebido vinculado à competência selecionada ÷ total enviado na mesma competência. A data de recebimento não altera a competência.")
 
     meses = _meses_relatorio(envios, devs)
     periodo_opts = ["Todo o período"] + [dp.rotulo_mes(m) for m in meses]
