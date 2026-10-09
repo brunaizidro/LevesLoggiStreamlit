@@ -32,32 +32,50 @@ def _pct(recebido: int, enviado: int) -> float:
     return (recebido / enviado) * 100.0
 
 
+def _competencia_relatorio(devs):
+    """Usa a competência escolhida na devolução; para registros antigos, usa o mês de criação."""
+    import pandas as pd
+
+    d = devs.copy()
+    competencia = d["competencia"].astype(str).str.strip() if "competencia" in d.columns else pd.Series("", index=d.index)
+    competencia_valida = competencia.str.match(r"^\\d{4}-\\d{2}$", na=False)
+
+    if "data_criacao" in d.columns:
+        criacao = pd.to_datetime(d["data_criacao"], errors="coerce")
+        competencia = competencia.where(competencia_valida, criacao.dt.to_period("M").astype(str))
+    else:
+        competencia = competencia.where(competencia_valida, "")
+
+    return competencia
+
+
 def _meses_relatorio(envios, devs) -> list[str]:
+    """Lista competências de envios e devoluções, não o mês em que a devolução foi recebida."""
     meses = set()
 
     if not envios.empty:
         meses.update(envios["mes"].dropna().astype(str).tolist())
 
-    if not devs.empty and "data_recebimento" in devs.columns:
-        dt = __import__("pandas").to_datetime(devs["data_recebimento"], errors="coerce")
-        meses.update(dt.dropna().dt.to_period("M").astype(str).tolist())
+    if not devs.empty:
+        competencia = _competencia_relatorio(devs)
+        meses.update(competencia[competencia.str.match(r"^\\d{4}-\\d{2}$", na=False)].tolist())
 
     return sorted(meses, reverse=True)
 
 
 def _recebidos_no_periodo(devs, its, mes: str) -> dict[str, int]:
-    """Soma o recebido efetivo por tipo usando a data de recebimento."""
+    """Soma o recebido efetivo pela competência selecionada, independentemente da data de recebimento."""
     if devs.empty or its.empty:
         return {}
 
     import pandas as pd
 
     d = devs[devs["status"].isin(dp.STATUS_RECEBIDOS)].copy()
-    if d.empty or "data_recebimento" not in d.columns:
+    if d.empty:
         return {}
 
-    d["dt_receb"] = pd.to_datetime(d["data_recebimento"], errors="coerce")
-    d = d[d["dt_receb"].notna() & (d["dt_receb"].dt.to_period("M").astype(str) == mes)]
+    d["competencia_relatorio"] = _competencia_relatorio(d)
+    d = d[d["competencia_relatorio"] == mes]
     if d.empty:
         return {}
 
@@ -110,11 +128,11 @@ def page_5():
     elif not devs.empty and not its.empty:
         import pandas as pd
 
+        # "Todo o período" considera todas as devoluções efetivamente recebidas/conferidas,
+        # agrupadas por tipo. O filtro por competência só é aplicado quando um mês é escolhido.
         d = devs[devs["status"].isin(dp.STATUS_RECEBIDOS)].copy()
-        if not d.empty and "data_recebimento" in d.columns:
-            d["dt_receb"] = pd.to_datetime(d["data_recebimento"], errors="coerce")
-            d = d[d["dt_receb"].notna()]
-            mapa = d.set_index("id").index
+        if not d.empty:
+            mapa = d["id"].dropna().unique().tolist()
             it = its[its["id_devolucao"].isin(set(mapa))].copy()
             if not it.empty:
                 it["qtd_recebida"] = pd.to_numeric(it["qtd_recebida"], errors="coerce")
