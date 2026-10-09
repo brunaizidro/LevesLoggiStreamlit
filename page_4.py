@@ -40,6 +40,17 @@ def _confirmar(dev: dict, itens: list[dict], recebidos: dict | None, quem: str):
         }
         divergente = False
     else:
+        # Regra de negócio: não é permitido confirmar recebimento acima da quantidade declarada.
+        # Validação no backend protege também contra valores enviados fora do formulário.
+        for it in itens:
+            tipo = it["tipo"]
+            qtd = int(recebidos.get(tipo, 0))
+            declarada = int(it["qtd_declarada"])
+            if qtd < 0 or qtd > declarada:
+                raise ValueError(
+                    f"Quantidade recebida de {tipo} deve ficar entre 0 e {declarada}."
+                )
+
         divergente = any(
             int(recebidos.get(it["tipo"], 0)) != int(it["qtd_declarada"])
             for it in itens
@@ -114,8 +125,12 @@ def _card_devolucao(dev: dict, quem: str):
             recebidos = {}
             for it in itens:
                 recebidos[it["tipo"]] = st.number_input(
-                    f"{it['tipo'].title()} recebido", min_value=0, step=1,
+                    f"{it['tipo'].title()} recebido",
+                    min_value=0,
+                    max_value=int(it["qtd_declarada"]),
+                    step=1,
                     value=int(it["qtd_declarada"]),
+                    help="A quantidade recebida não pode ultrapassar a quantidade declarada no romaneio.",
                 )
             ok = st.form_submit_button("Registrar contagem")
         if ok:
