@@ -290,10 +290,13 @@ def page_6():
         valores_op = tab.groupby("destino")["Valor cobrável"].sum()
         piv["VALOR TOTAL"] = valores_op
     piv = piv[piv["TOTAL"] > 0].sort_values("TOTAL", ascending=False)
+
+    # Inicializa a tabela mesmo quando não houver operações cobráveis.
+    # A exportação Excel usa piv_disp independentemente de a tabela estar vazia.
+    piv_disp = piv.copy()
     if piv.empty:
         st.caption("Nenhuma operação com itens cobráveis no período.")
     else:
-        piv_disp = piv.copy()
         if usa_valor:
             piv_disp["VALOR TOTAL"] = piv_disp["VALOR TOTAL"].map(dp.fmt_brl)
         st.dataframe(
