@@ -134,12 +134,16 @@ def _card_devolucao(dev: dict, quem: str):
                 )
             ok = st.form_submit_button("Registrar contagem")
         if ok:
-            status = _confirmar(dev, itens, recebidos, quem)
-            if status == dp.STATUS_DIVERGENTE:
-                st.warning("Recebido com **divergência** entre declarado e contado.")
+            try:
+                status = _confirmar(dev, itens, recebidos, quem)
+            except ValueError as exc:
+                st.error(str(exc))
             else:
-                st.success("Recebimento **conferido** — quantidades batem.")
-            st.rerun()
+                if status == dp.STATUS_DIVERGENTE:
+                    st.warning("Recebido com **divergência** entre declarado e contado.")
+                else:
+                    st.success("Recebimento **conferido** — quantidades batem.")
+                st.rerun()
 
 
 def page_4(scan_id: str | None = None, scan_token: str | None = None):
