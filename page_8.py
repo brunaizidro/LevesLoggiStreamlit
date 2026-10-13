@@ -22,7 +22,7 @@ def _fmt(n) -> str:
 def _grupos(pend, competencia_label):
     grupos = []
     for destino, g in pend.groupby("destino"):
-        itens = [{"tipo": r["tipo"], "pendente": int(r["cobravel"])} for _, r in g.iterrows()]
+        itens = [{"tipo": r["tipo"], "enviado": int(r["enviado"]), "devolvido": int(r["devolvido"]), "pendente": int(r["cobravel"])} for _, r in g.iterrows()]
         grupos.append({
             "destino": destino,
             "itens": itens,
