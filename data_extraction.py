@@ -516,4 +516,4 @@ def limpar_codigo_recuperacao(linha: int):
     ws = _aba(ABA_USUARIOS, CAB_USUARIOS)
     ws.update_cell(linha, 11, "")
     ws.update_cell(linha, 12, "")
-    limpar_cache()
+    limpar_cache("usuarios")
