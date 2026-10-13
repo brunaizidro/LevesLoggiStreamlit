@@ -42,8 +42,13 @@ def _abrir_conexao(c: dict):
     return server
 
 
-def enviar_email(destinatario: str, assunto: str, corpo_html: str,
-                 reply_to: str | None = None) -> tuple[bool, str]:
+def enviar_email(
+    destinatario: str,
+    assunto: str,
+    corpo_html: str,
+    reply_to: str | None = None,
+    destinatarios_adicionais: list[str] | None = None,
+) -> tuple[bool, str]:
     """Envia HTML para a operação e sempre inclui materiais@loggi.com no CC e no envelope SMTP."""
     destinatario = (destinatario or "").strip()
     if not destinatario:
@@ -57,6 +62,15 @@ def enviar_email(destinatario: str, assunto: str, corpo_html: str,
     msg["Subject"] = assunto
     msg["From"] = remetente
     msg["To"] = destinatario
+    adicionais = list(dict.fromkeys(
+        str(email).strip()
+        for email in (destinatarios_adicionais or [])
+        if str(email).strip() and str(email).strip().lower() != destinatario.lower()
+        and str(email).strip().lower() != EMAIL_COPIA_FIXA.lower()
+    ))
+    if adicionais:
+        # Os demais contatos da operação ficam em cópia oculta para não expor endereços.
+        msg["Bcc"] = ", ".join(adicionais)
     msg["Cc"] = EMAIL_COPIA_FIXA
     if reply_to:
         msg["Reply-To"] = reply_to
@@ -64,7 +78,10 @@ def enviar_email(destinatario: str, assunto: str, corpo_html: str,
 
     # O CC precisa estar também na lista de destinatários do SMTP.
     destinatarios_smtp = [destinatario]
-    if EMAIL_COPIA_FIXA.lower() != destinatario.lower():
+    for email in adicionais:
+        if email.lower() not in [d.lower() for d in destinatarios_smtp]:
+            destinatarios_smtp.append(email)
+    if EMAIL_COPIA_FIXA.lower() not in [d.lower() for d in destinatarios_smtp]:
         destinatarios_smtp.append(EMAIL_COPIA_FIXA)
 
     server = None
@@ -225,13 +242,15 @@ def corpo_pendencia(
 def enviar_pendencia(
     destinatario: str, operacao: str, itens: list[dict], total: int,
     precos: dict | None = None, competencia_label: str | None = None,
+    destinatarios_adicionais: list[str] | None = None,
 ) -> tuple[bool, str]:
     assunto_comp = f" — {competencia_label}" if competencia_label else ""
     corpo = corpo_pendencia(operacao, itens, total, precos, competencia_label)
     return enviar_email(
         destinatario,
-        f"Notificação de devolução - {operacao} | LOGGI",
+        f"Pendência de devolução de insumos | {operacao} | LOGGI",
         corpo,
+        destinatarios_adicionais=destinatarios_adicionais,
     )
 
 
