@@ -203,7 +203,7 @@ def corpo_pendencia(
     <div style="margin:0;padding:24px 10px;background:#f4f7fb;font-family:Montserrat,Arial,Helvetica,sans-serif;color:#172b4d">
       <div style="max-width:900px;margin:0 auto;background:#fff;border:1px solid #e3eaf4;border-radius:10px;overflow:hidden">
         <div style="background:#0067fc;padding:22px 28px;text-align:center">
-          <img src="{LOGO_URL}" alt="Loggi" width="96" style="display:block;margin:0 auto 8px;height:auto">
+          <img src="{LOGO_URL}" alt="Loggi" width="96" style="display:block;margin:0 auto 8px;height:auto;filter:brightness(0) invert(1)">
           <div style="font-family:Montserrat,Arial,sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#fff">Portal LEVES</div>
         </div>
         <div style="padding:26px 28px">
