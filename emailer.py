@@ -151,25 +151,73 @@ def _tabela_itens(itens: list[dict], qtd_key: str, rot_qtd: str, precos: dict | 
     return html, valor_total
 
 
+def _tabela_resumo_devolucao(itens: list[dict], precos: dict | None = None) -> tuple[str, float]:
+    """Tabela visual com volumes enviados, devolvidos, pendentes e valores."""
+    precos_norm = {str(k).strip().upper(): float(v or 0) for k, v in (precos or {}).items()}
+    linhas = []
+    total_enviado = total_devolvido = total_pendente = 0
+    total_valor = 0.0
+    for it in itens:
+        tipo = str(it.get("tipo", "")).strip().upper()
+        enviado = int(it.get("enviado", 0) or 0)
+        devolvido = int(it.get("devolvido", 0) or 0)
+        pendente = int(it.get("pendente", 0) or 0)
+        unitario = precos_norm.get(tipo, 0.0)
+        valor = pendente * unitario
+        total_enviado += enviado
+        total_devolvido += devolvido
+        total_pendente += pendente
+        total_valor += valor
+        linhas.append(
+            "<tr>"
+            f"<td style='padding:10px;border:1px solid #d9e2f0;font-weight:bold'>{_escape(tipo.title())}</td>"
+            f"<td style='padding:10px;border:1px solid #d9e2f0;text-align:center'>{_fmt(enviado)}</td>"
+            f"<td style='padding:10px;border:1px solid #d9e2f0;text-align:center'>{_fmt(devolvido)}</td>"
+            f"<td style='padding:10px;border:1px solid #d9e2f0;text-align:center;color:#d93025;font-weight:bold'>{_fmt(pendente)}</td>"
+            f"<td style='padding:10px;border:1px solid #d9e2f0;text-align:right'>{_brl(unitario)}</td>"
+            f"<td style='padding:10px;border:1px solid #d9e2f0;text-align:right;font-weight:bold'>{_brl(valor)}</td></tr>"
+        )
+    linhas.append(
+        "<tr style='background:#f2f7ff;font-weight:bold'>"
+        "<td style='padding:10px;border:1px solid #d9e2f0'>TOTAL</td>"
+        f"<td style='padding:10px;border:1px solid #d9e2f0;text-align:center'>{_fmt(total_enviado)}</td>"
+        f"<td style='padding:10px;border:1px solid #d9e2f0;text-align:center'>{_fmt(total_devolvido)}</td>"
+        f"<td style='padding:10px;border:1px solid #d9e2f0;text-align:center;color:#d93025'>{_fmt(total_pendente)}</td>"
+        "<td style='padding:10px;border:1px solid #d9e2f0'></td>"
+        f"<td style='padding:10px;border:1px solid #d9e2f0;text-align:right'>{_brl(total_valor)}</td></tr>"
+    )
+    headers = ["Insumo", "Enviados", "Devolvidos", "Pendentes", "Valor unit.", "Total pendente"]
+    th = "".join(f"<th style='padding:11px 7px;border:1px solid #008bd2;background:#00aeef;color:#fff;text-align:center'>{h}</th>" for h in headers)
+    html = "<table role='presentation' cellpadding='0' cellspacing='0' style='border-collapse:collapse;width:100%;font-family:Arial,sans-serif;font-size:13px;margin:20px 0'><thead><tr>" + th + "</tr></thead><tbody>" + "".join(linhas) + "</tbody></table>"
+    return html, total_valor
+
+
 def corpo_pendencia(
     operacao: str, itens: list[dict], total: int, precos: dict | None = None,
     competencia_label: str | None = None,
 ) -> str:
-    tabela, _ = _tabela_itens(itens, "pendente", "Pendente", precos)
-    referencia = (
-        f" referente à competência <b>{_escape(competencia_label)}</b>"
-        if competencia_label else ""
-    )
+    tabela, valor_total = _tabela_resumo_devolucao(itens, precos)
+    competencia = _escape(competencia_label or "mês selecionado")
+    link_portal = "https://levesloggiapp-1.streamlit.app/"
     return f"""
-    <div style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;max-width:770px;margin:0 auto">
-      <div style="text-align:center;margin-bottom:8px">
-        <img src="{LOGO_URL}" alt="Loggi" width="110" style="display:block;margin:0 auto;height:auto">
+    <div style="margin:0;padding:24px 10px;background:#f4f7fb;font-family:Arial,Helvetica,sans-serif;color:#172b4d">
+      <div style="max-width:900px;margin:0 auto;background:#fff;border:1px solid #e3eaf4;border-radius:10px;overflow:hidden">
+        <div style="background:#0067fc;padding:22px 28px;text-align:center">
+          <img src="{LOGO_URL}" alt="Loggi" width="96" style="display:block;margin:0 auto 8px;height:auto">
+          <div style="font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#fff">Portal LEVES</div>
+        </div>
+        <div style="padding:26px 28px">
+          <h2 style="margin:0 0 18px;font-size:22px;color:#172b4d">Acompanhamento de devolução de insumos</h2>
+          <p style="font-size:15px;line-height:1.6">Olá, <b>{_escape(operacao)}</b>.</p>
+          <p style="font-size:15px;line-height:1.6">Este é um comunicado sobre o acompanhamento dos insumos de propriedade da Loggi (sacas, gaylords e pallets) enviados à sua operação. Para a competência <b>{competencia}</b>, consolidamos os volumes enviados e devolvidos para identificar possíveis pendências.</p>
+          {tabela}
+          <div style="margin:18px 0;padding:14px 16px;background:#fff5f4;border-left:4px solid #e53935;border-radius:4px;font-size:15px"><b>Valor total pendente de devolução: {_brl(valor_total)}</b></div>
+          <div style="text-align:center;margin:24px 0 28px"><a href="{link_portal}" style="display:inline-block;background:#00aeef;color:#fff;text-decoration:none;font-weight:bold;padding:14px 28px;border-radius:5px">Formalizar Devolução Aqui</a></div>
+          <p style="font-size:14px;line-height:1.6">Solicitamos a regularização desta pendência o quanto antes, para evitar descontos. Caso haja divergências nos números ou dificuldades no processo, entre em contato pelo e-mail <a href="mailto:materiais@loggi.com" style="color:#0067fc">materiais@loggi.com</a>, para que possamos realizar os ajustes antes do desconto.</p>
+          <p style="font-size:14px;line-height:1.6">Contamos com o apoio de todos para que as devoluções ocorram dentro do prazo e em conformidade com as orientações do processo.</p>
+          <div style="border-top:1px solid #e3eaf4;padding-top:14px;margin-top:24px;color:#6b778c;font-size:12px">Comunicado automático do Portal LEVES · Loggi</div>
+        </div>
       </div>
-      <div style="color:#6e6e6e;letter-spacing:2px;text-transform:uppercase;font-size:11px;margin-bottom:16px;text-align:center">Portal LEVES</div>
-      <p>Olá, <b>{_escape(operacao)}</b>.</p>
-      <p>Consta a seguinte <b>pendência de devolução</b>{referencia} de insumos com a sua operação. Por favor, programe a devolução ou acerto o quanto antes:</p>
-      {tabela}
-      <p style="color:#6e6e6e;font-size:13px">Aviso automático do Portal LEVES. Em caso de dúvida, responda a este e-mail.</p>
     </div>
     """
 
