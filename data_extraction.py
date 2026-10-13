@@ -146,10 +146,10 @@ def _aba(nome: str, cabecalho: list[str]) -> gspread.Worksheet:
 
 
 # ---------------------------------------------------------------------------
-# Leitura (crua) — cacheada com ttl curto (padrão DLE)
+# Leitura (crua) — cacheada para reduzir chamadas à API do Google Sheets
 # ---------------------------------------------------------------------------
 
-@st.cache_data(ttl=300, show_spinner=False)
+@st.cache_data(ttl=600, show_spinner=False)
 def ler_envios() -> list[dict]:
     """Lê os envios brutos da aba Envios."""
     ws = _aba(ABA_ENVIOS, CAB_ENVIOS)
@@ -174,7 +174,7 @@ def ler_envios() -> list[dict]:
     return linhas
 
 
-@st.cache_data(ttl=30, show_spinner=False)
+@st.cache_data(ttl=120, show_spinner=False)
 def ler_usuarios() -> list[dict]:
     """Lê todos os usuários (inclui hash/salt — uso interno)."""
     ws = _aba(ABA_USUARIOS, CAB_USUARIOS)
@@ -205,7 +205,7 @@ def ler_usuarios() -> list[dict]:
     return linhas
 
 
-@st.cache_data(ttl=20, show_spinner=False)
+@st.cache_data(ttl=120, show_spinner=False)
 def ler_devolucoes() -> list[dict]:
     """Lê os cabeçalhos de devolução."""
     ws = _aba(ABA_DEVOLUCOES, CAB_DEVOLUCOES)
@@ -221,7 +221,7 @@ def ler_devolucoes() -> list[dict]:
     return linhas
 
 
-@st.cache_data(ttl=20, show_spinner=False)
+@st.cache_data(ttl=120, show_spinner=False)
 def ler_dev_itens() -> list[dict]:
     """Lê os itens de devolução."""
     ws = _aba(ABA_DEV_ITENS, CAB_DEV_ITENS)
@@ -326,7 +326,7 @@ def criar_devolucao(dev: dict, itens: list[dict]):
         if rows:
             wsi.append_rows(rows, value_input_option="USER_ENTERED")
 
-    limpar_cache()
+    limpar_cache("devolucoes", "itens")
     return id_dev
 
 
@@ -345,7 +345,7 @@ def atualizar_devolucao(id_dev: str, campos: dict):
             for nome, val in campos.items():
                 ws.update_cell(i + 1, _col(CAB_DEVOLUCOES, nome), val)
             break
-    limpar_cache()
+    limpar_cache("devolucoes")
 
 
 def atualizar_itens_recebidos(id_dev: str, recebidos: dict):
@@ -359,10 +359,10 @@ def atualizar_itens_recebidos(id_dev: str, recebidos: dict):
             tipo = str(row[1]).strip().upper() if len(row) > 1 else ""
             if tipo in recebidos:
                 ws.update_cell(i + 1, 4, recebidos[tipo])
-    limpar_cache()
+    limpar_cache("itens")
 
 
-@st.cache_data(ttl=20, show_spinner=False)
+@st.cache_data(ttl=120, show_spinner=False)
 def ler_cobrancas() -> list[dict]:
     """Lê as cobranças registradas (itens já baixados por cobrança)."""
     ws = _aba(ABA_COBRANCAS, CAB_COBRANCAS)
@@ -387,7 +387,7 @@ def registrar_cobrancas(rows: list[dict]):
         [[r.get(c, "") for c in CAB_COBRANCAS] for r in rows],
         value_input_option="USER_ENTERED",
     )
-    limpar_cache()
+    limpar_cache("cobrancas")
 
 
 def competencia_ja_fechada(competencia: str) -> bool:
@@ -399,7 +399,7 @@ def competencia_ja_fechada(competencia: str) -> bool:
 # Configuração (chave/valor) — usada para o SMTP de e-mail
 # ---------------------------------------------------------------------------
 
-@st.cache_data(ttl=30, show_spinner=False)
+@st.cache_data(ttl=120, show_spinner=False)
 def get_config() -> dict:
     """Lê a aba Config como dicionário chave->valor."""
     ws = _aba(ABA_CONFIG, CAB_CONFIG)
@@ -433,13 +433,23 @@ def set_config(novos: dict):
     get_config.clear()
 
 
-def limpar_cache():
-    """Invalida os caches de leitura após uma escrita."""
-    ler_envios.clear()
-    ler_usuarios.clear()
-    ler_devolucoes.clear()
-    ler_dev_itens.clear()
-    ler_cobrancas.clear()
+def limpar_cache(*abas: str):
+    """Invalida os caches das abas alteradas; sem argumento, invalida todos."""
+    alvos = set(abas)
+    if not alvos:
+        alvos = {"envios", "usuarios", "devolucoes", "itens", "cobrancas", "config"}
+    funcoes = {
+        "envios": ler_envios,
+        "usuarios": ler_usuarios,
+        "devolucoes": ler_devolucoes,
+        "itens": ler_dev_itens,
+        "cobrancas": ler_cobrancas,
+        "config": get_config,
+    }
+    for alvo in alvos:
+        funcao = funcoes.get(alvo)
+        if funcao is not None:
+            funcao.clear()
 
 
 # ---------------------------------------------------------------------------
@@ -465,7 +475,7 @@ def inserir_usuario(usuario, senha_hash, salt, destino, nome, perfil, ativo=True
         ],
         value_input_option="USER_ENTERED",
     )
-    limpar_cache()
+    limpar_cache("usuarios")
 
 
 def inserir_usuarios_lote(rows: list[list]):
@@ -474,14 +484,14 @@ def inserir_usuarios_lote(rows: list[list]):
         return
     ws = _aba(ABA_USUARIOS, CAB_USUARIOS)
     ws.append_rows(rows, value_input_option="USER_ENTERED")
-    limpar_cache()
+    limpar_cache("usuarios")
 
 
 def definir_ativo(linha: int, ativo: bool):
     """Atualiza a coluna 'ativo' (7ª) de uma linha específica."""
     ws = _aba(ABA_USUARIOS, CAB_USUARIOS)
     ws.update_cell(linha, 7, "TRUE" if ativo else "FALSE")
-    limpar_cache()
+    limpar_cache("usuarios")
 
 
 def atualizar_senha_usuario(linha: int, senha_hash: str, salt: str):
@@ -490,7 +500,7 @@ def atualizar_senha_usuario(linha: int, senha_hash: str, salt: str):
     ws.update_cell(linha, 2, senha_hash)
     ws.update_cell(linha, 3, salt)
     ws.update_cell(linha, 10, "FALSE")
-    limpar_cache()
+    limpar_cache("usuarios")
 
 
 def salvar_codigo_recuperacao(linha: int, codigo_hash: str, expira_em: str):
@@ -498,7 +508,7 @@ def salvar_codigo_recuperacao(linha: int, codigo_hash: str, expira_em: str):
     ws = _aba(ABA_USUARIOS, CAB_USUARIOS)
     ws.update_cell(linha, 11, codigo_hash)
     ws.update_cell(linha, 12, expira_em)
-    limpar_cache()
+    limpar_cache("usuarios")
 
 
 def limpar_codigo_recuperacao(linha: int):
