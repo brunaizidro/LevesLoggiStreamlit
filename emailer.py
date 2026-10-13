@@ -103,7 +103,7 @@ def enviar_duvida(nome: str, email_remetente: str, mensagem: str) -> tuple[bool,
         return False, "Envio indisponível no momento. Tente mais tarde."
 
     corpo = f"""
-    <div style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;max-width:560px">
+    <div style="font-family:Montserrat,Arial,Helvetica,sans-serif;color:#1a1a1a;max-width:560px">
       <div style="font-size:22px;font-weight:800;color:#0067fc">loggi</div>
       <div style="color:#6e6e6e;letter-spacing:2px;text-transform:uppercase;font-size:11px;margin-bottom:14px">Portal LEVES · Dúvida</div>
       <p><b>De:</b> {nome or '(sem nome)'} &lt;{email_remetente}&gt;</p>
@@ -187,8 +187,8 @@ def _tabela_resumo_devolucao(itens: list[dict], precos: dict | None = None) -> t
         f"<td style='padding:10px;border:1px solid #d9e2f0;text-align:right'>{_brl(total_valor)}</td></tr>"
     )
     headers = ["Insumo", "Enviados", "Devolvidos", "Pendentes", "Valor unit.", "Total pendente"]
-    th = "".join(f"<th style='padding:11px 7px;border:1px solid #008bd2;background:#00aeef;color:#fff;text-align:center'>{h}</th>" for h in headers)
-    html = "<table role='presentation' cellpadding='0' cellspacing='0' style='border-collapse:collapse;width:100%;font-family:Arial,sans-serif;font-size:13px;margin:20px 0'><thead><tr>" + th + "</tr></thead><tbody>" + "".join(linhas) + "</tbody></table>"
+    th = "".join(f"<th style='padding:11px 7px;border:1px solid #008bd2;background:#00baff;color:#fff;text-align:center'>{h}</th>" for h in headers)
+    html = "<div style='width:100%;text-align:center;margin:20px 0'><table role='presentation' align='center' cellpadding='0' cellspacing='0' style='border-collapse:collapse;width:96%;margin:0 auto;font-family:Montserrat,Arial,sans-serif;font-size:13px'><thead><tr>" + th + "</tr></thead><tbody>" + "".join(linhas) + "</tbody></table>"
     return html, total_valor
 
 
@@ -200,11 +200,11 @@ def corpo_pendencia(
     competencia = _escape(competencia_label or "mês selecionado")
     link_portal = "https://levesloggiapp-1.streamlit.app/"
     return f"""
-    <div style="margin:0;padding:24px 10px;background:#f4f7fb;font-family:Arial,Helvetica,sans-serif;color:#172b4d">
+    <div style="margin:0;padding:24px 10px;background:#f4f7fb;font-family:Montserrat,Arial,Helvetica,sans-serif;color:#172b4d">
       <div style="max-width:900px;margin:0 auto;background:#fff;border:1px solid #e3eaf4;border-radius:10px;overflow:hidden">
         <div style="background:#0067fc;padding:22px 28px;text-align:center">
           <img src="{LOGO_URL}" alt="Loggi" width="96" style="display:block;margin:0 auto 8px;height:auto">
-          <div style="font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#fff">Portal LEVES</div>
+          <div style="font-family:Montserrat,Arial,sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#fff">Portal LEVES</div>
         </div>
         <div style="padding:26px 28px">
           <h2 style="margin:0 0 18px;font-size:22px;color:#172b4d">Acompanhamento de devolução de insumos</h2>
@@ -212,7 +212,7 @@ def corpo_pendencia(
           <p style="font-size:15px;line-height:1.6">Este é um comunicado sobre o acompanhamento dos insumos de propriedade da Loggi (sacas, gaylords e pallets) enviados à sua operação. Para a competência <b>{competencia}</b>, consolidamos os volumes enviados e devolvidos para identificar possíveis pendências.</p>
           {tabela}
           <div style="margin:18px 0;padding:14px 16px;background:#fff5f4;border-left:4px solid #e53935;border-radius:4px;font-size:15px"><b>Valor total pendente de devolução: {_brl(valor_total)}</b></div>
-          <div style="text-align:center;margin:24px 0 28px"><a href="{link_portal}" style="display:inline-block;background:#00aeef;color:#fff;text-decoration:none;font-weight:bold;padding:14px 28px;border-radius:5px">Formalizar Devolução Aqui</a></div>
+          <div style="text-align:center;margin:24px 0 28px"><a href="{link_portal}" style="display:inline-block;background:#00baff;color:#fff;text-decoration:none;font-family:Montserrat,Arial,sans-serif;font-weight:bold;padding:14px 28px;border-radius:5px">Formalizar Devolução Aqui</a></div>
           <p style="font-size:14px;line-height:1.6">Solicitamos a regularização desta pendência o quanto antes, para evitar descontos. Caso haja divergências nos números ou dificuldades no processo, entre em contato pelo e-mail <a href="mailto:materiais@loggi.com" style="color:#0067fc">materiais@loggi.com</a>, para que possamos realizar os ajustes antes do desconto.</p>
           <p style="font-size:14px;line-height:1.6">Contamos com o apoio de todos para que as devoluções ocorram dentro do prazo e em conformidade com as orientações do processo.</p>
           <div style="border-top:1px solid #e3eaf4;padding-top:14px;margin-top:24px;color:#6b778c;font-size:12px">Comunicado automático do Portal LEVES · Loggi</div>
