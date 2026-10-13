@@ -151,24 +151,40 @@ def _tabela_itens(itens: list[dict], qtd_key: str, rot_qtd: str, precos: dict | 
     return html, valor_total
 
 
-def corpo_pendencia(operacao: str, itens: list[dict], total: int, precos: dict | None = None) -> str:
+def corpo_pendencia(
+    operacao: str, itens: list[dict], total: int, precos: dict | None = None,
+    competencia_label: str | None = None,
+) -> str:
     tabela, _ = _tabela_itens(itens, "pendente", "Pendente", precos)
+    referencia = (
+        f" referente à competência <b>{_escape(competencia_label)}</b>"
+        if competencia_label else ""
+    )
     return f"""
     <div style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;max-width:770px;margin:0 auto">
       <div style="text-align:center;margin-bottom:8px">
         <img src="{LOGO_URL}" alt="Loggi" width="110" style="display:block;margin:0 auto;height:auto">
       </div>
       <div style="color:#6e6e6e;letter-spacing:2px;text-transform:uppercase;font-size:11px;margin-bottom:16px;text-align:center">Portal LEVES</div>
-      <p>Olá, <b>{operacao}</b>.</p>
-      <p>Consta a seguinte <b>pendência de devolução</b> de insumos com a sua operação. Por favor, programe a devolução o quanto antes:</p>
+      <p>Olá, <b>{_escape(operacao)}</b>.</p>
+      <p>Consta a seguinte <b>pendência de devolução</b>{referencia} de insumos com a sua operação. Por favor, programe a devolução ou acerto o quanto antes:</p>
       {tabela}
       <p style="color:#6e6e6e;font-size:13px">Aviso automático do Portal LEVES. Em caso de dúvida, responda a este e-mail.</p>
     </div>
     """
 
 
-def enviar_pendencia(destinatario: str, operacao: str, itens: list[dict], total: int, precos: dict | None = None) -> tuple[bool, str]:
-    return enviar_email(destinatario, f"Pendência de devolução — {operacao} — Portal LEVES", corpo_pendencia(operacao, itens, total, precos))
+def enviar_pendencia(
+    destinatario: str, operacao: str, itens: list[dict], total: int,
+    precos: dict | None = None, competencia_label: str | None = None,
+) -> tuple[bool, str]:
+    assunto_comp = f" — {competencia_label}" if competencia_label else ""
+    corpo = corpo_pendencia(operacao, itens, total, precos, competencia_label)
+    return enviar_email(
+        destinatario,
+        f"Pendência de devolução{assunto_comp} — {operacao} — Portal LEVES",
+        corpo,
+    )
 
 
 def corpo_cobranca(operacao: str, competencia_label: str, prazo: str, itens: list[dict], total: int, precos: dict | None = None) -> str:
