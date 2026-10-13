@@ -434,10 +434,8 @@ def set_config(novos: dict):
 
 
 def limpar_cache(*abas: str):
-    """Invalida os caches das abas alteradas; sem argumento, invalida todos."""
-    alvos = set(abas)
-    if not alvos:
-        alvos = {"envios", "usuarios", "devolucoes", "itens", "cobrancas", "config"}
+    """Limpa caches de leitura; sem argumentos limpa todos."""
+    alvos = set(abas) or {"envios", "usuarios", "devolucoes", "itens", "cobrancas", "config"}
     funcoes = {
         "envios": ler_envios,
         "usuarios": ler_usuarios,
