@@ -140,18 +140,24 @@ def page_8():
 def _enviar_grupo(x, silencioso=False):
     pr = dp.precos()
     enviados, falhas = 0, []
-    for email in x["emails"]:
+    emails = list(dict.fromkeys(
+        str(email).strip() for email in x.get("emails", []) if str(email).strip()
+    ))
+    if emails:
+        # Uma única mensagem por operação; contatos adicionais ficam em cópia oculta.
         ok, msg = emailer.enviar_pendencia(
-            email, x["destino"], x["itens"], x["total"],
-            precos=pr, competencia_label=x["competencia_label"],
+            emails[0], x["destino"], x["itens"], x["total"],
+            precos=pr,
+            competencia_label=x["competencia_label"],
+            destinatarios_adicionais=emails[1:],
         )
         if ok:
-            enviados += 1
+            enviados = 1
         else:
             falhas.append(msg)
     if not silencioso:
         if enviados:
-            st.success(f"{enviados} e-mail(s) de {x['competencia_label']} enviado(s) para {x['destino']}.")
+            st.success(f"1 e-mail de {x['competencia_label']} enviado para {x['destino']} ({len(emails)} destinatário(s)).")
         for f in falhas:
             st.error(f)
     return enviados, falhas
