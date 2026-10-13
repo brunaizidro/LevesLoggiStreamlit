@@ -174,8 +174,8 @@ def _tabela_resumo_devolucao(itens: list[dict], precos: dict | None = None) -> t
             f"<td style='padding:10px;border:1px solid #d9e2f0;text-align:center'>{_fmt(enviado)}</td>"
             f"<td style='padding:10px;border:1px solid #d9e2f0;text-align:center'>{_fmt(devolvido)}</td>"
             f"<td style='padding:10px;border:1px solid #d9e2f0;text-align:center;color:#d93025;font-weight:bold'>{_fmt(pendente)}</td>"
-            f"<td style='padding:10px;border:1px solid #d9e2f0;text-align:right'>{_brl(unitario)}</td>"
-            f"<td style='padding:10px;border:1px solid #d9e2f0;text-align:right;font-weight:bold'>{_brl(valor)}</td></tr>"
+            f"<td style='padding:10px;border:1px solid #d9e2f0;text-align:center'>{_brl(unitario)}</td>"
+            f"<td style='padding:10px;border:1px solid #d9e2f0;text-align:center;font-weight:bold'>{_brl(valor)}</td></tr>"
         )
     linhas.append(
         "<tr style='background:#f2f7ff;font-weight:bold'>"
@@ -184,11 +184,11 @@ def _tabela_resumo_devolucao(itens: list[dict], precos: dict | None = None) -> t
         f"<td style='padding:10px;border:1px solid #d9e2f0;text-align:center'>{_fmt(total_devolvido)}</td>"
         f"<td style='padding:10px;border:1px solid #d9e2f0;text-align:center;color:#d93025'>{_fmt(total_pendente)}</td>"
         "<td style='padding:10px;border:1px solid #d9e2f0'></td>"
-        f"<td style='padding:10px;border:1px solid #d9e2f0;text-align:right'>{_brl(total_valor)}</td></tr>"
+        f"<td style='padding:10px;border:1px solid #d9e2f0;text-align:center'>{_brl(total_valor)}</td></tr>"
     )
     headers = ["Insumo", "Enviados", "Devolvidos", "Pendentes", "Valor unit.", "Total pendente"]
     th = "".join(f"<th style='padding:11px 7px;border:1px solid #008bd2;background:#00baff;color:#fff;text-align:center'>{h}</th>" for h in headers)
-    html = "<div style='width:100%;text-align:center;margin:20px 0'><table role='presentation' align='center' cellpadding='0' cellspacing='0' style='border-collapse:collapse;width:96%;margin:0 auto;font-family:Montserrat,Arial,sans-serif;font-size:13px'><thead><tr>" + th + "</tr></thead><tbody>" + "".join(linhas) + "</tbody></table>"
+    html = "<div style='width:100%;text-align:center;margin:20px 0'><table role='presentation' align='center' cellpadding='0' cellspacing='0' style='border-collapse:collapse;width:96%;margin:0 auto;font-family:Montserrat,Arial,sans-serif;font-size:13px'><thead><tr>" + th + "</tr></thead><tbody>" + "".join(linhas) + "</tbody></table></div>"
     return html, total_valor
 
 
@@ -230,7 +230,7 @@ def enviar_pendencia(
     corpo = corpo_pendencia(operacao, itens, total, precos, competencia_label)
     return enviar_email(
         destinatario,
-        f"Pendência de devolução{assunto_comp} — {operacao} — Portal LEVES",
+        f"Notificação de devolução - {operacao} | LOGGI",
         corpo,
     )
 
