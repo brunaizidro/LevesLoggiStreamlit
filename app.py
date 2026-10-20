@@ -466,21 +466,33 @@ def tela_login():
 
             if not st.session_state.get("recuperacao_codigo_enviado"):
                 with st.form("solicitar_recuperacao"):
-                    usuario_rec = st.text_input("Usuário", placeholder="Digite seu usuário")
-                    enviar_codigo = st.form_submit_button("Enviar código de recuperação", type="primary", width="stretch")
+                    email_rec = st.text_input(
+                        "E-mail cadastrado",
+                        placeholder="Digite seu e-mail",
+                    )
+                    enviar_codigo = st.form_submit_button(
+                        "Enviar código de recuperação",
+                        type="primary",
+                        width="stretch",
+                    )
 
                 if enviar_codigo:
-                    try:
-                        ok, mensagem = auth.solicitar_recuperacao(usuario_rec)
-                        if ok:
-                            st.session_state["recuperacao_usuario"] = (usuario_rec or "").strip().lower()
-                            st.session_state["recuperacao_codigo_enviado"] = True
-                            st.success("Se o usuário estiver cadastrado com e-mail, o código foi enviado.")
-                            st.rerun()
-                        else:
-                            st.error(mensagem)
-                    except Exception as e:
-                        st.error(f"Não foi possível enviar o código: {e}")
+                    if not (email_rec or "").strip() or "@" not in email_rec:
+                        st.error("Digite um endereço de e-mail válido.")
+                    else:
+                        try:
+                            ok, mensagem, usuario_encontrado = auth.solicitar_recuperacao_por_email(email_rec)
+                            if ok and usuario_encontrado:
+                                st.session_state["recuperacao_usuario"] = usuario_encontrado
+                                st.session_state["recuperacao_codigo_enviado"] = True
+                                st.success("Código solicitado. Confira sua caixa de entrada e o spam.")
+                                st.rerun()
+                            elif ok:
+                                st.info(mensagem)
+                            else:
+                                st.error(mensagem)
+                        except Exception as e:
+                            st.error(f"Não foi possível enviar o código: {e}")
             else:
                 st.info("Digite o código de 6 dígitos recebido por e-mail.")
                 with st.form("redefinir_senha"):
