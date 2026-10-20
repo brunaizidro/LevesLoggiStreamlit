@@ -328,6 +328,40 @@ def _enviar_email_recuperacao(
                 pass
 
 
+
+def buscar_usuario_por_email(email: str) -> dict | None:
+    """Localiza uma conta ativa pelo e-mail cadastrado."""
+    email = (email or "").strip().lower()
+    if not email or "@" not in email:
+        return None
+
+    try:
+        sheets.ler_usuarios.clear()
+    except Exception:
+        pass
+
+    encontrados = [
+        u for u in sheets.ler_usuarios()
+        if u.get("ativo")
+        and str(u.get("email", "")).strip().lower() == email
+    ]
+    return encontrados[0] if len(encontrados) == 1 else None
+
+
+def solicitar_recuperacao_por_email(email: str) -> tuple[bool, str, str]:
+    """Solicita recuperação a partir do e-mail cadastrado."""
+    u = buscar_usuario_por_email(email)
+    mensagem = (
+        "Se houver uma conta ativa vinculada a esse e-mail, "
+        "enviaremos um código de recuperação."
+    )
+    if not u:
+        return True, mensagem, ""
+
+    ok, retorno = solicitar_recuperacao(u["usuario"])
+    return ok, retorno, u["usuario"]
+
+
 def solicitar_recuperacao(usuario: str) -> tuple[bool, str]:
     usuario = (usuario or "").strip().lower()
     u = buscar_usuario(usuario)
