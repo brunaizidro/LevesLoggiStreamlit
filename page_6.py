@@ -321,25 +321,126 @@ def page_6():
         key="dl_concil",
     )
 
-    # ---- Enviar cobrança por e-mail ----
+    # ---- Enviar cobrança por e-mail (base financeira Cobrancas) ----
     st.markdown("---")
     st.markdown("#### Enviar cobrança por e-mail")
-    cobs = dp.cobrancas_df()
-    if cobs.empty:
-        st.caption(f"Feche a cobrança de {escolha} para poder enviar os e-mails.")
+    st.caption("Os destinatários vêm do cadastro de usuários e os valores da aba Cobrancas.")
+
+    try:
+        registros_financeiros = dados._planilha().worksheet("Cobrancas").get_all_records()
+    except Exception:
+        registros_financeiros = []
+
+    if not registros_financeiros:
+        st.info("Não há lançamentos na aba Cobrancas para enviar por e-mail.")
         return
 
-    cobs_mes = cobs[cobs["competencia"] == mes]
-    if cobs_mes.empty:
-        st.caption(f"Não há cobranças fechadas para {escolha} para enviar por e-mail.")
+    import pandas as pd
+    base_email = pd.DataFrame(registros_financeiros)
+    obrigatorias_email = ["id", "competencia", "destino", "valor"]
+    faltantes_email = [col for col in obrigatorias_email if col not in base_email.columns]
+    if faltantes_email:
+        st.error("A aba Cobrancas precisa conter as colunas: " + ", ".join(obrigatorias_email))
         return
+
+    def _valor_financeiro(valor):
+        if isinstance(valor, (int, float)):
+            return float(valor)
+        texto = str(valor or "").replace("R$", "").strip()
+        if "," in texto:
+            texto = texto.replace(".", "").replace(",", ".")
+        try:
+            return float(texto)
+        except (TypeError, ValueError):
+            return 0.0
+
+    base_email["valor_email"] = base_email["valor"].map(_valor_financeiro)
+    competencias_email = sorted(
+        base_email["competencia"].dropna().astype(str).unique().tolist(),
+        reverse=True,
+    )
+    competencia_email = st.selectbox(
+        "Competência para envio",
+        competencias_email,
+        format_func=lambda m: dp.rotulo_mes(m) if len(m) == 7 and m[4:5] == "-" else m,
+        key="cobrancas_email_competencia_financeira",
+    )
+    base_email = base_email[base_email["competencia"].astype(str) == competencia_email].copy()
+
+    usuarios_email = [
+        u for u in dados.ler_usuarios()
+        if u.get("ativo") and u.get("email") and u.get("destino")
+    ]
+    emails_por_sigla = {}
+    for u in usuarios_email:
+        sigla = dp._normalizar(u["destino"])
+        emails_por_sigla.setdefault(sigla, [])
+        if u["email"].strip() not in emails_por_sigla[sigla]:
+            emails_por_sigla[sigla].append(u["email"].strip())
+
+    grupos_email = []
+    for sigla, grupo in base_email.groupby("destino"):
+        emails = emails_por_sigla.get(dp._normalizar(sigla), [])
+        grupos_email.append({
+            "sigla": str(sigla),
+            "emails": emails,
+            "valor": float(grupo["valor_email"].sum()),
+            "ncs": grupo["id"].astype(str).tolist(),
+        })
+
+    resumo_email = pd.DataFrame([
+        {
+            "Operação": g["sigla"],
+            "Valor total": dp.fmt_brl(g["valor"]),
+            "Destinatários": ", ".join(g["emails"]) if g["emails"] else "Sem e-mail cadastrado",
+            "Notas": len(g["ncs"]),
+        }
+        for g in grupos_email
+    ])
+    st.dataframe(resumo_email, width="stretch", hide_index=True)
+
+    sem_email = [g["sigla"] for g in grupos_email if not g["emails"]]
+    if sem_email:
+        st.warning("Cadastre e-mail ativo na aba Usuarios para: " + ", ".join(sem_email))
+
     if not emailer.smtp_configurado():
-        st.warning("Configure o servidor de e-mail (SMTP) em **Configurações** para enviar cobranças.")
+        st.warning("Configure o servidor SMTP em Configurações para habilitar o envio.")
         return
 
-    _enviar_cobrancas_email(cobs_mes, escolha, prazo_txt)
-
-
+    if st.button("✉️ Enviar cobrança financeira por e-mail", type="primary", key="btn_enviar_cobranca_financeira"):
+        enviados = 0
+        falhas = []
+        for g in grupos_email:
+            if not g["emails"]:
+                continue
+            ncs_html = "".join(
+                f"<li>{nc}</li>" for nc in g["ncs"]
+            )
+            corpo = (
+                "<div style='font-family:Arial,sans-serif;color:#172b4d;max-width:700px;margin:auto'>"
+                "<h2>Portal LEVES — Nota de débito</h2>"
+                f"<p>Olá, {g['sigla']}.</p>"
+                f"<p>Segue o valor total registrado para a competência <b>{competencia_email}</b>.</p>"
+                f"<p style='font-size:20px'><b>Valor total: {dp.fmt_brl(g['valor'])}</b></p>"
+                f"<p>Notas de débito:</p><ul>{ncs_html}</ul>"
+                "<p>Em caso de dúvidas, responda a este e-mail ou entre em contato com materiais@loggi.com.</p>"
+                "</div>"
+            )
+            ok, msg = emailer.enviar_email(
+                g["emails"][0],
+                f"Cobrança financeira de insumos | {g['sigla']} | {competencia_email}",
+                corpo,
+                destinatarios_adicionais=g["emails"][1:],
+            )
+            if ok:
+                enviados += 1
+                st.success(f"{g['sigla']}: e-mail enviado.")
+            else:
+                falhas.append(f"{g['sigla']}: {msg}")
+        for falha in falhas:
+            st.error(falha)
+        if enviados == 0 and not falhas:
+            st.info("Nenhum e-mail enviado: confira os destinatários cadastrados.");
 
 
 def _emails_do_destino(destino: str) -> list[str]:
