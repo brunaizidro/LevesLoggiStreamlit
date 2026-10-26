@@ -321,67 +321,25 @@ def page_6():
         key="dl_concil",
     )
 
-    # ---- Histórico de cobranças fechadas ----
-    st.markdown("---")
-    st.markdown("#### Histórico de cobranças fechadas")
-    cobs = dp.cobrancas_df()
-    if cobs.empty:
-        st.caption("Nenhuma cobrança fechada ainda.")
-        return
-
-    cobs = cobs.sort_values("dt", ascending=False)
-    cobs["Competência"] = cobs["competencia"].map(
-        lambda m: dp.rotulo_mes(m) if len(str(m)) == 7 else str(m))
-
-    resumo = (cobs.groupby(["competencia", "Competência"], as_index=False)
-              .agg(itens_cobrados=("qtd", "sum"), operacoes=("destino", "nunique"),
-                   fechada_em=("data", "max")))
-    resumo = resumo.sort_values("competencia", ascending=False)
-    resumo_disp = resumo[["Competência", "itens_cobrados", "operacoes", "fechada_em"]].rename(
-        columns={"itens_cobrados": "Itens cobrados", "operacoes": "Operações", "fechada_em": "Fechada em"})
-    st.dataframe(
-        resumo_disp,
-        width="stretch",
-        hide_index=True,
-        column_config=_centralizar_tabela(resumo_disp),
-    )
-
-    # ---- Detalhamento histórico ----
-    comps = list(dict.fromkeys(cobs["competencia"]))
-    rot_comp = {c: (dp.rotulo_mes(c) if len(str(c)) == 7 else str(c)) for c in comps}
-    fcomp = st.selectbox("Detalhar competência", ["Todas"] + [rot_comp[c] for c in comps], key="hist_comp")
-    det = cobs
-    if fcomp != "Todas":
-        alvo = next(c for c, r in rot_comp.items() if r == fcomp)
-        det = cobs[cobs["competencia"] == alvo]
-
-    det_disp = det[["id", "data", "Competência", "destino", "tipo", "qtd", "prazo_dias", "gerado_por"]].rename(columns={
-        "id": "Cobrança", "data": "Data/hora", "destino": "Operação", "tipo": "Tipo",
-        "qtd": "Qtd cobrada", "prazo_dias": "Prazo (até)", "gerado_por": "Gerado por"})
-    st.dataframe(
-        det_disp,
-        width="stretch",
-        hide_index=True,
-        column_config=_centralizar_tabela(det_disp),
-    )
-    st.download_button(
-        "Baixar histórico de cobranças (CSV)",
-        det_disp.to_csv(index=False).encode("utf-8-sig"),
-        file_name="cobrancas_fechadas.csv", mime="text/csv", key="dl_cobs",
-    )
-
     # ---- Enviar cobrança por e-mail ----
     st.markdown("---")
     st.markdown("#### Enviar cobrança por e-mail")
-    cobs_mes = cobs[cobs["competencia"] == mes] if not cobs.empty else cobs
-    if cobs_mes.empty:
+    cobs = dp.cobrancas_df()
+    if cobs.empty:
         st.caption(f"Feche a cobrança de {escolha} para poder enviar os e-mails.")
+        return
+
+    cobs_mes = cobs[cobs["competencia"] == mes]
+    if cobs_mes.empty:
+        st.caption(f"Não há cobranças fechadas para {escolha} para enviar por e-mail.")
         return
     if not emailer.smtp_configurado():
         st.warning("Configure o servidor de e-mail (SMTP) em **Configurações** para enviar cobranças.")
         return
 
     _enviar_cobrancas_email(cobs_mes, escolha, prazo_txt)
+
+
 
 
 def _emails_do_destino(destino: str) -> list[str]:
