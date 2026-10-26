@@ -101,10 +101,18 @@ def _mostrar_notas_debito():
             st.info("Não há notas de débito vinculadas à operação do seu usuário.")
             return
 
-    base["Total"] = pd.to_numeric(
-        base["Total"].astype(str).str.replace("R$", "", regex=False).str.replace(".", "", regex=False).str.replace(",", ".", regex=False).str.strip(),
-        errors="coerce",
-    ).fillna(0)
+    def converter_valor(valor):
+        if isinstance(valor, (int, float)):
+            return float(valor)
+        texto = str(valor or "").replace("R$", "").strip()
+        if "," in texto:
+            texto = texto.replace(".", "").replace(",", ".")
+        try:
+            return float(texto)
+        except (TypeError, ValueError):
+            return 0.0
+
+    base["Total"] = base["Total"].map(converter_valor)
     tabela = base[["Sigla", "Leve (LMC)", "N° INS", "Total", "Mês"]].rename(columns={
         "Leve (LMC)": "Leve",
         "N° INS": "NC",
