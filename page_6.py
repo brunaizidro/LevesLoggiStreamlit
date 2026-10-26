@@ -36,37 +36,36 @@ def _centralizar_tabela(df):
 
 
 def _mostrar_notas_debito():
-    """Exibe notas da aba LEVE APP com filtro de acesso por operação."""
+    """Exibe notas da aba Cobrancas, com filtro por operação."""
     st.markdown("---")
     st.markdown("### Notas de débito")
-    st.caption("Competência conforme a base LEVE APP. Cada operação visualiza somente seus próprios registros.")
+    st.caption("Competência conforme a aba Cobrancas. Cada operação visualiza somente seus próprios registros.")
 
     usuario = st.session_state.get("usuario") or {}
     perfil = str(usuario.get("perfil", "operacao")).strip().lower()
     destino_usuario = str(usuario.get("destino", "")).strip()
 
     try:
-        # A base financeira é lida da planilha configurada no portal, não fica
-        # versionada no repositório público junto com o código.
-        ws = dados._planilha().worksheet("LEVE APP")
+        ws = dados._planilha().worksheet("Cobrancas")
         valores = ws.get_all_records()
     except Exception:
-        st.info("A base de notas ainda não está disponível. Importe a base de setembro para a aba 'LEVE APP' da planilha configurada no portal.")
+        st.info("A base de notas ainda não está disponível. Confira se a aba 'Cobrancas' existe na planilha configurada no portal.")
         return
 
     if not valores:
-        st.info("A aba LEVE APP está vazia.")
+        st.info("A aba Cobrancas está vazia.")
         return
 
     pd = __import__("pandas")
     base = pd.DataFrame(valores)
-    # Aceita os títulos da planilha original, sem exigir renomeação de colunas.
+    # Estrutura da aba Cobrancas: id, data, competencia, destino, tipo,
+    # valor, gerado_por. "destino" é a sigla da operação e "id" é a NC.
     aliases = {
-        "Mês": ["Mês", "Mes", "Competência", "Competencia"],
-        "N° INS": ["N° INS", "Nº INS", "N°INS", "NºINS", "INS", "NC"],
-        "Sigla": ["Sigla", "SIGLA"],
-        "Leve (LMC)": ["Leve (LMC)", "Leve", "Nome do Leve", "Operação", "Operacao"],
-        "Total": ["Total", "Valor", "Valor total"],
+        "Mês": ["Mês", "Mes", "Competência", "Competencia", "competencia"],
+        "N° INS": ["N° INS", "Nº INS", "N°INS", "NºINS", "INS", "NC", "id"],
+        "Sigla": ["Sigla", "SIGLA", "destino"],
+        "Leve (LMC)": ["Leve (LMC)", "Leve", "Nome do Leve", "Operação", "Operacao", "destino"],
+        "Total": ["Total", "Valor", "Valor total", "valor"],
     }
     renomear = {}
     for destino, opcoes in aliases.items():
@@ -78,7 +77,7 @@ def _mostrar_notas_debito():
     obrigatorias = ["Mês", "N° INS", "Sigla", "Leve (LMC)", "Total"]
     faltantes = [col for col in obrigatorias if col not in base.columns]
     if faltantes:
-        st.error("A aba LEVE APP não contém as colunas esperadas: " + ", ".join(faltantes))
+        st.error("A aba Cobrancas não contém as colunas esperadas: " + ", ".join(faltantes))
         return
 
     def normalizar(valor):
@@ -86,8 +85,6 @@ def _mostrar_notas_debito():
         texto = str(valor or "").strip().casefold()
         return "".join(c for c in unicodedata.normalize("NFD", texto) if unicodedata.category(c) != "Mn")
 
-    # Administradores podem auditar a base completa; usuários de operação são
-    # filtrados no DataFrame antes de exibir ou exportar qualquer informação.
     if perfil not in ("admin", "administrador"):
         alvo = normalizar(destino_usuario)
         if not alvo:
