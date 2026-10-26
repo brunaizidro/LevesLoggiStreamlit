@@ -30,6 +30,7 @@ from page_6 import page_6  # noqa: E402
 from page_7 import page_7  # noqa: E402
 from page_8 import page_8  # noqa: E402
 from page_9 import page_9  # noqa: E402
+from page_10 import page_10  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Sessão / login
@@ -595,6 +596,7 @@ def main():
                 "📦 Envios",
                 "📥 Recebimento",
                 "🧾 Conciliação",
+                "💰 Cobranças",
                 "↩️ Devoluções",
                 "🔔 Pendências",
                 "👥 Usuários",
@@ -668,7 +670,7 @@ def main():
         elif "Devoluções" in pagina:
             page_3()
         elif "Cobranças" in pagina:
-            page_9()
+            page_10() if eh_admin else page_9()
         else:
             page_1()
     except Exception as e:  # noqa: BLE001
