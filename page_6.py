@@ -321,126 +321,106 @@ def page_6():
         key="dl_concil",
     )
 
-    # ---- Enviar cobrança por e-mail (base financeira Cobrancas) ----
+    # ---- Enviar e-mail de saldo pendente da competência ----
     st.markdown("---")
-    st.markdown("#### Enviar cobrança por e-mail")
-    st.caption("Os destinatários vêm do cadastro de usuários e os valores da aba Cobrancas.")
+    st.markdown("#### Enviar saldo pendente por e-mail")
+    st.caption(f"O e-mail considera somente os itens ainda pendentes da competência {escolha}; não envia notas de débito da aba Cobrancas.")
 
-    try:
-        registros_financeiros = dados._planilha().worksheet("Cobrancas").get_all_records()
-    except Exception:
-        registros_financeiros = []
-
-    if not registros_financeiros:
-        st.info("Não há lançamentos na aba Cobrancas para enviar por e-mail.")
+    pend_email = df.copy()
+    pend_email = pend_email[pend_email["cobravel"] > 0].copy()
+    if pend_email.empty:
+        st.info(f"Não há saldo pendente para enviar por e-mail na competência {escolha}.")
         return
-
-    import pandas as pd
-    base_email = pd.DataFrame(registros_financeiros)
-    obrigatorias_email = ["id", "competencia", "destino", "valor"]
-    faltantes_email = [col for col in obrigatorias_email if col not in base_email.columns]
-    if faltantes_email:
-        st.error("A aba Cobrancas precisa conter as colunas: " + ", ".join(obrigatorias_email))
-        return
-
-    def _valor_financeiro(valor):
-        if isinstance(valor, (int, float)):
-            return float(valor)
-        texto = str(valor or "").replace("R$", "").strip()
-        if "," in texto:
-            texto = texto.replace(".", "").replace(",", ".")
-        try:
-            return float(texto)
-        except (TypeError, ValueError):
-            return 0.0
-
-    base_email["valor_email"] = base_email["valor"].map(_valor_financeiro)
-    competencias_email = sorted(
-        base_email["competencia"].dropna().astype(str).unique().tolist(),
-        reverse=True,
-    )
-    competencia_email = st.selectbox(
-        "Competência para envio",
-        competencias_email,
-        format_func=lambda m: dp.rotulo_mes(m) if len(m) == 7 and m[4:5] == "-" else m,
-        key="cobrancas_email_competencia_financeira",
-    )
-    base_email = base_email[base_email["competencia"].astype(str) == competencia_email].copy()
-
-    usuarios_email = [
-        u for u in dados.ler_usuarios()
-        if u.get("ativo") and u.get("email") and u.get("destino")
-    ]
-    emails_por_sigla = {}
-    for u in usuarios_email:
-        sigla = dp._normalizar(u["destino"])
-        emails_por_sigla.setdefault(sigla, [])
-        if u["email"].strip() not in emails_por_sigla[sigla]:
-            emails_por_sigla[sigla].append(u["email"].strip())
 
     grupos_email = []
-    for sigla, grupo in base_email.groupby("destino"):
-        emails = emails_por_sigla.get(dp._normalizar(sigla), [])
+    for destino_email, grupo_email in pend_email.groupby("destino"):
+        itens_email = [
+            {
+                "tipo": linha["tipo"],
+                "enviado": int(linha["enviado"]),
+                "devolvido": int(linha["devolvido"]),
+                "pendente": int(linha["cobravel"]),
+            }
+            for _, linha in grupo_email.iterrows()
+        ]
+        emails = dp.emails_por_destino(destino_email)
         grupos_email.append({
-            "sigla": str(sigla),
+            "destino": str(destino_email),
+            "itens": itens_email,
+            "total": int(grupo_email["cobravel"].sum()),
             "emails": emails,
-            "valor": float(grupo["valor_email"].sum()),
-            "ncs": grupo["id"].astype(str).tolist(),
         })
 
-    resumo_email = pd.DataFrame([
-        {
-            "Operação": g["sigla"],
-            "Valor total": dp.fmt_brl(g["valor"]),
-            "Destinatários": ", ".join(g["emails"]) if g["emails"] else "Sem e-mail cadastrado",
-            "Notas": len(g["ncs"]),
+    pr_email = dp.precos()
+    resumo_email = []
+    for grupo in grupos_email:
+        linha = {
+            "Operação": grupo["destino"],
+            "Saldo pendente": _fmt(grupo["total"]),
+            "E-mail(s)": ", ".join(grupo["emails"]) if grupo["emails"] else "Sem e-mail cadastrado",
         }
-        for g in grupos_email
-    ])
-    st.dataframe(resumo_email, width="stretch", hide_index=True)
+        if usa_valor:
+            linha["Valor pendente"] = dp.fmt_brl(
+                sum(item["pendente"] * pr_email.get(item["tipo"], 0) for item in grupo["itens"])
+            )
+        resumo_email.append(linha)
+    st.dataframe(pd.DataFrame(resumo_email), width="stretch", hide_index=True)
 
-    sem_email = [g["sigla"] for g in grupos_email if not g["emails"]]
+    sem_email = [grupo["destino"] for grupo in grupos_email if not grupo["emails"]]
     if sem_email:
-        st.warning("Cadastre e-mail ativo na aba Usuarios para: " + ", ".join(sem_email))
+        st.warning("Não há e-mail cadastrado para: " + ", ".join(sem_email))
 
     if not emailer.smtp_configurado():
-        st.warning("Configure o servidor SMTP em Configurações para habilitar o envio.")
+        st.warning("Configure o servidor SMTP em Configurações para enviar os saldos pendentes.")
         return
 
-    if st.button("✉️ Enviar cobrança financeira por e-mail", type="primary", key="btn_enviar_cobranca_financeira"):
-        enviados = 0
-        falhas = []
-        for g in grupos_email:
-            if not g["emails"]:
+    opcoes_email = {
+        f"{grupo['destino']} · {_fmt(grupo['total'])} pendentes": grupo
+        for grupo in grupos_email if grupo["emails"]
+    }
+    if opcoes_email:
+        col_a, col_b = st.columns([2, 1])
+        escolha_email = col_a.selectbox(
+            "Enviar para uma operação",
+            ["—"] + list(opcoes_email.keys()),
+            key="saldo_pendente_destino_email",
+        )
+        if col_b.button("Enviar e-mail", width="stretch", key="btn_enviar_saldo_pendente_unico") and escolha_email != "—":
+            grupo = opcoes_email[escolha_email]
+            ok, msg = emailer.enviar_pendencia(
+                grupo["emails"][0], grupo["destino"], grupo["itens"], grupo["total"],
+                precos=pr_email, competencia_label=escolha,
+                destinatarios_adicionais=grupo["emails"][1:],
+            )
+            if ok:
+                st.success(f"E-mail de saldo pendente enviado para {grupo['destino']}.")
+            else:
+                st.error(msg)
+
+    if st.button(
+        f"✉️ Enviar saldo pendente de {escolha} para todas as operações com e-mail",
+        type="primary",
+        key="btn_enviar_saldo_pendente_todas",
+    ):
+        enviados, falhas = 0, []
+        for grupo in grupos_email:
+            if not grupo["emails"]:
                 continue
-            ncs_html = "".join(
-                f"<li>{nc}</li>" for nc in g["ncs"]
-            )
-            corpo = (
-                "<div style='font-family:Arial,sans-serif;color:#172b4d;max-width:700px;margin:auto'>"
-                "<h2>Portal LEVES — Nota de débito</h2>"
-                f"<p>Olá, {g['sigla']}.</p>"
-                f"<p>Segue o valor total registrado para a competência <b>{competencia_email}</b>.</p>"
-                f"<p style='font-size:20px'><b>Valor total: {dp.fmt_brl(g['valor'])}</b></p>"
-                f"<p>Notas de débito:</p><ul>{ncs_html}</ul>"
-                "<p>Em caso de dúvidas, responda a este e-mail ou entre em contato com materiais@loggi.com.</p>"
-                "</div>"
-            )
-            ok, msg = emailer.enviar_email(
-                g["emails"][0],
-                f"Cobrança financeira de insumos | {g['sigla']} | {competencia_email}",
-                corpo,
-                destinatarios_adicionais=g["emails"][1:],
+            ok, msg = emailer.enviar_pendencia(
+                grupo["emails"][0], grupo["destino"], grupo["itens"], grupo["total"],
+                precos=pr_email, competencia_label=escolha,
+                destinatarios_adicionais=grupo["emails"][1:],
             )
             if ok:
                 enviados += 1
-                st.success(f"{g['sigla']}: e-mail enviado.")
             else:
-                falhas.append(f"{g['sigla']}: {msg}")
+                falhas.append(f"{grupo['destino']}: {msg}")
+        if enviados:
+            st.success(f"{enviados} e-mail(s) de saldo pendente enviados para {escolha}.")
         for falha in falhas:
             st.error(falha)
         if enviados == 0 and not falhas:
-            st.info("Nenhum e-mail enviado: confira os destinatários cadastrados.");
+            st.info("Nenhuma operação com e-mail cadastrado para envio.")
 
 
 def _emails_do_destino(destino: str) -> list[str]:
