@@ -35,8 +35,96 @@ def _centralizar_tabela(df):
     return config
 
 
+def _mostrar_notas_debito():
+    """Exibe notas da aba LEVE APP com filtro de acesso por operação."""
+    st.markdown("---")
+    st.markdown("### Notas de débito")
+    st.caption("Competência conforme a base LEVE APP. Cada operação visualiza somente seus próprios registros.")
+
+    usuario = st.session_state.get("usuario") or {}
+    perfil = str(usuario.get("perfil", "operacao")).strip().lower()
+    destino_usuario = str(usuario.get("destino", "")).strip()
+
+    try:
+        # A base financeira é lida da planilha configurada no portal, não fica
+        # versionada no repositório público junto com o código.
+        ws = dados._planilha().worksheet("LEVE APP")
+        valores = ws.get_all_records()
+    except Exception:
+        st.info("A base de notas ainda não está disponível. Importe a base de setembro para a aba 'LEVE APP' da planilha configurada no portal.")
+        return
+
+    if not valores:
+        st.info("A aba LEVE APP está vazia.")
+        return
+
+    pd = __import__("pandas")
+    base = pd.DataFrame(valores)
+    # Aceita os títulos da planilha original, sem exigir renomeação de colunas.
+    aliases = {
+        "Mês": ["Mês", "Mes", "Competência", "Competencia"],
+        "N° INS": ["N° INS", "Nº INS", "N°INS", "NºINS", "INS", "NC"],
+        "Sigla": ["Sigla", "SIGLA"],
+        "Leve (LMC)": ["Leve (LMC)", "Leve", "Nome do Leve", "Operação", "Operacao"],
+        "Total": ["Total", "Valor", "Valor total"],
+    }
+    renomear = {}
+    for destino, opcoes in aliases.items():
+        for opcao in opcoes:
+            if opcao in base.columns:
+                renomear[opcao] = destino
+                break
+    base = base.rename(columns=renomear)
+    obrigatorias = ["Mês", "N° INS", "Sigla", "Leve (LMC)", "Total"]
+    faltantes = [col for col in obrigatorias if col not in base.columns]
+    if faltantes:
+        st.error("A aba LEVE APP não contém as colunas esperadas: " + ", ".join(faltantes))
+        return
+
+    def normalizar(valor):
+        import unicodedata
+        texto = str(valor or "").strip().casefold()
+        return "".join(c for c in unicodedata.normalize("NFD", texto) if unicodedata.category(c) != "Mn")
+
+    # Administradores podem auditar a base completa; usuários de operação são
+    # filtrados no DataFrame antes de exibir ou exportar qualquer informação.
+    if perfil not in ("admin", "administrador"):
+        alvo = normalizar(destino_usuario)
+        if not alvo:
+            st.warning("Seu usuário não possui uma operação vinculada. Solicite ao administrador a correção do cadastro.")
+            return
+        base = base[
+            base["Sigla"].map(normalizar).eq(alvo)
+            | base["Leve (LMC)"].map(normalizar).eq(alvo)
+        ].copy()
+        if base.empty:
+            st.info("Não há notas de débito vinculadas à operação do seu usuário.")
+            return
+
+    base["Total"] = pd.to_numeric(
+        base["Total"].astype(str).str.replace("R$", "", regex=False).str.replace(".", "", regex=False).str.replace(",", ".", regex=False).str.strip(),
+        errors="coerce",
+    ).fillna(0)
+    tabela = base[["Sigla", "Leve (LMC)", "N° INS", "Total", "Mês"]].rename(columns={
+        "Leve (LMC)": "Leve",
+        "N° INS": "NC",
+        "Total": "Valor",
+        "Mês": "Mês de competência",
+    })
+    tabela["Valor"] = tabela["Valor"].map(lambda valor: f"R$ {valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
+    st.dataframe(tabela, width="stretch", hide_index=True)
+    st.download_button(
+        "Baixar minhas notas de débito (CSV)",
+        tabela.to_csv(index=False).encode("utf-8-sig"),
+        file_name="notas_debito.csv",
+        mime="text/csv",
+        key="dl_notas_debito",
+    )
+
+
 def page_6():
     st.subheader("Conciliação e cobrança")
+    _mostrar_notas_debito()
     st.markdown(
         "<p class='custom-text'>Cobrança por <b>competência de mês</b>. A operação tem até o "
         "<b>dia 5 do mês seguinte</b> para devolver os itens do mês. O que não voltar até lá é cobrável.</p>",
