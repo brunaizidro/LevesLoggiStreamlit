@@ -12,7 +12,7 @@ import io
 import qrcode
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm
-from reportlab.lib.utils import ImageReader
+from reportlab.lib.utils import ImageReader, simpleSplit
 from reportlab.pdfgen import canvas
 
 AZUL = (0.0, 0.404, 0.988)      # #0067fc
@@ -96,6 +96,22 @@ def gerar_romaneio_pdf(dev: dict, itens: list[dict], base_url: str) -> bytes:
     linha("Veículo (placa):", dev.get("placa", "") or "—")
     linha("Data de emissão:", dev.get("data_criacao", ""))
     linha("Status:", dev.get("status", ""))
+
+    # Observação informada no formulário de devolução.
+    observacao = str(dev.get("obs", "") or "").strip()
+    if observacao:
+        y -= 2
+        c.setFillColorRGB(*CINZA)
+        c.setFont("Helvetica-Bold", 11)
+        c.drawString(x, y, "Observação:")
+        c.setFillColorRGB(0, 0, 0)
+        c.setFont("Helvetica", 10)
+        largura_obs = w - 20 * mm - (x + 45 * mm)
+        linhas_obs = simpleSplit(observacao, "Helvetica", 10, largura_obs)
+        for linha_obs in linhas_obs:
+            c.drawString(x + 45 * mm, y, linha_obs)
+            y -= 13
+        y -= 2
 
     # Tabela de itens
     y -= 12
