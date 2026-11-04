@@ -268,11 +268,62 @@ def tela_login():
             padding: 0 !important;
             box-shadow: none !important;
         }
-        [data-testid="stForm"] label {
+        @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,500,0,0');
+
+        /* Rótulos dos campos em negrito */
+        [data-testid="stForm"] label,
+        [data-testid="stTextInput"] label,
+        [data-testid="stTextInput"] label p {
             color: #253B5B !important;
             font-family: 'Montserrat', sans-serif !important;
             font-size: 14px !important;
-            font-weight: 700 !important;
+            font-weight: 800 !important;
+        }
+
+        /* Ícone de usuário dentro do campo Usuário */
+        [data-testid="stTextInput"]:has(input[placeholder="Digite seu usuário"]) {
+            position: relative !important;
+        }
+        [data-testid="stTextInput"]:has(input[placeholder="Digite seu usuário"])::after {
+            content: "person";
+            font-family: "Material Symbols Rounded";
+            font-size: 21px;
+            font-weight: 500;
+            color: #71829A;
+            position: absolute;
+            left: 14px;
+            bottom: 13px;
+            z-index: 2;
+            pointer-events: none;
+        }
+        [data-testid="stTextInput"]:has(input[placeholder="Digite seu usuário"]) input {
+            padding-left: 44px !important;
+        }
+
+        /* Cadeado dentro do campo Senha */
+        [data-testid="stTextInput"]:has(input[placeholder="Digite sua senha"]) {
+            position: relative !important;
+        }
+        [data-testid="stTextInput"]:has(input[placeholder="Digite sua senha"])::after {
+            content: "lock";
+            font-family: "Material Symbols Rounded";
+            font-size: 21px;
+            font-weight: 500;
+            color: #71829A;
+            position: absolute;
+            left: 14px;
+            bottom: 13px;
+            z-index: 2;
+            pointer-events: none;
+        }
+        [data-testid="stTextInput"]:has(input[placeholder="Digite sua senha"]) input {
+            padding-left: 44px !important;
+        }
+
+        /* Botão de recuperação em negrito */
+        .st-key-btn_esqueci_senha button {
+            font-weight: 800 !important;
+            font-family: 'Montserrat', sans-serif !important;
         }
         [data-testid="stForm"] input {
             border-radius: 12px !important;
