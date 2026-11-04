@@ -186,31 +186,37 @@ def tela_login():
             background: transparent !important;
             display: none !important;
         }
-        [data-testid="column"]:has(.login-title) {
+        /* Logo separado; o cartão começa no título Portal Leves. */
+        .login-logo {
             position: relative !important;
+            top: auto !important;
+            left: auto !important;
+            right: auto !important;
+            text-align: center !important;
+            margin: 0 auto 34px !important;
+            height: auto !important;
+        }
+        .login-logo-fallback {
+            color: #FFFFFF !important;
+            font-size: 42px !important;
+            font-weight: 800 !important;
+            font-family: 'Montserrat', sans-serif !important;
+        }
+        /* Streamlit adiciona esta classe ao container com key=login_card. */
+        .st-key-login_card {
+            box-sizing: border-box !important;
+            width: 100% !important;
             max-width: 720px !important;
-            min-width: min(100%, 320px) !important;
-            margin: 112px auto 0 !important;
-            padding: 34px 42px 32px !important;
+            margin: 0 auto !important;
+            padding: 32px 42px 30px !important;
             background: #FFFFFF !important;
-            border: 1px solid rgba(222,232,246,.95) !important;
+            border: 1px solid rgba(222,232,246,.98) !important;
             border-radius: 28px !important;
             box-shadow: 0 22px 58px rgba(15,55,115,.18) !important;
             overflow: visible !important;
         }
-        [data-testid="column"]:has(.login-title) [data-testid="stVerticalBlock"] {
-            background: transparent !important;
-            padding: 0 !important;
-            box-shadow: none !important;
-        }
-        .login-logo {
-            position: absolute !important;
-            top: -116px !important;
-            left: 0 !important;
-            right: 0 !important;
-            text-align: center !important;
-            margin: 0 auto !important;
-            height: 78px !important;
+        .st-key-login_card > [data-testid="stVerticalBlock"] {
+            gap: 0.8rem !important;
         }
         .login-logo img {
             display: block !important;
@@ -352,12 +358,11 @@ def tela_login():
         }
         @media (max-width: 700px) {
             [data-testid="stAppViewBlockContainer"] { padding: 1.5rem 12px 2rem !important; }
-            [data-testid="column"]:has(.login-title) {
-                padding: 28px 20px 24px !important;
-                margin-top: 96px !important;
+            .st-key-login_card {
+                padding: 25px 20px 23px !important;
                 border-radius: 22px !important;
             }
-            .login-logo { top: -100px !important; }
+            .login-logo { margin-bottom: 24px !important; }
             .login-logo img { width: 178px !important; }
             .login-title { gap: 10px; font-size: 30px !important; letter-spacing: -1px !important; }
             .login-cube { flex-basis: 48px; width: 48px; height: 48px; border-radius: 13px; }
@@ -380,179 +385,171 @@ def tela_login():
             else ""
         )
 
-        # Logo + título
+        # Logo Loggi — fica acima do cartão branco.
         if logo_base64:
             st.markdown(
-                f"""
-                <div class="login-logo">
-                    <img src="data:image/png;base64,{logo_base64}">
-                </div>
-                <div class="login-title"><span class="login-cube"><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M24 4L43 14.5V34L24 44L5 34V14.5L24 4Z" stroke="#0786F7" stroke-width="2.8" stroke-linejoin="round"/><path d="M5.5 14.5L24 25L42.5 14.5M24 25V43.5M14.5 9.5L33.5 20" stroke="#0786F7" stroke-width="2.8" stroke-linejoin="round"/></svg></span>Portal Leves</div>
-                """,
+                f'<div class="login-logo"><img src="data:image/png;base64,{logo_base64}"></div>',
                 unsafe_allow_html=True,
             )
         else:
             st.markdown(
+                '<div class="login-logo"><div class="login-logo-fallback">loggi</div></div>',
+                unsafe_allow_html=True,
+            )
+
+        # O cartão envolve o título, a orientação, o login e o manual.
+        with st.container(key="login_card"):
+            st.markdown(
+                '<div class="login-title"><span class="login-cube"><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M24 4L43 14.5V34L24 44L5 34V14.5L24 4Z" stroke="#0786F7" stroke-width="2.8" stroke-linejoin="round"/><path d="M5.5 14.5L24 25L42.5 14.5M24 25V43.5M14.5 9.5L33.5 20" stroke="#0786F7" stroke-width="2.8" stroke-linejoin="round"/></svg></span>Portal Leves</div>',
+                unsafe_allow_html=True,
+            )
+
+            st.markdown(
                 """
-                <div class="login-logo">
-                    <div style="
-                        color:#0067fc;
-                        font-size:36px;
-                        font-weight:800;
-                        font-family:Montserrat,sans-serif;
-                    ">loggi</div>
+                <div class="login-description">
+                    Acesse o portal para consultar os insumos
+                    enviados para sua operação.
                 </div>
-                <div class="login-title">Portal LEVES</div>
                 """,
                 unsafe_allow_html=True,
             )
 
-        st.markdown(
-            """
-            <div class="login-description">
-                Acesse o portal para consultar os insumos
-                enviados para sua operação.
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+            if st.session_state["tentativas"] >= 5:
+                st.error("Muitas tentativas. Recarregue a página e tente novamente.")
 
-        if st.session_state["tentativas"] >= 5:
-            st.error("Muitas tentativas. Recarregue a página e tente novamente.")
-
-        # Login — a lógica de autenticação permanece exatamente igual.
-        with st.form("login"):
-            usuario = st.text_input(
-                "Usuário",
-                placeholder="Digite seu usuário",
-            )
-            senha = st.text_input(
-                "Senha",
-                type="password",
-                placeholder="Digite sua senha",
-            )
-            entrar = st.form_submit_button(
-                "Entrar",
-                type="primary",
-                width="stretch",
-            )
-
-        if entrar and st.session_state["tentativas"] < 5:
-            usuario = (usuario or "").strip()
-            senha = senha or ""
-
-            try:
-                if hasattr(auth, "diagnosticar_login"):
-                    valido, mensagem, u = auth.diagnosticar_login(
-                        usuario,
-                        senha,
-                    )
-                else:
-                    u = auth.autenticar(usuario, senha)
-                    valido = bool(u)
-                    mensagem = (
-                        "Login validado com sucesso."
-                        if valido
-                        else "Usuário ou senha inválidos."
-                    )
-            except Exception as e:
-                st.error(
-                    "Não foi possível validar o login. "
-                    f"Detalhes: {e}"
+            # Login — a lógica de autenticação permanece exatamente igual.
+            with st.form("login"):
+                usuario = st.text_input(
+                    "Usuário",
+                    placeholder="Digite seu usuário",
                 )
-                return
+                senha = st.text_input(
+                    "Senha",
+                    type="password",
+                    placeholder="Digite sua senha",
+                )
+                entrar = st.form_submit_button(
+                    "Entrar",
+                    type="primary",
+                    width="stretch",
+                )
 
-            if not valido:
-                st.session_state["tentativas"] += 1
-                st.error(mensagem)
-            else:
-                st.session_state["tentativas"] = 0
+            if entrar and st.session_state["tentativas"] < 5:
+                usuario = (usuario or "").strip()
+                senha = senha or ""
 
-                if u.get("primeiro_acesso"):
-                    st.session_state["usuario_primeiro_acesso"] = u
-                    st.rerun()
+                try:
+                    if hasattr(auth, "diagnosticar_login"):
+                        valido, mensagem, u = auth.diagnosticar_login(
+                            usuario,
+                            senha,
+                        )
+                    else:
+                        u = auth.autenticar(usuario, senha)
+                        valido = bool(u)
+                        mensagem = (
+                            "Login validado com sucesso."
+                            if valido
+                            else "Usuário ou senha inválidos."
+                        )
+                except Exception as e:
+                    st.error(
+                        "Não foi possível validar o login. "
+                        f"Detalhes: {e}"
+                    )
+                    return
+
+                if not valido:
+                    st.session_state["tentativas"] += 1
+                    st.error(mensagem)
                 else:
-                    st.session_state["usuario"] = u
-                    st.rerun()
+                    st.session_state["tentativas"] = 0
 
-        if st.button("Esqueci minha senha", width="stretch", key="btn_esqueci_senha"):
-            st.session_state["recuperacao_senha"] = True
-            st.session_state["recuperacao_codigo_enviado"] = False
-            st.rerun()
-
-        if st.session_state.get("recuperacao_senha"):
-            st.markdown("### Redefinir senha")
-
-            if not st.session_state.get("recuperacao_codigo_enviado"):
-                with st.form("solicitar_recuperacao"):
-                    email_rec = st.text_input(
-                        "E-mail cadastrado",
-                        placeholder="Digite seu e-mail",
-                    )
-                    enviar_codigo = st.form_submit_button(
-                        "Enviar código de recuperação",
-                        type="primary",
-                        width="stretch",
-                    )
-
-                if enviar_codigo:
-                    if not (email_rec or "").strip() or "@" not in email_rec:
-                        st.error("Digite um endereço de e-mail válido.")
+                    if u.get("primeiro_acesso"):
+                        st.session_state["usuario_primeiro_acesso"] = u
+                        st.rerun()
                     else:
-                        try:
-                            ok, mensagem, usuario_encontrado = auth.solicitar_recuperacao_por_email(email_rec)
-                            if ok and usuario_encontrado:
-                                st.session_state["recuperacao_usuario"] = usuario_encontrado
-                                st.session_state["recuperacao_codigo_enviado"] = True
-                                st.success("Código solicitado. Confira sua caixa de entrada e o spam.")
-                                st.rerun()
-                            elif ok:
-                                st.info(mensagem)
-                            else:
-                                st.error(mensagem)
-                        except Exception as e:
-                            st.error(f"Não foi possível enviar o código: {e}")
-            else:
-                st.info("Digite o código de 6 dígitos recebido por e-mail.")
-                with st.form("redefinir_senha"):
-                    codigo = st.text_input("Código de recuperação", max_chars=6)
-                    nova_senha = st.text_input("Nova senha", type="password")
-                    confirmar = st.text_input("Confirmar nova senha", type="password")
-                    redefinir = st.form_submit_button("Redefinir senha", type="primary", width="stretch")
+                        st.session_state["usuario"] = u
+                        st.rerun()
 
-                if redefinir:
-                    if nova_senha != confirmar:
-                        st.error("As senhas não são iguais.")
-                    else:
-                        try:
-                            ok, mensagem = auth.redefinir_senha_com_codigo(
-                                st.session_state["recuperacao_usuario"], codigo, nova_senha
-                            )
-                            if ok:
-                                st.success("Senha redefinida com sucesso. Você já pode entrar com a nova senha.")
-                                st.session_state["recuperacao_senha"] = False
-                                st.session_state["recuperacao_codigo_enviado"] = False
-                                st.session_state["recuperacao_usuario"] = ""
-                                st.rerun()
-                            else:
-                                st.error(mensagem)
-                        except Exception as e:
-                            st.error(f"Não foi possível redefinir a senha: {e}")
-
-            if st.button("← Voltar para o login", width="stretch", key="btn_voltar_login"):
-                st.session_state["recuperacao_senha"] = False
+            if st.button("Esqueci minha senha", width="stretch", key="btn_esqueci_senha"):
+                st.session_state["recuperacao_senha"] = True
                 st.session_state["recuperacao_codigo_enviado"] = False
-                st.session_state["recuperacao_usuario"] = ""
                 st.rerun()
 
-        # Manual
-        if manual.disponivel():
-            st.markdown(
-                '<div class="login-manual">',
-                unsafe_allow_html=True,
-            )
-            manual.botao_manual(key="manual_login")
-            st.markdown("</div>", unsafe_allow_html=True)
+            if st.session_state.get("recuperacao_senha"):
+                st.markdown("### Redefinir senha")
+
+                if not st.session_state.get("recuperacao_codigo_enviado"):
+                    with st.form("solicitar_recuperacao"):
+                        email_rec = st.text_input(
+                            "E-mail cadastrado",
+                            placeholder="Digite seu e-mail",
+                        )
+                        enviar_codigo = st.form_submit_button(
+                            "Enviar código de recuperação",
+                            type="primary",
+                            width="stretch",
+                        )
+
+                    if enviar_codigo:
+                        if not (email_rec or "").strip() or "@" not in email_rec:
+                            st.error("Digite um endereço de e-mail válido.")
+                        else:
+                            try:
+                                ok, mensagem, usuario_encontrado = auth.solicitar_recuperacao_por_email(email_rec)
+                                if ok and usuario_encontrado:
+                                    st.session_state["recuperacao_usuario"] = usuario_encontrado
+                                    st.session_state["recuperacao_codigo_enviado"] = True
+                                    st.success("Código solicitado. Confira sua caixa de entrada e o spam.")
+                                    st.rerun()
+                                elif ok:
+                                    st.info(mensagem)
+                                else:
+                                    st.error(mensagem)
+                            except Exception as e:
+                                st.error(f"Não foi possível enviar o código: {e}")
+                else:
+                    st.info("Digite o código de 6 dígitos recebido por e-mail.")
+                    with st.form("redefinir_senha"):
+                        codigo = st.text_input("Código de recuperação", max_chars=6)
+                        nova_senha = st.text_input("Nova senha", type="password")
+                        confirmar = st.text_input("Confirmar nova senha", type="password")
+                        redefinir = st.form_submit_button("Redefinir senha", type="primary", width="stretch")
+
+                    if redefinir:
+                        if nova_senha != confirmar:
+                            st.error("As senhas não são iguais.")
+                        else:
+                            try:
+                                ok, mensagem = auth.redefinir_senha_com_codigo(
+                                    st.session_state["recuperacao_usuario"], codigo, nova_senha
+                                )
+                                if ok:
+                                    st.success("Senha redefinida com sucesso. Você já pode entrar com a nova senha.")
+                                    st.session_state["recuperacao_senha"] = False
+                                    st.session_state["recuperacao_codigo_enviado"] = False
+                                    st.session_state["recuperacao_usuario"] = ""
+                                    st.rerun()
+                                else:
+                                    st.error(mensagem)
+                            except Exception as e:
+                                st.error(f"Não foi possível redefinir a senha: {e}")
+
+                if st.button("← Voltar para o login", width="stretch", key="btn_voltar_login"):
+                    st.session_state["recuperacao_senha"] = False
+                    st.session_state["recuperacao_codigo_enviado"] = False
+                    st.session_state["recuperacao_usuario"] = ""
+                    st.rerun()
+
+            # Manual
+            if manual.disponivel():
+                st.markdown(
+                    '<div class="login-manual">',
+                    unsafe_allow_html=True,
+                )
+                manual.botao_manual(key="manual_login")
+                st.markdown("</div>", unsafe_allow_html=True)
 
         # Suporte
         st.markdown(
