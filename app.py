@@ -407,6 +407,106 @@ def tela_login():
             font-size: 11px;
             margin-top: 20px;
         }
+
+        /* Login em uma única tela: dimensões compactas e sem rolagem vertical. */
+        html, body, [data-testid="stApp"], [data-testid="stAppViewContainer"] {
+            height: 100% !important;
+            min-height: 100% !important;
+            overflow: hidden !important;
+        }
+        [data-testid="stAppViewContainer"] {
+            height: 100vh !important;
+            height: 100dvh !important;
+            overflow: hidden !important;
+        }
+        [data-testid="stAppViewMain"] {
+            height: 100vh !important;
+            height: 100dvh !important;
+            overflow: hidden !important;
+        }
+        [data-testid="stAppViewBlockContainer"] {
+            box-sizing: border-box !important;
+            height: 100vh !important;
+            height: 100dvh !important;
+            min-height: 0 !important;
+            overflow: hidden !important;
+            padding: clamp(8px, 1.4vh, 14px) 14px 6px !important;
+        }
+        .login-logo {
+            margin: 0 auto clamp(8px, 1.3vh, 14px) !important;
+        }
+        .login-logo img {
+            width: clamp(112px, 17vh, 158px) !important;
+            max-height: 8vh !important;
+            object-fit: contain !important;
+        }
+        .st-key-login_card {
+            max-width: 650px !important;
+            padding: clamp(12px, 1.8vh, 20px) clamp(18px, 3vw, 32px) clamp(10px, 1.5vh, 16px) !important;
+            border-radius: 22px !important;
+        }
+        .st-key-login_card > [data-testid="stVerticalBlock"] {
+            gap: clamp(5px, .8vh, 9px) !important;
+        }
+        .login-title {
+            font-size: clamp(25px, 4vh, 38px) !important;
+            gap: 11px !important;
+            margin: 0 0 clamp(7px, 1.1vh, 12px) !important;
+            letter-spacing: -1px !important;
+        }
+        .login-cube {
+            flex-basis: clamp(42px, 5.5vh, 52px) !important;
+            width: clamp(42px, 5.5vh, 52px) !important;
+            height: clamp(42px, 5.5vh, 52px) !important;
+            border-radius: 13px !important;
+        }
+        .login-cube svg { width: 30px !important; height: 30px !important; }
+        .login-description {
+            font-size: clamp(11px, 1.6vh, 14px) !important;
+            line-height: 1.4 !important;
+            margin: 0 auto clamp(8px, 1.2vh, 13px) !important;
+        }
+        [data-testid="stForm"] {
+            padding: 0 !important;
+        }
+        [data-testid="stForm"] label,
+        [data-testid="stTextInput"] label,
+        [data-testid="stTextInput"] label p {
+            font-size: 12px !important;
+            margin-bottom: 2px !important;
+        }
+        [data-testid="stForm"] input {
+            min-height: 40px !important;
+            height: 40px !important;
+        }
+        [data-testid="stFormSubmitButton"] button {
+            min-height: 44px !important;
+            height: 44px !important;
+            margin-top: 5px !important;
+            font-size: 15px !important;
+        }
+        .st-key-btn_esqueci_senha button,
+        [data-testid="stAppViewContainer"] .stButton > button {
+            min-height: 40px !important;
+            height: 40px !important;
+            font-size: 13px !important;
+        }
+        .login-manual { margin-top: 5px !important; }
+        [data-testid="stDownloadButton"] button {
+            min-height: 40px !important;
+            height: 40px !important;
+            font-size: 12px !important;
+        }
+        .login-help-title {
+            font-size: 11px !important;
+            margin: clamp(6px, 1vh, 10px) 0 3px !important;
+        }
+        [data-testid="stExpander"] summary {
+            font-size: 11px !important;
+        }
+        [data-testid="stExpander"] {
+            margin-top: 0 !important;
+        }
         @media (max-width: 700px) {
             [data-testid="stAppViewBlockContainer"] { padding: 1.5rem 12px 2rem !important; }
             .st-key-login_card {
