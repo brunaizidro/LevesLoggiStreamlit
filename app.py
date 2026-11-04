@@ -521,6 +521,28 @@ def tela_login():
             .login-description { font-size: 13px !important; margin-bottom: 26px !important; }
         }
 
+
+        /* Ajustes solicitados: sem brilho inferior, título maior e logo mais alta. */
+        [data-testid="stAppViewContainer"]::after {
+            background:
+                radial-gradient(ellipse 24% 23% at 103% 0%, rgba(0,195,238,.92) 0%, rgba(0,195,238,0) 100%) !important;
+        }
+        .login-title {
+            font-size: clamp(30px, 4vw, 48px) !important;
+            letter-spacing: -1.8px !important;
+        }
+        .login-logo {
+            transform: translateY(-4vh) !important;
+        }
+        @media (max-width: 700px) {
+            .login-title {
+                font-size: clamp(30px, 4vw, 40px) !important;
+            }
+            .login-logo {
+                transform: translateY(-3vh) !important;
+            }
+        }
+
         /* Ajustes finais para aproximar o login da referência visual */
         [data-testid="stAppViewBlockContainer"] > div [data-testid="stHorizontalBlock"] {
             transform: translateY(-5vh) !important;
