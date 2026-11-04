@@ -146,205 +146,113 @@ def tela_login():
     st.markdown(
         """
         <style>
-        /* ===== LOGIN ===== */
+        /* ===== LOGIN PORTAL LEVES — IDENTIDADE LOGGI ===== */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
 
-        /* Fundo mais clean */
+        html, body, [class*="css"], [data-testid="stApp"] {
+            font-family: 'Montserrat', sans-serif !important;
+        }
         [data-testid="stAppViewContainer"] {
-            background: #f7f9fc;
+            background: linear-gradient(180deg, #0067FC 0%, #087EF5 42%, #F4F8FF 42%, #F4F8FF 100%) !important;
+            min-height: 100vh;
         }
-
-        /* Remove o excesso de espaço lateral criado pelo CSS global */
         [data-testid="stAppViewBlockContainer"] {
-            padding-left: 20px !important;
-            padding-right: 20px !important;
-            padding-top: 2.5rem !important;
-            padding-bottom: 2rem !important;
             max-width: 100% !important;
+            padding: 3.2rem 20px 2rem !important;
         }
-
-        /* Esconde a barra de ferramentas do Streamlit na tela de login */
-        [data-testid="stToolbar"] {
+        [data-testid="stHeader"], [data-testid="stToolbar"] {
+            background: transparent !important;
             display: none !important;
         }
-
-        /* Coluna central */
         [data-testid="column"]:has([data-testid="stForm"]) {
-            max-width: 440px !important;
+            max-width: 560px !important;
             margin: 0 auto !important;
         }
-
-        /* Logo */
-        .login-logo {
-            text-align: center;
-            margin: 0 auto 6px auto;
-        }
-
+        .login-logo { text-align:center; margin: 0 auto 18px; }
         .login-logo img {
-            display: block;
-            width: 155px;
-            max-width: 70%;
-            height: auto;
-            margin: 0 auto;
+            display:block; width:180px; max-width:72%; height:auto; margin:0 auto;
+            filter: brightness(0) invert(1);
         }
-
-        /* Título */
         .login-title {
-            text-align: center;
-            color: #0067fc;
-            font-family: Montserrat, sans-serif;
-            font-size: 24px;
-            font-weight: 800;
-            letter-spacing: 2px;
-            line-height: 1.2;
-            margin: 4px 0 8px 0;
-            text-transform: uppercase;
+            text-align:center; color:#0067FC; font-family:'Montserrat',sans-serif;
+            font-size:42px; font-weight:800; letter-spacing:-1.5px;
+            line-height:1.12; margin: 12px 0 12px; text-transform:none;
         }
-
-        /* Descrição */
         .login-description {
-            text-align: center;
-            color: #6b7280;
-            font-family: Montserrat, sans-serif;
-            font-size: 14px;
-            line-height: 1.5;
-            max-width: 360px;
-            margin: 0 auto 22px auto;
+            text-align:center; color:#65748B; font-family:'Montserrat',sans-serif;
+            font-size:15px; font-weight:500; line-height:1.65;
+            max-width:450px; margin:0 auto 26px;
         }
-
-        /* Formulário/card */
         [data-testid="stForm"] {
-            background: #ffffff !important;
-            border: 1px solid #e1e5eb !important;
-            border-radius: 16px !important;
-            padding: 25px 26px 22px 26px !important;
-            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.07) !important;
+            background:#fff !important; border:1px solid #E4EAF3 !important;
+            border-radius:22px !important; padding:30px 30px 26px !important;
+            box-shadow:0 18px 48px rgba(12,48,100,.13) !important;
         }
-
-        /* Labels */
         [data-testid="stForm"] label {
-            color: #374151 !important;
-            font-family: Montserrat, sans-serif !important;
-            font-size: 13px !important;
-            font-weight: 600 !important;
+            color:#23344D !important; font-family:'Montserrat',sans-serif !important;
+            font-size:13px !important; font-weight:700 !important;
         }
-
-        /* Inputs */
         [data-testid="stForm"] input {
-            border-radius: 10px !important;
-            border: 1px solid #d8dee8 !important;
-            min-height: 44px !important;
-            font-family: Montserrat, sans-serif !important;
-            background: #ffffff !important;
+            border-radius:11px !important; border:1px solid #D9E2EF !important;
+            min-height:48px !important; font-family:'Montserrat',sans-serif !important;
+            background:#fff !important;
         }
-
         [data-testid="stForm"] input:focus {
-            border-color: #0067fc !important;
-            box-shadow: 0 0 0 2px rgba(0, 103, 252, 0.10) !important;
+            border-color:#0067FC !important;
+            box-shadow:0 0 0 3px rgba(0,103,252,.11) !important;
         }
-
-        /* Espaçamento entre campos */
-        [data-testid="stForm"] [data-testid="stTextInput"] {
-            margin-bottom: 5px !important;
-        }
-
-        /* Botão Entrar */
         [data-testid="stFormSubmitButton"] button {
-            width: 100% !important;
-            min-height: 46px !important;
-            margin-top: 8px !important;
-            border-radius: 10px !important;
-            border: 0 !important;
-            background: #0067fc !important;
-            color: #ffffff !important;
-            font-family: Montserrat, sans-serif !important;
-            font-size: 15px !important;
-            font-weight: 700 !important;
-            transition: all 0.2s ease !important;
+            width:100% !important; min-height:50px !important; margin-top:10px !important;
+            border-radius:11px !important; border:0 !important;
+            background:linear-gradient(90deg,#005BEE,#087BFF) !important;
+            color:#fff !important; font-family:'Montserrat',sans-serif !important;
+            font-size:15px !important; font-weight:800 !important;
+            box-shadow:0 7px 18px rgba(0,103,252,.20) !important;
         }
-
         [data-testid="stFormSubmitButton"] button:hover {
-            background: #0056d6 !important;
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(0, 103, 252, 0.20) !important;
+            background:#004FD1 !important; transform:translateY(-1px);
         }
-
-        /* Mensagens de erro */
-        [data-testid="stAlert"] {
-            border-radius: 10px !important;
-            font-family: Montserrat, sans-serif !important;
-            font-size: 13px !important;
+        [data-testid="stAppViewContainer"] .stButton > button,
+        [data-testid="stAppViewContainer"] .stDownloadButton > button {
+            border-radius:11px !important; min-height:46px !important;
+            font-family:'Montserrat',sans-serif !important; font-weight:700 !important;
         }
-
-        /* Manual */
-        .login-manual {
-            margin-top: 14px;
+        [data-testid="stAppViewContainer"] .stButton > button {
+            border:1px solid #D7E1EF !important; background:#fff !important;
+            color:#18345A !important;
         }
-
-        /* Botão do manual */
+        [data-testid="stAppViewContainer"] .stButton > button:hover {
+            border-color:#0067FC !important; color:#0067FC !important;
+        }
         [data-testid="stDownloadButton"] button {
-            border: 1px solid #e1e5eb !important;
-            border-radius: 12px !important;
-            background: #ffffff !important;
-            color: #374151 !important;
-            min-height: 46px !important;
-            font-family: Montserrat, sans-serif !important;
-            font-weight: 600 !important;
-            width: 100% !important;
+            background:#EFF6FF !important; border:1px solid #D6E7FF !important;
+            color:#174A91 !important; width:100% !important;
         }
-
-        [data-testid="stDownloadButton"] button:hover {
-            border-color: #0067fc !important;
-            color: #0067fc !important;
+        [data-testid="stAlert"] {
+            border-radius:11px !important; font-family:'Montserrat',sans-serif !important;
         }
-
-        /* Título da área de ajuda */
+        .login-manual { margin-top:14px; }
         .login-help-title {
-            text-align: center;
-            color: #9ca3af;
-            font-family: Montserrat, sans-serif;
-            font-size: 12px;
-            margin: 18px 0 8px 0;
+            text-align:center; color:#7D8DA4; font-family:'Montserrat',sans-serif;
+            font-size:12px; font-weight:600; margin:22px 0 8px;
         }
-
-        /* Expander do suporte */
         [data-testid="stExpander"] {
-            border: 1px solid #e1e5eb !important;
-            border-radius: 12px !important;
-            background: #ffffff !important;
-            overflow: hidden !important;
+            border:1px solid #E1E8F2 !important; border-radius:12px !important;
+            background:#fff !important; overflow:hidden !important;
         }
-
         [data-testid="stExpander"] summary {
-            font-family: Montserrat, sans-serif !important;
-            font-size: 13px !important;
-            font-weight: 600 !important;
-            color: #374151 !important;
+            font-family:'Montserrat',sans-serif !important; font-size:13px !important;
+            font-weight:600 !important; color:#29415F !important;
         }
-
-        /* Rodapé */
         .login-footer {
-            text-align: center;
-            color: #a1a8b3;
-            font-family: Montserrat, sans-serif;
-            font-size: 11px;
-            margin-top: 20px;
+            text-align:center; color:#9AA8BA; font-family:'Montserrat',sans-serif;
+            font-size:11px; margin-top:20px;
         }
-
-        /* Responsivo */
-        @media (max-width: 600px) {
-            [data-testid="stAppViewBlockContainer"] {
-                padding-top: 1.5rem !important;
-                padding-left: 14px !important;
-                padding-right: 14px !important;
-            }
-
-            [data-testid="stForm"] {
-                padding: 22px 18px 20px 18px !important;
-            }
-
-            .login-title {
-                font-size: 21px;
-            }
+        @media (max-width: 700px) {
+            [data-testid="stAppViewBlockContainer"] { padding:2rem 14px !important; }
+            [data-testid="stForm"] { padding:23px 18px 20px !important; }
+            .login-title { font-size:34px; }
+            .login-description { font-size:13px; }
         }
         </style>
         """,
