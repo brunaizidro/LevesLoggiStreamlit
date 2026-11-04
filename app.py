@@ -520,6 +520,80 @@ def tela_login():
             .login-cube svg { width: 30px; height: 30px; }
             .login-description { font-size: 13px !important; margin-bottom: 26px !important; }
         }
+
+        /* Ajustes finais para aproximar o login da referência visual */
+        [data-testid="stAppViewBlockContainer"] > div [data-testid="stHorizontalBlock"] {
+            transform: translateY(-5vh) !important;
+        }
+        .login-logo {
+            transform: translateY(-1.5vh) !important;
+            margin-bottom: clamp(5px, .8vh, 9px) !important;
+        }
+        .login-logo img {
+            width: clamp(118px, 15vh, 145px) !important;
+            max-height: 7vh !important;
+        }
+        .st-key-login_card {
+            max-width: 610px !important;
+            padding: clamp(10px, 1.3vh, 15px) clamp(18px, 2.2vw, 26px) clamp(9px, 1.1vh, 13px) !important;
+            border-radius: 22px !important;
+        }
+        .st-key-login_card > [data-testid="stVerticalBlock"] {
+            gap: clamp(4px, .55vh, 6px) !important;
+        }
+        .login-title {
+            font-size: clamp(24px, 3.4vh, 34px) !important;
+            margin-bottom: clamp(4px, .7vh, 8px) !important;
+        }
+        .login-cube {
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        .login-description {
+            margin-bottom: clamp(6px, .9vh, 10px) !important;
+            line-height: 1.35 !important;
+        }
+        /* Centraliza verticalmente os ícones de usuário e cadeado nos inputs. */
+        [data-testid="stTextInput"]:has(input[placeholder="Digite seu usuário"])::after,
+        [data-testid="stTextInput"]:has(input[placeholder="Digite sua senha"])::after {
+            top: 47px !important;
+            bottom: auto !important;
+            transform: translateY(-50%) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            height: 22px !important;
+        }
+        [data-testid="stFormSubmitButton"] button {
+            font-weight: 800 !important;
+        }
+        .st-key-btn_esqueci_senha button {
+            font-weight: 800 !important;
+        }
+        /* Manual com azul claro e tipografia em negrito. */
+        [data-testid="stDownloadButton"] button {
+            color: #36B9F5 !important;
+            background: #EFF9FF !important;
+            border: 1px solid #D7F0FF !important;
+            font-family: 'Montserrat', sans-serif !important;
+            font-weight: 800 !important;
+            min-height: 38px !important;
+            height: 38px !important;
+            font-size: 12px !important;
+        }
+        .login-manual {
+            margin-top: 3px !important;
+        }
+        @media (max-width: 700px) {
+            [data-testid="stAppViewBlockContainer"] > div [data-testid="stHorizontalBlock"] {
+                transform: translateY(-2vh) !important;
+            }
+            .st-key-login_card {
+                max-width: 100% !important;
+                padding: 12px 16px 10px !important;
+            }
+            .login-logo img { width: 118px !important; }
+        }
         </style>
         """,
         unsafe_allow_html=True,
