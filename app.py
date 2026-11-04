@@ -187,19 +187,21 @@ def tela_login():
             display: none !important;
         }
         [data-testid="column"]:has(.login-title) {
+            position: relative !important;
             max-width: 720px !important;
             min-width: min(100%, 320px) !important;
-            margin: 0 auto !important;
-        }
-        [data-testid="column"]:has(.login-title) > div[data-testid="stVerticalBlock"] {
-            position: relative !important;
+            margin: 112px auto 0 !important;
+            padding: 34px 42px 32px !important;
             background: #FFFFFF !important;
             border: 1px solid rgba(222,232,246,.95) !important;
             border-radius: 28px !important;
-            padding: 34px 42px 32px !important;
-            margin-top: 112px !important;
             box-shadow: 0 22px 58px rgba(15,55,115,.18) !important;
             overflow: visible !important;
+        }
+        [data-testid="column"]:has(.login-title) [data-testid="stVerticalBlock"] {
+            background: transparent !important;
+            padding: 0 !important;
+            box-shadow: none !important;
         }
         .login-logo {
             position: absolute !important;
@@ -350,7 +352,7 @@ def tela_login():
         }
         @media (max-width: 700px) {
             [data-testid="stAppViewBlockContainer"] { padding: 1.5rem 12px 2rem !important; }
-            [data-testid="column"]:has(.login-title) > div[data-testid="stVerticalBlock"] {
+            [data-testid="column"]:has(.login-title) {
                 padding: 28px 20px 24px !important;
                 margin-top: 96px !important;
                 border-radius: 22px !important;
