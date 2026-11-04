@@ -2,4 +2,6 @@
 primaryColor = "#0067fc"
 backgroundColor = "#FFFFFF"
 textColor = "#262730"
-font = "Monteserrat"
+font = "sans serif"
+
+# A tipografia Montserrat é carregada pelo CSS do aplicativo.
