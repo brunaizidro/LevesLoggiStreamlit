@@ -616,6 +616,36 @@ def tela_login():
             }
             .login-logo img { width: 118px !important; }
         }
+
+        /* Aumento final do título e da marca Loggi — sobrescreve regras anteriores. */
+        .login-title {
+            font-size: clamp(38px, 5.2vh, 52px) !important;
+            letter-spacing: -2px !important;
+            line-height: 1.08 !important;
+        }
+        .login-logo {
+            transform: translateY(-5vh) !important;
+            margin-bottom: clamp(5px, .8vh, 10px) !important;
+        }
+        .login-logo img {
+            width: clamp(155px, 20vh, 190px) !important;
+            max-height: 10vh !important;
+            height: auto !important;
+            object-fit: contain !important;
+        }
+        @media (max-width: 700px) {
+            .login-title {
+                font-size: clamp(34px, 8vw, 43px) !important;
+                letter-spacing: -1.4px !important;
+            }
+            .login-logo {
+                transform: translateY(-3.5vh) !important;
+            }
+            .login-logo img {
+                width: clamp(140px, 28vw, 170px) !important;
+                max-height: 9vh !important;
+            }
+        }
         </style>
         """,
         unsafe_allow_html=True,
