@@ -375,32 +375,32 @@ def page_1():
             unsafe_allow_html=True,
         )
         fcol1, fcol2, fcol3 = st.columns([1, 1.1, 1.4])
-    meses = sorted(df["mes"].unique(), reverse=True)
-    rotulos = {m: dp.rotulo_mes(m) for m in meses}
-    opcoes = ["Todo o período"] + [rotulos[m] for m in meses]
-    escolha = fcol1.selectbox(
-        "Período",
-        opcoes,
-        index=1 if meses else 0,
-    )
-
-    tipos_disp = sorted(df["tipo"].unique())
-    sel_tipos = fcol2.multiselect(
-        "Tipo de insumo",
-        tipos_disp,
-        default=tipos_disp,
-    )
-
-    if eh_admin or eh_gdl:
-        operacoes_disp = sorted(df["destino"].dropna().astype(str).unique())
-        sel_operacoes = fcol3.multiselect(
-            "Operação",
-            operacoes_disp,
-            default=operacoes_disp,
+        meses = sorted(df["mes"].unique(), reverse=True)
+        rotulos = {m: dp.rotulo_mes(m) for m in meses}
+        opcoes = ["Todo o período"] + [rotulos[m] for m in meses]
+        escolha = fcol1.selectbox(
+            "Período",
+            opcoes,
+            index=1 if meses else 0,
         )
-    else:
-        sel_operacoes = []
-
+    
+        tipos_disp = sorted(df["tipo"].unique())
+        sel_tipos = fcol2.multiselect(
+            "Tipo de insumo",
+            tipos_disp,
+            default=tipos_disp,
+        )
+    
+        if eh_admin or eh_gdl:
+            operacoes_disp = sorted(df["destino"].dropna().astype(str).unique())
+            sel_operacoes = fcol3.multiselect(
+                "Operação",
+                operacoes_disp,
+                default=operacoes_disp,
+            )
+        else:
+            sel_operacoes = []
+    
     dfx = df.copy()
     if escolha != "Todo o período":
         mes_sel = next(m for m, r in rotulos.items() if r == escolha)
