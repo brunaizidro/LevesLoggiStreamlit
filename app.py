@@ -721,6 +721,85 @@ def tela_login():
                 margin-bottom: 12px !important;
             }
         }
+
+        /* Layout final conforme referência: cartão menor e conteúdo inteiro visível. */
+        .st-key-login_card {
+            box-sizing: border-box !important;
+            width: 100% !important;
+            max-width: 540px !important;
+            padding: 20px 30px 24px !important;
+            border-radius: 22px !important;
+        }
+        .st-key-login_card > [data-testid="stVerticalBlock"] {
+            gap: 7px !important;
+        }
+        .login-title {
+            font-size: clamp(36px, 4.8vh, 44px) !important;
+            line-height: 1.08 !important;
+            gap: 11px !important;
+            margin: 0 0 7px !important;
+            letter-spacing: -1.5px !important;
+        }
+        .login-cube {
+            flex: 0 0 50px !important;
+            width: 50px !important;
+            height: 50px !important;
+            border-radius: 14px !important;
+        }
+        .login-cube svg {
+            width: 30px !important;
+            height: 30px !important;
+        }
+        .login-description {
+            max-width: 470px !important;
+            font-size: 13px !important;
+            line-height: 1.45 !important;
+            margin: 0 auto 9px !important;
+        }
+        [data-testid="stForm"] label,
+        [data-testid="stTextInput"] label,
+        [data-testid="stTextInput"] label p {
+            font-size: 12px !important;
+            margin-bottom: 2px !important;
+        }
+        [data-testid="stForm"] input {
+            min-height: 42px !important;
+            height: 42px !important;
+        }
+        [data-testid="stFormSubmitButton"] button {
+            min-height: 44px !important;
+            height: 44px !important;
+            margin-top: 5px !important;
+            font-size: 15px !important;
+        }
+        .st-key-btn_esqueci_senha button,
+        [data-testid="stAppViewContainer"] .stButton > button {
+            min-height: 42px !important;
+            height: 42px !important;
+            font-size: 13px !important;
+        }
+        .login-manual {
+            margin-top: 3px !important;
+        }
+        [data-testid="stDownloadButton"] button {
+            min-height: 42px !important;
+            height: 42px !important;
+            font-size: 12px !important;
+        }
+        @media (max-width: 700px) {
+            .st-key-login_card {
+                max-width: 100% !important;
+                padding: 18px 18px 22px !important;
+            }
+            .login-title {
+                font-size: clamp(31px, 8vw, 39px) !important;
+                gap: 9px !important;
+            }
+            .login-description {
+                font-size: 12px !important;
+                margin-bottom: 8px !important;
+            }
+        }
         </style>
         """,
         unsafe_allow_html=True,
