@@ -207,6 +207,124 @@ div[data-testid="stHorizontalBlock"] {
     .leves-page-title { font-size: 29px; }
     .leves-kpi { min-height: 96px; }
 }
+
+/* Identidade visual Loggi — painel de envios */
+[data-testid="stAppViewContainer"] {
+    background:
+        radial-gradient(ellipse 35% 24% at 100% 0%, rgba(0,185,238,.10), transparent 72%),
+        #F3F7FD !important;
+}
+[data-testid="stAppViewBlockContainer"] {
+    max-width: 100% !important;
+    padding: 26px clamp(24px, 3vw, 54px) 42px !important;
+}
+.leves-breadcrumb {
+    color: #7386A3 !important;
+    font-size: 11px !important;
+    letter-spacing: .55px !important;
+    margin-bottom: 9px !important;
+}
+.leves-page-title {
+    color: #102B50 !important;
+    font-size: clamp(29px, 2.3vw, 36px) !important;
+    letter-spacing: -1.2px !important;
+}
+.leves-page-description {
+    color: #647895 !important;
+    font-size: 13px !important;
+    margin-top: 5px !important;
+    margin-bottom: 22px !important;
+}
+.leves-filter-heading {
+    color: #102B50;
+    font-family: Montserrat, sans-serif;
+    font-size: 17px;
+    font-weight: 800;
+    margin: 0 0 12px 0;
+}
+.leves-filter-heading span,
+.leves-summary-heading:first-letter {
+    color: #0866F5;
+}
+[data-testid="stVerticalBlockBorderWrapper"] {
+    background: #FFFFFF !important;
+    border: 1px solid #DFE9F7 !important;
+    border-radius: 17px !important;
+    box-shadow: 0 7px 22px rgba(22, 65, 125, .055) !important;
+}
+.leves-section-label {
+    color: #102B50 !important;
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    margin: 18px 0 12px !important;
+}
+.leves-summary-heading {
+    margin-top: 18px !important;
+}
+.leves-kpi {
+    border: 1px solid #E0EAF8 !important;
+    border-radius: 17px !important;
+    padding: 17px 19px 15px !important;
+    min-height: 116px !important;
+    box-shadow: 0 7px 20px rgba(24, 70, 130, .055) !important;
+}
+.leves-kpi-total {
+    background: linear-gradient(135deg, #DDF1FF 0%, #C6E5FF 100%) !important;
+    border-color: #C8E5FF !important;
+}
+.leves-kpi-top {
+    color: #496486 !important;
+    font-size: 11px !important;
+    letter-spacing: .35px !important;
+}
+.leves-kpi-icon {
+    color: #0875F5 !important;
+    background: rgba(255,255,255,.72) !important;
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 50% !important;
+}
+.leves-kpi-value {
+    color: #102B50 !important;
+    font-size: 32px !important;
+    font-weight: 800 !important;
+    margin-top: 9px !important;
+}
+.leves-kpi-sub {
+    color: #7186A4 !important;
+    font-size: 11px !important;
+}
+.leves-chart-title {
+    color: #102B50 !important;
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    margin: 1px 0 7px !important;
+}
+[data-baseweb="select"] > div {
+    border: 1px solid #D6E2F2 !important;
+    border-radius: 10px !important;
+    min-height: 42px !important;
+    box-shadow: none !important;
+}
+[data-baseweb="select"] > div:focus-within {
+    border-color: #0866F5 !important;
+    box-shadow: 0 0 0 2px rgba(8,102,245,.10) !important;
+}
+[data-testid="stWidgetLabel"] p {
+    color: #344B6B !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+}
+[data-testid="stExpander"] {
+    border-color: #DFE9F7 !important;
+    box-shadow: 0 5px 16px rgba(24,70,130,.035) !important;
+}
+@media (max-width: 900px) {
+    [data-testid="stAppViewBlockContainer"] {
+        padding: 20px 16px 32px !important;
+    }
+    .leves-kpi-value { font-size: 27px !important; }
+}
 </style>
         """,
         unsafe_allow_html=True,
@@ -251,9 +369,12 @@ def page_1():
     # ============================================================
     # Filtros
     # ============================================================
-    st.markdown('<div class="leves-section-label">Filtros</div>', unsafe_allow_html=True)
-
-    fcol1, fcol2, fcol3 = st.columns([1, 1.1, 1.4])
+    with st.container(border=True):
+        st.markdown(
+            '<div class="leves-filter-heading"><span>⚙</span> Filtros</div>',
+            unsafe_allow_html=True,
+        )
+        fcol1, fcol2, fcol3 = st.columns([1, 1.1, 1.4])
     meses = sorted(df["mes"].unique(), reverse=True)
     rotulos = {m: dp.rotulo_mes(m) for m in meses}
     opcoes = ["Todo o período"] + [rotulos[m] for m in meses]
@@ -296,7 +417,10 @@ def page_1():
     # ============================================================
     # KPIs
     # ============================================================
-    st.markdown('<div class="leves-section-label" style="margin-top:20px;">Resumo do período</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="leves-section-label leves-summary-heading">▥ &nbsp; Resumo do período</div>',
+        unsafe_allow_html=True,
+    )
 
     total_geral = int(dfx["total"].sum())
     por_tipo = dfx.groupby("tipo")["total"].sum().to_dict()
@@ -308,7 +432,7 @@ def page_1():
     for col, (nome, valor, icone, subtitulo) in zip(cols, kpis):
         with col:
             st.markdown(
-                f'<div class="leves-kpi">'
+                f'<div class="leves-kpi {"leves-kpi-total" if icone else ""}">'
                 f'<div class="leves-kpi-top">'
                 f'<span class="leves-kpi-icon" style="display:{"inline-flex" if icone else "none"};">{icone}</span>'
                 f'{html.escape(nome)}</div>'
@@ -343,8 +467,14 @@ def page_1():
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         margin=dict(l=10, r=10, t=15, b=10),
-        xaxis=dict(showgrid=False, title=None),
-        yaxis=dict(gridcolor="#edf0f4", title=None),
+        xaxis=dict(showgrid=False, zeroline=False, showline=False, title=None, tickfont=dict(color="#536789", size=11)),
+        yaxis=dict(showgrid=False, zeroline=False, showline=False, title=None, tickfont=dict(color="#536789", size=10)),
+    )
+    fig_tipo.update_traces(
+        text=[_fmt(v) for v in tdf["total"]],
+        textposition="outside",
+        textfont=dict(family="Montserrat", size=12, color="#102B50"),
+        cliponaxis=False,
     )
     with g1:
         with st.container(border=True):
@@ -367,9 +497,16 @@ def page_1():
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         margin=dict(l=10, r=10, t=15, b=10),
-        xaxis=dict(showgrid=False, title=None),
-        yaxis=dict(gridcolor="#edf0f4", title=None),
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        xaxis=dict(showgrid=False, zeroline=False, showline=False, title=None, tickfont=dict(color="#536789", size=11)),
+        yaxis=dict(showgrid=False, zeroline=False, showline=False, title=None, tickfont=dict(color="#536789", size=10)),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, font=dict(family="Montserrat", size=10, color="#344766")),
+    )
+    fig_dia.update_traces(
+        texttemplate="%{y:,.0f}",
+        textposition="inside",
+        insidetextanchor="middle",
+        textfont=dict(family="Montserrat", size=10, color="#FFFFFF"),
+        cliponaxis=False,
     )
     with g2:
         with st.container(border=True):
@@ -394,15 +531,21 @@ def page_1():
             orientation="h",
             labels={"total": "Total", "destino": "Destino"},
         )
-        fig_dest.update_traces(marker_color=AZUL)
+        fig_dest.update_traces(
+            marker_color=AZUL,
+            text=[_fmt(v) for v in rank["total"]],
+            textposition="outside",
+            textfont=dict(family="Montserrat", size=11, color="#102B50"),
+            cliponaxis=False,
+        )
         fig_dest.update_layout(
             height=400,
             font_family="Montserrat",
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
             margin=dict(l=10, r=10, t=15, b=10),
-            xaxis=dict(gridcolor="#edf0f4", title=None),
-            yaxis=dict(title=None),
+            xaxis=dict(showgrid=False, zeroline=False, showline=False, title=None, tickfont=dict(color="#536789", size=10)),
+            yaxis=dict(showgrid=False, zeroline=False, showline=False, title=None, tickfont=dict(color="#536789", size=10)),
         )
         st.plotly_chart(fig_dest, width="stretch", config={"displayModeBar": False})
     # ============================================================
