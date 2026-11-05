@@ -800,6 +800,54 @@ def tela_login():
                 margin-bottom: 8px !important;
             }
         }
+        /* Suporte integrado ao cartão, próximo ao manual e sem tipografia em negrito. */
+        .login-support-divider {
+            height: 1px !important;
+            background: #E2EAF5 !important;
+            margin: 10px 0 9px !important;
+        }
+        .st-key-login_card [data-testid="stExpander"] {
+            margin: 0 !important;
+            border: 1.5px solid #0875F5 !important;
+            border-radius: 13px !important;
+            background: linear-gradient(90deg, #F0F8FF, #EAF4FF) !important;
+            overflow: hidden !important;
+        }
+        .st-key-login_card [data-testid="stExpander"] summary {
+            min-height: 44px !important;
+            padding: 8px 14px !important;
+            color: #075BEA !important;
+            font-family: 'Montserrat', sans-serif !important;
+            font-size: 14px !important;
+            font-weight: 500 !important;
+        }
+        .st-key-login_card [data-testid="stExpander"] summary p {
+            font-weight: 500 !important;
+        }
+        .st-key-login_card [data-testid="stExpander"] [data-testid="stExpanderDetails"] {
+            padding: 12px 14px 14px !important;
+            background: #FFFFFF !important;
+        }
+        /* Recuperação e manual em negrito, com pouco espaço entre eles. */
+        .st-key-btn_esqueci_senha button {
+            font-weight: 800 !important;
+            margin-bottom: 0 !important;
+        }
+        .login-manual {
+            margin-top: 2px !important;
+        }
+        [data-testid="stDownloadButton"] button {
+            font-weight: 800 !important;
+        }
+        @media (max-width: 700px) {
+            .st-key-login_card [data-testid="stExpander"] summary {
+                min-height: 40px !important;
+                font-size: 13px !important;
+            }
+            .login-support-divider {
+                margin: 7px 0 !important;
+            }
+        }
         </style>
         """,
         unsafe_allow_html=True,
@@ -982,14 +1030,10 @@ def tela_login():
                 manual.botao_manual(key="manual_login")
                 st.markdown("</div>", unsafe_allow_html=True)
 
-        # Suporte
-        st.markdown(
-            '<div class="login-help-title">Precisa de ajuda?</div>',
-            unsafe_allow_html=True,
-        )
-
-        with st.expander("💬 Falar com o suporte"):
-            contato.form_contato(key="login")
+            # Suporte integrado ao cartão, logo abaixo do manual.
+            st.markdown('<div class="login-support-divider"></div>', unsafe_allow_html=True)
+            with st.expander("🎧  Falar com o suporte"):
+                contato.form_contato(key="login")
 
         st.markdown(
             """
