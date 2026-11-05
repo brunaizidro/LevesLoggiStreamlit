@@ -912,6 +912,14 @@ def tela_login():
         .st-key-login_card [data-testid="stDownloadButton"] button {
             margin-top: 0 !important;
         }
+
+        /* Força o negrito no texto interno dos botões, inclusive elementos filhos do Streamlit. */
+        .st-key-login_card .st-key-btn_esqueci_senha button,
+        .st-key-login_card .st-key-btn_esqueci_senha button *,
+        .st-key-login_card [data-testid="stDownloadButton"] button,
+        .st-key-login_card [data-testid="stDownloadButton"] button * {
+            font-weight: 800 !important;
+        }
         </style>
         """,
         unsafe_allow_html=True,
