@@ -369,6 +369,37 @@ div[data-testid="stHorizontalBlock"] {
 .leves-kpi {
     min-height: 108px !important;
 }
+
+/* Remove o contorno cinza que envolve toda a área principal. */
+[data-testid="stMain"],
+[data-testid="stMainBlockContainer"],
+[data-testid="stAppViewBlockContainer"],
+section.main,
+section.main > div,
+.main .block-container {
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+}
+/* O fundo branco é exclusivo do cartão de filtros. */
+.st-key-filters_card,
+.st-key-filters_card [data-testid="stVerticalBlockBorderWrapper"],
+.st-key-filters_card [data-testid="stVerticalBlock"],
+.st-key-filters_card [data-testid="stHorizontalBlock"],
+.st-key-filters_card [data-testid="stElementContainer"] {
+    background: #FFFFFF !important;
+    background-color: #FFFFFF !important;
+}
+.st-key-filters_card {
+    border: 1px solid #DCE8F8 !important;
+    border-radius: 16px !important;
+    padding: 14px 16px !important;
+    box-shadow: 0 7px 22px rgba(22,65,125,.07) !important;
+}
+.st-key-filters_card [data-testid="stVerticalBlockBorderWrapper"] {
+    border: 0 !important;
+    box-shadow: none !important;
+}
 </style>
         """,
         unsafe_allow_html=True,
@@ -413,7 +444,7 @@ def page_1():
     # ============================================================
     # Filtros
     # ============================================================
-    with st.container(border=True):
+    with st.container(border=True, key="filters_card"):
         st.markdown(
             '<div class="leves-filter-heading"><span>⚙</span> Filtros</div>',
             unsafe_allow_html=True,
