@@ -325,6 +325,50 @@ div[data-testid="stHorizontalBlock"] {
     }
     .leves-kpi-value { font-size: 27px !important; }
 }
+
+/* Ajustes finais: conteúdo mais alto, filtros destacados e paleta 100% azul. */
+[data-testid="stAppViewBlockContainer"] {
+    padding-top: 7px !important;
+    padding-bottom: 32px !important;
+}
+.leves-breadcrumb {
+    margin-top: 0 !important;
+    margin-bottom: 5px !important;
+}
+.leves-page-title {
+    margin-top: 0 !important;
+    line-height: 1.08 !important;
+}
+.leves-page-description {
+    margin-top: 4px !important;
+    margin-bottom: 13px !important;
+    line-height: 1.4 !important;
+}
+/* O cartão que contém os filtros fica branco, separado do fundo da página. */
+[data-testid="stVerticalBlockBorderWrapper"]:has(.leves-filter-heading) {
+    background: #FFFFFF !important;
+    background-color: #FFFFFF !important;
+    border: 1px solid #DCE8F8 !important;
+    border-radius: 16px !important;
+    box-shadow: 0 7px 22px rgba(22,65,125,.07) !important;
+}
+[data-testid="stVerticalBlockBorderWrapper"]:has(.leves-filter-heading) > div {
+    background: #FFFFFF !important;
+}
+.leves-filter-heading {
+    margin-bottom: 8px !important;
+}
+.leves-section-label {
+    margin-top: 12px !important;
+    margin-bottom: 9px !important;
+}
+.leves-summary-heading {
+    margin-top: 13px !important;
+}
+/* Evita excesso de espaço antes dos gráficos após os KPIs. */
+.leves-kpi {
+    min-height: 108px !important;
+}
 </style>
         """,
         unsafe_allow_html=True,
@@ -457,7 +501,7 @@ def page_1():
         x="tipo",
         y="total",
         color="tipo",
-        color_discrete_map=dp.CORES_TIPO,
+        color_discrete_map={"SACA": "#0866F5", "GAYLORD": "#19BCEB", "PALLET": "#174A9A"},
         labels={"tipo": "Tipo", "total": "Total"},
     )
     fig_tipo.update_layout(
