@@ -848,6 +848,53 @@ def tela_login():
                 margin: 7px 0 !important;
             }
         }
+
+        /* Acabamento compacto: reduzir espaços e destacar os três acessos. */
+        .st-key-login_card [data-testid="stVerticalBlock"] {
+            gap: 3px !important;
+            row-gap: 3px !important;
+        }
+        .st-key-login_card [data-testid="stElementContainer"] {
+            margin-bottom: 0 !important;
+            padding-bottom: 0 !important;
+        }
+        .st-key-btn_esqueci_senha {
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+        }
+        .st-key-btn_esqueci_senha button {
+            font-weight: 800 !important;
+            margin: 0 !important;
+        }
+        .login-manual {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+        }
+        .st-key-login_card [data-testid="stDownloadButton"] {
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+        }
+        .st-key-login_card [data-testid="stDownloadButton"] button {
+            font-weight: 800 !important;
+            margin: 0 !important;
+        }
+        .login-support-divider {
+            margin: 5px 0 5px !important;
+        }
+        .st-key-login_card [data-testid="stExpander"] {
+            margin: 0 !important;
+        }
+        .st-key-login_card [data-testid="stExpander"] summary,
+        .st-key-login_card [data-testid="stExpander"] summary p {
+            font-weight: 800 !important;
+        }
+        .st-key-login_card [data-testid="stExpander"] summary {
+            min-height: 40px !important;
+            padding: 6px 12px !important;
+        }
+        .st-key-login_card [data-testid="stExpander"] [data-testid="stExpanderDetails"] {
+            padding: 9px 12px 11px !important;
+        }
         </style>
         """,
         unsafe_allow_html=True,
