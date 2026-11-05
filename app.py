@@ -895,6 +895,23 @@ def tela_login():
         .st-key-login_card [data-testid="stExpander"] [data-testid="stExpanderDetails"] {
             padding: 9px 12px 11px !important;
         }
+
+        /* Aproxima especificamente o Manual do botão "Esqueci minha senha".
+           O recuo compensa o espaçamento automático entre elementos do Streamlit. */
+        .st-key-login_card [data-testid="stElementContainer"]:has(.st-key-btn_esqueci_senha) {
+            margin-bottom: 0 !important;
+            padding-bottom: 0 !important;
+        }
+        .st-key-login_card [data-testid="stElementContainer"]:has([data-testid="stDownloadButton"]) {
+            margin-top: -20px !important;
+            padding-top: 0 !important;
+        }
+        .st-key-login_card [data-testid="stDownloadButton"] {
+            margin-top: 0 !important;
+        }
+        .st-key-login_card [data-testid="stDownloadButton"] button {
+            margin-top: 0 !important;
+        }
         </style>
         """,
         unsafe_allow_html=True,
