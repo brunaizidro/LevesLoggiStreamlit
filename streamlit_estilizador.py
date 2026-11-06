@@ -22,6 +22,44 @@ class PageStyler:
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap"
               rel="stylesheet">
         <style>
+        /* Tipografia única do Portal LEVES: Montserrat em todos os módulos. */
+        html, body, [data-testid="stApp"],
+        [data-testid="stApp"] p,
+        [data-testid="stApp"] span,
+        [data-testid="stApp"] div,
+        [data-testid="stApp"] label,
+        [data-testid="stApp"] input,
+        [data-testid="stApp"] textarea,
+        [data-testid="stApp"] select,
+        [data-testid="stApp"] option,
+        [data-testid="stApp"] button,
+        [data-testid="stApp"] a,
+        [data-testid="stApp"] li,
+        [data-testid="stApp"] small,
+        [data-testid="stApp"] strong,
+        [data-testid="stApp"] em,
+        [data-testid="stApp"] h1,
+        [data-testid="stApp"] h2,
+        [data-testid="stApp"] h3,
+        [data-testid="stApp"] h4,
+        [data-testid="stApp"] h5,
+        [data-testid="stApp"] h6,
+        [data-testid="stApp"] td,
+        [data-testid="stApp"] th,
+        [data-testid="stApp"] [data-testid="stMarkdownContainer"],
+        [data-testid="stApp"] [data-testid="stMarkdownContainer"] * {
+            font-family: 'Montserrat', sans-serif !important;
+        }
+
+        /* Preserva os glifos dos ícones do Streamlit e Material Symbols. */
+        [data-testid="stApp"] .material-icons,
+        [data-testid="stApp"] .material-symbols,
+        [data-testid="stApp"] .material-symbols-outlined,
+        [data-testid="stApp"] .material-symbols-rounded,
+        [data-testid="stApp"] [data-testid="stIconMaterial"] {
+            font-family: 'Material Symbols Rounded', 'Material Icons' !important;
+        }
+
         li, span, input, label, small {
             font-family: Montserrat, sans-serif;
         }
