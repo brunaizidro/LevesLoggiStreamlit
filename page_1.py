@@ -41,6 +41,14 @@ def _injetar_css():
 /* ============================================================
    PORTAL LEVES — ÁREA INTERNA V7
    ============================================================ */
+/* Mantém Montserrat como tipografia única também nesta página. */
+html, body, [data-testid="stApp"], [data-testid="stApp"] *,
+[data-testid="stDataFrame"], [data-testid="stDataFrame"] * {
+    font-family: 'Montserrat', sans-serif !important;
+}
+[data-testid="stDataFrame"] {
+    --gdg-font-family: 'Montserrat', sans-serif;
+}
 /* Remove a barra superior padrão do Streamlit */
 [data-testid="stHeader"] {
     display: none !important;
@@ -568,6 +576,10 @@ def page_1():
                                   color_discrete_map=paleta,
                                   labels={"dia": "Data", "total": "Quantidade", "tipo": "Tipo"})
                 fig_dia.update_traces(
+                    mode="lines+markers+text",
+                    texttemplate="%{y:,.0f}",
+                    textposition="top center",
+                    textfont=dict(family="Montserrat", size=10, color="#102B50"),
                     line=dict(width=3), marker=dict(size=7, line=dict(width=1.5, color="#FFFFFF")),
                     hovertemplate="<b>%{fullData.name}</b><br>%{x|%d/%m/%Y}<br>Quantidade: %{y:,.0f}<extra></extra>",
                 )
@@ -597,15 +609,16 @@ def page_1():
             with st.container(border=True):
                 st.markdown('<div class="leves-chart-title">Top 10 destinos</div>', unsafe_allow_html=True)
                 rank = (dfx.groupby("destino", as_index=False)["total"].sum()
-                        .sort_values("total", ascending=False).head(10).sort_values("total", ascending=True))
+                        .sort_values("total", ascending=False).head(10).sort_values("total", ascending=True, kind="stable"))
                 if not rank.empty:
                     fig_dest = px.bar(rank, x="total", y="destino", orientation="h", text="total",
                                       labels={"total": "Quantidade", "destino": "Destino"})
                     fig_dest.update_traces(
                         marker=dict(color=["#9CCBFF", "#8ABFFF", "#78B3FF", "#66A7FF", "#559BFF",
                                            "#438DFA", "#327FF2", "#2072E9", "#1166E0", "#075BEA"][-len(rank):]),
-                        texttemplate="%{x:,.0f}", textposition="outside",
-                        textfont=dict(family="Montserrat", size=11, color="#102B50"), cliponaxis=False,
+                        texttemplate="%{x:,.0f}", textposition="inside",
+                        insidetextanchor="middle",
+                        textfont=dict(family="Montserrat", size=11, color="#FFFFFF"), cliponaxis=False,
                         hovertemplate="<b>%{y}</b><br>Quantidade: %{x:,.0f}<extra></extra>",
                     )
                     fig_dest.update_layout(
@@ -613,7 +626,12 @@ def page_1():
                         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
                         margin=dict(l=8, r=32, t=8, b=8),
                         xaxis=dict(title=None, showgrid=False, zeroline=False, showticklabels=False),
-                        yaxis=dict(title=None, showgrid=False, zeroline=False, autorange="reversed"),
+                        yaxis=dict(
+                            title=None, showgrid=False, zeroline=False,
+                            categoryorder="array",
+                            categoryarray=rank["destino"].astype(str).tolist(),
+                            autorange="reversed",
+                        ),
                     )
                     st.plotly_chart(fig_dest, width="stretch", config={"displayModeBar": False})
                 else:
@@ -637,7 +655,20 @@ def page_1():
             tab["dt"] = tab["dt"].dt.strftime("%d/%m/%Y")
             tab = tab.rename(columns={"dt": "Data", "tipo": "Tipo de insumo",
                                       "destino": "Destino", "total": "Quantidade"})
-            st.dataframe(tab, width="stretch", hide_index=True, height=335)
+            config_tabela = {
+                coluna: st.column_config.TextColumn(coluna, alignment="center")
+                for coluna in tab.columns if coluna != "Quantidade"
+            }
+            config_tabela["Quantidade"] = st.column_config.NumberColumn(
+                "Quantidade", alignment="center", format="%d"
+            )
+            st.dataframe(
+                tab,
+                width="stretch",
+                hide_index=True,
+                height=335,
+                column_config=config_tabela,
+            )
             st.download_button("Baixar CSV", tab.to_csv(index=False).encode("utf-8-sig"),
                                file_name="ativos_leves.csv", mime="text/csv", key="dl_envios")
 
