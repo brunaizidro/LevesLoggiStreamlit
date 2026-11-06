@@ -21,9 +21,40 @@ class PageStyler:
             "<link href=\"https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap\" rel=\"stylesheet\">"
             """
 <style>
-/* Tipografia global — Montserrat em todos os módulos */
+/* Tipografia global — Montserrat Bold 700 em todos os textos e módulos */
 html, body, [data-testid="stApp"], [data-testid="stApp"] * {
     font-family: 'Montserrat', sans-serif !important;
+    font-weight: 700 !important;
+}
+
+/* Títulos de páginas e módulos em Montserrat ExtraBold 800 */
+[data-testid="stApp"] h1,
+[data-testid="stApp"] h2,
+[data-testid="stApp"] h3,
+[data-testid="stApp"] h4,
+[data-testid="stApp"] h5,
+[data-testid="stApp"] h6,
+[data-testid="stApp"] .page-title,
+[data-testid="stApp"] .leves-page-title,
+[data-testid="stApp"] .leves-section-label,
+[data-testid="stApp"] .leves-chart-title,
+[data-testid="stApp"] .leves-table-heading,
+[data-testid="stApp"] .leves-filter-heading,
+[data-testid="stApp"] .leves-summary-heading,
+[data-testid="stApp"] .tool-subtitle,
+[data-testid="stApp"] .subtitle,
+[data-testid="stApp"] [data-testid="stSubheader"] {
+    font-weight: 800 !important;
+}
+
+/* Preserva o peso e a família próprios dos ícones */
+.material-icons,
+.material-symbols,
+.material-symbols-outlined,
+.material-symbols-rounded,
+[data-testid="stIconMaterial"] {
+    font-family: 'Material Symbols Rounded', 'Material Icons' !important;
+    font-weight: 500 !important;
 }
 
 /* Preserva os ícones do Streamlit e Material Symbols */
