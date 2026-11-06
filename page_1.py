@@ -39,78 +39,179 @@ def _injetar_css():
         """
 <style>
 /* ============================================================
-   PORTAL LEVES — ÁREA INTERNA V7
+   ENVIOS — MESMA IDENTIDADE VISUAL DO RECEBIMENTO
    ============================================================ */
-/* Mantém Montserrat como tipografia única também nesta página. */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+
 html, body, [data-testid="stApp"], [data-testid="stApp"] *,
 [data-testid="stDataFrame"], [data-testid="stDataFrame"] * {
     font-family: 'Montserrat', sans-serif !important;
 }
+[data-testid="stHeader"], [data-testid="stToolbar"] {
+    display: none !important;
+}
+[data-testid="stAppViewContainer"],
+[data-testid="stMain"] {
+    background: #FFFFFF !important;
+}
+[data-testid="stAppViewBlockContainer"] {
+    max-width: 100% !important;
+    padding: 18px  clamp(22px, 3.2vw, 54px) 38px !important;
+}
 
-/* Tabela de detalhamento: cabeçalho azul e tipografia Montserrat. */
-[data-testid="stDataFrame"] [role="columnheader"],
-[data-testid="stDataFrame"] [role="columnheader"] *,
-[data-testid="stDataFrame"] [data-testid="glideDataEditor"] [role="columnheader"] {
-    background-color: #0866F5 !important;
-    color: #FFFFFF !important;
+/* Cabeçalho no mesmo padrão simples do Recebimento */
+.leves-breadcrumb {
+    color: #7B8798 !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    letter-spacing: .55px !important;
+    margin: 0 0 7px !important;
+}
+.leves-page-title {
+    color: #172B4D !important;
+    font-size: clamp(28px, 2.3vw, 34px) !important;
+    line-height: 1.18 !important;
+    font-weight: 800 !important;
+    letter-spacing: -.8px !important;
+    margin: 0 !important;
+}
+.leves-page-title span { color: #0067FC !important; }
+.leves-page-description {
+    color: #7A8493 !important;
+    font-size: 14px !important;
+    line-height: 1.55 !important;
+    margin: 6px 0 18px !important;
+}
+
+/* Títulos e textos */
+.leves-filter-heading,
+.leves-section-label,
+.leves-chart-title,
+.leves-table-heading {
+    color: #172B4D !important;
     font-family: 'Montserrat', sans-serif !important;
+    font-weight: 800 !important;
+}
+.leves-filter-heading { font-size: 17px !important; margin: 0 0 10px !important; }
+.leves-section-label { font-size: 16px !important; margin: 18px 0 10px !important; }
+.leves-summary-heading { margin-top: 16px !important; }
+.leves-filter-heading span,
+.leves-summary-heading:first-letter { color: #0067FC !important; }
+.leves-chart-title,
+.leves-table-heading { font-size: 16px !important; margin: 0 0 8px !important; }
+
+/* Filtros: campos suaves como os campos do Recebimento */
+[data-testid="stWidgetLabel"] p,
+[data-testid="stWidgetLabel"] label {
+    color: #172B4D !important;
+    font-size: 13px !important;
     font-weight: 700 !important;
 }
-[data-testid="stDataFrame"] *,
-[data-testid="stDataFrame"] canvas {
-    font-family: 'Montserrat', sans-serif !important;
+[data-baseweb="select"] > div {
+    background: #F0F2F6 !important;
+    border: 1px solid #E7EAF0 !important;
+    border-radius: 10px !important;
+    min-height: 42px !important;
+    box-shadow: none !important;
+}
+[data-baseweb="select"] > div:focus-within {
+    border-color: #0067FC !important;
+    box-shadow: 0 0 0 2px rgba(0,103,252,.10) !important;
+}
+[data-baseweb="tag"] {
+    background: #0067FC !important;
+    border-radius: 6px !important;
+}
+[data-baseweb="tag"] *,
+[data-baseweb="tag"] span { color: #FFFFFF !important; }
+
+/* Cartão de filtros branco, com borda azul discreta */
+.st-key-filters_card {
+    background: #FFFFFF !important;
+    border: 1px solid #DCE7F6 !important;
+    border-radius: 14px !important;
+    padding: 14px 16px !important;
+    box-shadow: 0 4px 14px rgba(16,43,80,.045) !important;
+}
+.st-key-filters_card [data-testid="stVerticalBlockBorderWrapper"],
+.st-key-filters_card [data-testid="stVerticalBlock"],
+.st-key-filters_card [data-testid="stHorizontalBlock"],
+.st-key-filters_card [data-testid="stElementContainer"] {
+    background: #FFFFFF !important;
+}
+.st-key-filters_card [data-testid="stVerticalBlockBorderWrapper"] {
+    border: 0 !important;
+    box-shadow: none !important;
 }
 
-
-
-/* Tabela HTML: o st.dataframe usa canvas e ignora estilos CSS de cabeçalho/fonte.
-   Esta tabela permite aplicar azul Loggi e Montserrat de ponta a ponta. */
-.leves-html-table-wrap {
-    height: 335px;
-    overflow: auto;
-    border: 1px solid #D6E2F2;
-    border-radius: 12px;
-    background: #FFFFFF;
+/* Indicadores: azul Loggi no total e cartões brancos nos demais */
+.leves-kpi {
+    background: #FFFFFF !important;
+    border: 1px solid #DCE7F6 !important;
+    border-radius: 14px !important;
+    padding: 16px 18px !important;
+    min-height: 108px !important;
+    box-shadow: 0 4px 14px rgba(16,43,80,.045) !important;
+    box-sizing: border-box !important;
 }
-.leves-html-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    font-family: 'Montserrat', sans-serif !important;
-    font-size: 13px;
-    color: #102B50;
-    table-layout: auto;
+.leves-kpi-total {
+    background: #0067FC !important;
+    border-color: #0067FC !important;
+    box-shadow: 0 6px 18px rgba(0,103,252,.16) !important;
 }
-.leves-html-table th {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    background: #0866F5 !important;
+.leves-kpi-top {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    color: #526783 !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    letter-spacing: .35px !important;
+    text-transform: uppercase !important;
+}
+.leves-kpi-icon {
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #EAF2FF !important;
+    color: #0067FC !important;
+}
+.leves-kpi-value {
+    color: #172B4D !important;
+    font-size: 30px !important;
+    line-height: 1.1 !important;
+    font-weight: 800 !important;
+    margin-top: 8px !important;
+}
+.leves-kpi-sub {
+    color: #7B8798 !important;
+    font-size: 11px !important;
+    margin-top: 4px !important;
+}
+.leves-kpi-total .leves-kpi-top,
+.leves-kpi-total .leves-kpi-value,
+.leves-kpi-total .leves-kpi-sub { color: #FFFFFF !important; }
+.leves-kpi-total .leves-kpi-icon {
+    background: rgba(255,255,255,.18) !important;
     color: #FFFFFF !important;
-    font-family: 'Montserrat', sans-serif !important;
-    font-weight: 700 !important;
-    text-align: center;
-    padding: 11px 12px;
-    border-right: 1px solid rgba(255,255,255,.20);
-    white-space: nowrap;
 }
-.leves-html-table td {
-    background: #FFFFFF;
-    color: #102B50;
-    font-family: 'Montserrat', sans-serif !important;
-    font-weight: 500;
-    text-align: center;
-    padding: 10px 12px;
-    border-right: 1px solid #E5EAF1;
-    border-bottom: 1px solid #E5EAF1;
-    white-space: nowrap;
-}
-.leves-html-table tbody tr:nth-child(even) td { background: #F8FBFF; }
-.leves-html-table tbody tr:hover td { background: #EEF6FF; }
-.leves-html-table th:last-child,
-.leves-html-table td:last-child { border-right: 0; }
 
-/* Gráficos Plotly: Montserrat em negrito em títulos, eixos, legendas e rótulos. */
+/* Gráficos e tabelas em cartões brancos, sem moldura cinza pesada */
+[data-testid="stVerticalBlockBorderWrapper"] {
+    border: 1px solid #DCE7F6 !important;
+    border-radius: 14px !important;
+    background: #FFFFFF !important;
+    box-shadow: 0 4px 14px rgba(16,43,80,.035) !important;
+}
+.leves-chart-card {
+    background: #FFFFFF !important;
+    border: 1px solid #DCE7F6 !important;
+    border-radius: 14px !important;
+    box-shadow: 0 4px 14px rgba(16,43,80,.035) !important;
+}
 .js-plotly-plot,
 .js-plotly-plot text,
 .js-plotly-plot .legendtext,
@@ -119,413 +220,82 @@ html, body, [data-testid="stApp"], [data-testid="stApp"] *,
 .js-plotly-plot .ytick text,
 .js-plotly-plot .annotation-text {
     font-family: 'Montserrat', sans-serif !important;
-    font-weight: 700 !important;
 }
-
-[data-testid="stDataFrame"] {
-    --gdg-font-family: 'Montserrat', sans-serif;
+.leves-html-table-wrap {
+    height: 335px;
+    overflow: auto;
+    border: 1px solid #DCE7F6;
+    border-radius: 10px;
+    background: #FFFFFF;
 }
-/* Remove a barra superior padrão do Streamlit */
-[data-testid="stHeader"] {
-    display: none !important;
-}
-
-[data-testid="stToolbar"] {
-    display: none !important;
-}
-
-[data-testid="stAppViewContainer"] {
-    background: #f7f9fc !important;
-}
-
-[data-testid="stAppViewBlockContainer"] {
-    padding-top: 12px !important;
-    padding-bottom: 40px !important;
-}
-/* Cabeçalho */
-.leves-breadcrumb {
-    color: #8a95a5;
-    font-family: Montserrat, sans-serif;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: .3px;
-    margin-bottom: 7px;
-}
-
-.leves-page-title {
-    color: #172033;
-    font-family: Montserrat, sans-serif;
-    font-size: 32px;
-    line-height: 1.15;
-    font-weight: 800;
-    letter-spacing: -1px;
-    margin: 0;
-}
-
-.leves-page-title span {
-    color: #0067fc;
-}
-.leves-page-description {
-    color: #697587;
-    font-family: Montserrat, sans-serif;
-    font-size: 14px;
-    line-height: 1.6;
-    margin-top: 8px;
-    margin-bottom: 20px;
-}
-
-/* Blocos */
-.leves-section-label {
-    color: #253044;
-    font-family: Montserrat, sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    margin: 4px 0 10px 0;
-}
-/* KPIs */
-.leves-kpi {
-    background: #ffffff;
-    border: 1px solid #e5eaf1;
-    border-radius: 16px;
-    padding: 15px 17px 14px 17px;
-    min-height: 96px;
-    box-shadow: 0 5px 18px rgba(23, 32, 51, .035);
-    box-sizing: border-box;
-}
-
-.leves-kpi-top {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #788497;
-    font-family: Montserrat, sans-serif;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .45px;
-}
-.leves-kpi-icon {
-    width: 25px;
-    height: 25px;
-    border-radius: 8px;
-    background: #eef6ff;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+.leves-html-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-family: 'Montserrat', sans-serif !important;
     font-size: 13px;
+    color: #172B4D;
 }
-
-.leves-kpi-value {
-    color: #172033;
-    font-family: Montserrat, sans-serif;
-    font-size: 28px;
-    line-height: 1;
-    font-weight: 700;
-    margin-top: 11px;
-}
-
-.leves-kpi-sub {
-    color: #a0a9b6;
-    font-family: Montserrat, sans-serif;
-    font-size: 10px;
-    margin-top: 5px;
-}
-/* Espaçamento dos widgets */
-div[data-testid="stHorizontalBlock"] {
-    gap: 16px;
-}
-
-/* Selectbox / multiselect */
-[data-baseweb="select"] > div {
-    border-color: #dfe5ed !important;
-    border-radius: 10px !important;
-    background: #ffffff !important;
-}
-
-[data-baseweb="select"] > div:hover {
-    border-color: #b9c7d8 !important;
-}
-[data-testid="stWidgetLabel"] p {
-    color: #536074 !important;
-    font-family: Montserrat, sans-serif !important;
-    font-size: 12px !important;
-    font-weight: 600 !important;
-}
-
-/* Dashboard de envios — visual compacto e corporativo */
-.leves-chart-title { color:#102B50 !important; font-family:Montserrat,sans-serif !important; font-size:17px !important; font-weight:800 !important; margin:0 0 8px 0 !important; }
-.leves-kpi { min-height:112px !important; display:flex; flex-direction:column; justify-content:center; }
-.leves-kpi-total { background:linear-gradient(135deg,#0873F9 0%,#0758DB 100%) !important; border-color:#0873F9 !important; }
-.leves-kpi-total .leves-kpi-top,.leves-kpi-total .leves-kpi-value,.leves-kpi-total .leves-kpi-sub { color:#FFFFFF !important; }
-.leves-kpi-total .leves-kpi-icon { color:#FFFFFF !important; background:rgba(255,255,255,.18) !important; }
-.leves-table-heading { color:#102B50; font-family:Montserrat,sans-serif; font-size:17px; font-weight:800; margin:0 0 10px 0; }
-[data-testid="stDataFrame"] { border:1px solid #E0EAF8; border-radius:12px; overflow:hidden; }
-[data-testid="stTextInput"] input { border-radius:10px !important; border-color:#D6E2F2 !important; }
-[data-testid="stDownloadButton"] button { border-radius:10px !important; border:1px solid #D6E2F2 !important; color:#075BEA !important; font-weight:700 !important; }
-
-/* Cards dos gráficos */
-.leves-chart-card {
-    background: #ffffff;
-    border: 1px solid #e5eaf1;
-    border-radius: 16px;
-    padding: 13px 14px 5px 14px;
-    box-shadow: 0 5px 18px rgba(23, 32, 51, .035);
-    min-height: 345px;
-}
-.leves-chart-title {
-    color: #253044;
-    font-family: Montserrat, sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    margin-bottom: 2px;
-}
-
-/* Tabela */
-[data-testid="stExpander"] {
-    border: 1px solid #e5eaf1 !important;
-    border-radius: 14px !important;
-    background: #ffffff !important;
-}
-
-[data-testid="stExpander"] summary {
-    color: #334056 !important;
-    font-family: Montserrat, sans-serif !important;
-    font-weight: 600 !important;
-}
-/* Avisos */
-[data-testid="stAlert"] {
-    border-radius: 12px !important;
-    font-family: Montserrat, sans-serif !important;
-}
-
-@media (max-width: 900px) {
-    .leves-page-title { font-size: 29px; }
-    .leves-kpi { min-height: 96px; }
-}
-
-/* Identidade visual Loggi — painel de envios */
-[data-testid="stAppViewContainer"] {
-    background: #FFFFFF !important;
-}
-[data-testid="stAppViewBlockContainer"] {
-    max-width: 100% !important;
-    padding: 26px clamp(24px, 3vw, 54px) 42px !important;
-}
-.leves-breadcrumb {
-    color: #7386A3 !important;
-    font-size: 11px !important;
-    letter-spacing: .55px !important;
-    margin-bottom: 9px !important;
-}
-.leves-page-title {
-    color: #102B50 !important;
-    font-size: clamp(29px, 2.3vw, 36px) !important;
-    letter-spacing: -1.2px !important;
-}
-.leves-page-description {
-    color: #647895 !important;
-    font-size: 13px !important;
-    margin-top: 5px !important;
-    margin-bottom: 22px !important;
-}
-.leves-filter-heading {
-    color: #102B50;
-    font-family: Montserrat, sans-serif;
-    font-size: 17px;
-    font-weight: 800;
-    margin: 0 0 12px 0;
-}
-.leves-filter-heading span,
-.leves-summary-heading:first-letter {
-    color: #0866F5;
-}
-[data-testid="stVerticalBlockBorderWrapper"] {
-    background: #FFFFFF !important;
-    border: 1px solid #DFE9F7 !important;
-    border-radius: 17px !important;
-    box-shadow: 0 7px 22px rgba(22, 65, 125, .055) !important;
-}
-.leves-section-label {
-    color: #102B50 !important;
-    font-size: 16px !important;
-    font-weight: 800 !important;
-    margin: 18px 0 12px !important;
-}
-.leves-summary-heading {
-    margin-top: 18px !important;
-}
-.leves-kpi {
-    border: 1px solid #E0EAF8 !important;
-    border-radius: 17px !important;
-    padding: 17px 19px 15px !important;
-    min-height: 116px !important;
-    box-shadow: 0 7px 20px rgba(24, 70, 130, .055) !important;
-}
-.leves-kpi-total {
-    background: linear-gradient(135deg, #0875F5 0%, #0754D8 100%) !important;
-    border-color: #0875F5 !important;
-    box-shadow: 0 8px 22px rgba(8,102,245,.18) !important;
-}
-.leves-kpi-total .leves-kpi-top,
-.leves-kpi-total .leves-kpi-value,
-.leves-kpi-total .leves-kpi-sub {
+.leves-html-table th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #0067FC !important;
     color: #FFFFFF !important;
+    font-weight: 700 !important;
+    text-align: center;
+    padding: 11px 12px;
+    white-space: nowrap;
 }
-.leves-kpi-total .leves-kpi-icon {
-    color: #FFFFFF !important;
-    background: rgba(255,255,255,.18) !important;
+.leves-html-table td {
+    background: #FFFFFF;
+    color: #172B4D;
+    font-weight: 500;
+    text-align: center;
+    padding: 10px 12px;
+    border-bottom: 1px solid #E8EEF7;
+    white-space: nowrap;
 }
-.leves-kpi-top {
-    color: #496486 !important;
-    font-size: 11px !important;
-    letter-spacing: .35px !important;
-}
-.leves-kpi-icon {
-    color: #0875F5 !important;
-    background: #EAF3FF !important;
-    width: 30px !important;
-    height: 30px !important;
-    border-radius: 50% !important;
-}
-.leves-kpi-value {
-    color: #102B50 !important;
-    font-size: 32px !important;
-    font-weight: 800 !important;
-    margin-top: 9px !important;
-}
-.leves-kpi-sub {
-    color: #7186A4 !important;
-    font-size: 11px !important;
-}
-.leves-chart-title {
-    color: #102B50 !important;
-    font-size: 16px !important;
-    font-weight: 800 !important;
-    margin: 1px 0 7px !important;
-}
-[data-baseweb="select"] > div {
-    border: 1px solid #D6E2F2 !important;
-    border-radius: 10px !important;
-    min-height: 42px !important;
-    box-shadow: none !important;
-}
-[data-baseweb="select"] > div:focus-within {
-    border-color: #0866F5 !important;
-    box-shadow: 0 0 0 2px rgba(8,102,245,.10) !important;
-}
-[data-testid="stWidgetLabel"] p {
-    color: #344B6B !important;
-    font-size: 12px !important;
+.leves-html-table tbody tr:nth-child(even) td { background: #F7FAFF; }
+.leves-html-table tbody tr:hover td { background: #EEF5FF; }
+
+/* Botões azuis no mesmo padrão dos botões de ação do Recebimento */
+[data-testid="stAppViewContainer"] .stButton > button,
+[data-testid="stAppViewContainer"] .stDownloadButton > button,
+[data-testid="stFormSubmitButton"] button {
+    min-height: 40px !important;
+    border-radius: 9px !important;
+    font-family: 'Montserrat', sans-serif !important;
     font-weight: 700 !important;
 }
-[data-testid="stExpander"] {
-    border-color: #DFE9F7 !important;
-    box-shadow: 0 5px 16px rgba(24,70,130,.035) !important;
+[data-testid="stAppViewContainer"] .stButton > button,
+[data-testid="stFormSubmitButton"] button {
+    background: #0067FC !important;
+    border: 1px solid #0067FC !important;
+    color: #FFFFFF !important;
 }
+[data-testid="stAppViewContainer"] .stButton > button:hover,
+[data-testid="stFormSubmitButton"] button:hover {
+    background: #0058DC !important;
+    border-color: #0058DC !important;
+}
+[data-testid="stDownloadButton"] button {
+    background: #EEF5FF !important;
+    border: 1px solid #D5E5FF !important;
+    color: #075BEA !important;
+}
+[data-testid="stTextInput"] input {
+    border-radius: 9px !important;
+    border: 1px solid #DCE7F6 !important;
+    background: #F0F2F6 !important;
+}
+[data-testid="stAlert"] { border-radius: 10px !important; }
+
+/* Sidebar permanece exatamente a do menu padrão do Recebimento */
 @media (max-width: 900px) {
-    [data-testid="stAppViewBlockContainer"] {
-        padding: 20px 16px 32px !important;
-    }
-    .leves-kpi-value { font-size: 27px !important; }
-}
-
-/* Identidade consistente com Recebimento: sidebar azul e conteúdo branco. */
-[data-testid="stSidebar"] {
-    width: 280px !important;
-    min-width: 280px !important;
-    max-width: 280px !important;
-    transform: none !important;
-    visibility: visible !important;
-    display: block !important;
-}
-[data-testid="stSidebar"] > div:first-child {
-    background: linear-gradient(180deg, #0067FC 0%, #0058DC 100%) !important;
-}
-[data-testid="stSidebarCollapsedControl"],
-[data-testid="collapsedControl"] {
-    display: none !important;
-}
-[data-testid="stAppViewContainer"] {
-    background: #FFFFFF !important;
-}
-.leves-chart-card {
-    border-color: #DCE8F8 !important;
-    box-shadow: 0 6px 18px rgba(24,70,130,.045) !important;
-}
-
-/* Ajustes finais: conteúdo mais alto, filtros destacados e paleta 100% azul. */
-[data-testid="stAppViewBlockContainer"] {
-    padding-top: 7px !important;
-    padding-bottom: 32px !important;
-}
-.leves-breadcrumb {
-    margin-top: 0 !important;
-    margin-bottom: 5px !important;
-}
-.leves-page-title {
-    margin-top: 0 !important;
-    line-height: 1.08 !important;
-}
-.leves-page-description {
-    margin-top: 4px !important;
-    margin-bottom: 13px !important;
-    line-height: 1.4 !important;
-}
-/* O cartão que contém os filtros fica branco, separado do fundo da página. */
-[data-testid="stVerticalBlockBorderWrapper"]:has(.leves-filter-heading) {
-    background: #FFFFFF !important;
-    background-color: #FFFFFF !important;
-    border: 1px solid #DCE8F8 !important;
-    border-radius: 16px !important;
-    box-shadow: 0 7px 22px rgba(22,65,125,.07) !important;
-}
-[data-testid="stVerticalBlockBorderWrapper"]:has(.leves-filter-heading) > div {
-    background: #FFFFFF !important;
-}
-.leves-filter-heading {
-    margin-bottom: 8px !important;
-}
-.leves-section-label {
-    margin-top: 12px !important;
-    margin-bottom: 9px !important;
-}
-.leves-summary-heading {
-    margin-top: 13px !important;
-}
-/* Evita excesso de espaço antes dos gráficos após os KPIs. */
-.leves-kpi {
-    min-height: 108px !important;
-}
-
-/* Remove o contorno cinza que envolve toda a área principal. */
-[data-testid="stMain"],
-[data-testid="stMainBlockContainer"],
-[data-testid="stAppViewBlockContainer"],
-section.main,
-section.main > div,
-.main .block-container {
-    border: 0 !important;
-    outline: 0 !important;
-    box-shadow: none !important;
-}
-/* O fundo branco é exclusivo do cartão de filtros. */
-.st-key-filters_card,
-.st-key-filters_card [data-testid="stVerticalBlockBorderWrapper"],
-.st-key-filters_card [data-testid="stVerticalBlock"],
-.st-key-filters_card [data-testid="stHorizontalBlock"],
-.st-key-filters_card [data-testid="stElementContainer"] {
-    background: #FFFFFF !important;
-    background-color: #FFFFFF !important;
-}
-.st-key-filters_card {
-    border: 1px solid #DCE8F8 !important;
-    border-radius: 16px !important;
-    padding: 14px 16px !important;
-    box-shadow: 0 7px 22px rgba(22,65,125,.07) !important;
-}
-.st-key-filters_card [data-testid="stVerticalBlockBorderWrapper"] {
-    border: 0 !important;
-    box-shadow: none !important;
+    [data-testid="stAppViewBlockContainer"] { padding: 16px 14px 28px !important; }
+    .leves-page-title { font-size: 27px !important; }
+    .leves-kpi-value { font-size: 26px !important; }
 }
 </style>
         """,
