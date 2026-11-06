@@ -47,6 +47,21 @@ html, body, [data-testid="stApp"], [data-testid="stApp"] *,
     font-family: 'Montserrat', sans-serif !important;
 }
 
+/* Tabela de detalhamento: cabeçalho azul e tipografia Montserrat. */
+[data-testid="stDataFrame"] [role="columnheader"],
+[data-testid="stDataFrame"] [role="columnheader"] *,
+[data-testid="stDataFrame"] [data-testid="glideDataEditor"] [role="columnheader"] {
+    background-color: #0866F5 !important;
+    color: #FFFFFF !important;
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 700 !important;
+}
+[data-testid="stDataFrame"] *,
+[data-testid="stDataFrame"] canvas {
+    font-family: 'Montserrat', sans-serif !important;
+}
+
+
 /* Gráficos Plotly: Montserrat em negrito em títulos, eixos, legendas e rótulos. */
 .js-plotly-plot,
 .js-plotly-plot text,
