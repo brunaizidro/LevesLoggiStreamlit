@@ -62,6 +62,54 @@ html, body, [data-testid="stApp"], [data-testid="stApp"] *,
 }
 
 
+
+/* Tabela HTML: o st.dataframe usa canvas e ignora estilos CSS de cabeçalho/fonte.
+   Esta tabela permite aplicar azul Loggi e Montserrat de ponta a ponta. */
+.leves-html-table-wrap {
+    height: 335px;
+    overflow: auto;
+    border: 1px solid #D6E2F2;
+    border-radius: 12px;
+    background: #FFFFFF;
+}
+.leves-html-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: 13px;
+    color: #102B50;
+    table-layout: auto;
+}
+.leves-html-table th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #0866F5 !important;
+    color: #FFFFFF !important;
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 700 !important;
+    text-align: center;
+    padding: 11px 12px;
+    border-right: 1px solid rgba(255,255,255,.20);
+    white-space: nowrap;
+}
+.leves-html-table td {
+    background: #FFFFFF;
+    color: #102B50;
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 500;
+    text-align: center;
+    padding: 10px 12px;
+    border-right: 1px solid #E5EAF1;
+    border-bottom: 1px solid #E5EAF1;
+    white-space: nowrap;
+}
+.leves-html-table tbody tr:nth-child(even) td { background: #F8FBFF; }
+.leves-html-table tbody tr:hover td { background: #EEF6FF; }
+.leves-html-table th:last-child,
+.leves-html-table td:last-child { border-right: 0; }
+
 /* Gráficos Plotly: Montserrat em negrito em títulos, eixos, legendas e rótulos. */
 .js-plotly-plot,
 .js-plotly-plot text,
@@ -696,12 +744,10 @@ def page_1():
             config_tabela["Quantidade"] = st.column_config.NumberColumn(
                 "Quantidade", alignment="center", format="%d"
             )
-            st.dataframe(
-                tab,
-                width="stretch",
-                hide_index=True,
-                height=335,
-                column_config=config_tabela,
+            tabela_html = tab.to_html(index=False, escape=True, border=0, classes="leves-html-table")
+            st.markdown(
+                f'<div class="leves-html-table-wrap">{tabela_html}</div>',
+                unsafe_allow_html=True,
             )
             st.download_button("Baixar CSV", tab.to_csv(index=False).encode("utf-8-sig"),
                                file_name="ativos_leves.csv", mime="text/csv", key="dl_envios")
