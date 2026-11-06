@@ -362,8 +362,18 @@ div[data-testid="stHorizontalBlock"] {
     box-shadow: 0 7px 20px rgba(24, 70, 130, .055) !important;
 }
 .leves-kpi-total {
-    background: linear-gradient(135deg, #A9D5FF 0%, #82BFFF 100%) !important;
-    border-color: #75B5F5 !important;
+    background: linear-gradient(135deg, #0875F5 0%, #0754D8 100%) !important;
+    border-color: #0875F5 !important;
+    box-shadow: 0 8px 22px rgba(8,102,245,.18) !important;
+}
+.leves-kpi-total .leves-kpi-top,
+.leves-kpi-total .leves-kpi-value,
+.leves-kpi-total .leves-kpi-sub {
+    color: #FFFFFF !important;
+}
+.leves-kpi-total .leves-kpi-icon {
+    color: #FFFFFF !important;
+    background: rgba(255,255,255,.18) !important;
 }
 .leves-kpi-top {
     color: #496486 !important;
@@ -372,7 +382,7 @@ div[data-testid="stHorizontalBlock"] {
 }
 .leves-kpi-icon {
     color: #0875F5 !important;
-    background: rgba(255,255,255,.72) !important;
+    background: #EAF3FF !important;
     width: 30px !important;
     height: 30px !important;
     border-radius: 50% !important;
@@ -417,6 +427,30 @@ div[data-testid="stHorizontalBlock"] {
         padding: 20px 16px 32px !important;
     }
     .leves-kpi-value { font-size: 27px !important; }
+}
+
+/* Identidade consistente com Recebimento: sidebar azul e conteúdo branco. */
+[data-testid="stSidebar"] {
+    width: 280px !important;
+    min-width: 280px !important;
+    max-width: 280px !important;
+    transform: none !important;
+    visibility: visible !important;
+    display: block !important;
+}
+[data-testid="stSidebar"] > div:first-child {
+    background: linear-gradient(180deg, #0067FC 0%, #0058DC 100%) !important;
+}
+[data-testid="stSidebarCollapsedControl"],
+[data-testid="collapsedControl"] {
+    display: none !important;
+}
+[data-testid="stAppViewContainer"] {
+    background: #FFFFFF !important;
+}
+.leves-chart-card {
+    border-color: #DCE8F8 !important;
+    box-shadow: 0 6px 18px rgba(24,70,130,.045) !important;
 }
 
 /* Ajustes finais: conteúdo mais alto, filtros destacados e paleta 100% azul. */
