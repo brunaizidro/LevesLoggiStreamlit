@@ -362,8 +362,8 @@ div[data-testid="stHorizontalBlock"] {
     box-shadow: 0 7px 20px rgba(24, 70, 130, .055) !important;
 }
 .leves-kpi-total {
-    background: linear-gradient(135deg, #DDF1FF 0%, #C6E5FF 100%) !important;
-    border-color: #C8E5FF !important;
+    background: linear-gradient(135deg, #A9D5FF 0%, #82BFFF 100%) !important;
+    border-color: #75B5F5 !important;
 }
 .leves-kpi-top {
     color: #496486 !important;
