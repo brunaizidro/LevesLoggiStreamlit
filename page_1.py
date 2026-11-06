@@ -46,6 +46,19 @@ html, body, [data-testid="stApp"], [data-testid="stApp"] *,
 [data-testid="stDataFrame"], [data-testid="stDataFrame"] * {
     font-family: 'Montserrat', sans-serif !important;
 }
+
+/* Gráficos Plotly: Montserrat em negrito em títulos, eixos, legendas e rótulos. */
+.js-plotly-plot,
+.js-plotly-plot text,
+.js-plotly-plot .legendtext,
+.js-plotly-plot .gtitle,
+.js-plotly-plot .xtick text,
+.js-plotly-plot .ytick text,
+.js-plotly-plot .annotation-text {
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 700 !important;
+}
+
 [data-testid="stDataFrame"] {
     --gdg-font-family: 'Montserrat', sans-serif;
 }
