@@ -112,7 +112,6 @@ h1 {
 }
 </style>
 """,
-            unsafe_allow_html=True,
         )
 
     def apply_sidebar_css(self, image_base64):
