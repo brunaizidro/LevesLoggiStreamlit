@@ -305,9 +305,7 @@ div[data-testid="stHorizontalBlock"] {
 
 /* Identidade visual Loggi — painel de envios */
 [data-testid="stAppViewContainer"] {
-    background:
-        radial-gradient(ellipse 35% 24% at 100% 0%, rgba(0,185,238,.10), transparent 72%),
-        #F3F7FD !important;
+    background: #FFFFFF !important;
 }
 [data-testid="stAppViewBlockContainer"] {
     max-width: 100% !important;
