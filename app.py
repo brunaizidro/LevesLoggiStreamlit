@@ -1235,6 +1235,33 @@ def main():
             page_10() if eh_admin else page_9()
         else:
             page_1()
+
+        # Ajuste global de altura: mantém todos os módulos próximos ao topo.
+        # Este CSS é injetado após a renderização da página para prevalecer
+        # sobre estilos locais dos módulos.
+        st.markdown(
+            """
+            <style>
+            [data-testid="stAppViewContainer"] [data-testid="stMain"],
+            [data-testid="stAppViewContainer"] [data-testid="stMainBlockContainer"],
+            [data-testid="stAppViewContainer"] [data-testid="stAppViewBlockContainer"],
+            [data-testid="stAppViewContainer"] section.main,
+            [data-testid="stAppViewContainer"] section.main > div,
+            [data-testid="stAppViewContainer"] .main .block-container {
+                padding-top: 8px !important;
+                margin-top: 0 !important;
+                scroll-padding-top: 8px !important;
+            }
+            [data-testid="stAppViewContainer"] [data-testid="stMain"] {
+                align-items: flex-start !important;
+            }
+            [data-testid="stAppViewContainer"] [data-testid="stVerticalBlock"] {
+                row-gap: 0.7rem !important;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True,
+        )
     except Exception as e:  # noqa: BLE001
         st.error(
             "Erro ao acessar a planilha: "
