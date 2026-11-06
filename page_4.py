@@ -26,80 +26,106 @@ def _injetar_css():
     st.markdown(
         """
 <style>
+/* Identidade visual replicada do módulo Envios — sem alterar conteúdo ou fluxo */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
 html, body, [data-testid="stApp"], [data-testid="stApp"] *,
 [data-testid="stDataFrame"], [data-testid="stDataFrame"] * {
-    font-family: 'Montserrat', sans-serif !important;
+    font-family:'Montserrat',sans-serif !important;
 }
 [data-testid="stHeader"], [data-testid="stToolbar"] { display:none !important; }
 [data-testid="stAppViewContainer"], [data-testid="stMain"] { background:#FFFFFF !important; }
 [data-testid="stAppViewBlockContainer"] {
     max-width:100% !important;
-    padding:24px clamp(24px, 4vw, 64px) 40px !important;
+    padding:18px clamp(22px,3.2vw,54px) 38px !important;
 }
-h1, h2, h3, h4, [data-testid="stMarkdownContainer"] h1,
-[data-testid="stMarkdownContainer"] h2, [data-testid="stMarkdownContainer"] h3 {
-    color:#172B4D !important;
-    font-family:'Montserrat',sans-serif !important;
+.rec-breadcrumb {
+    color:#7B8798 !important; font-size:11px !important;
+    font-weight:600 !important; letter-spacing:.55px !important; margin:0 0 7px !important;
+}
+.rec-page-title {
+    color:#172B4D !important; font-size:clamp(28px,2.3vw,34px) !important;
+    line-height:1.18 !important; font-weight:800 !important;
+    letter-spacing:-.8px !important; margin:0 !important;
+}
+.rec-page-description {
+    color:#7A8493 !important; font-size:14px !important;
+    line-height:1.55 !important; margin:6px 0 18px !important;
+}
+h1,h2,h3,h4,[data-testid="stMarkdownContainer"] h1,
+[data-testid="stMarkdownContainer"] h2,[data-testid="stMarkdownContainer"] h3 {
+    color:#172B4D !important; font-family:'Montserrat',sans-serif !important;
     font-weight:800 !important;
 }
 [data-testid="stMarkdownContainer"] p,
 [data-testid="stMarkdownContainer"] li,
 [data-testid="stCaptionContainer"] {
-    color:#253B59;
-    font-family:'Montserrat',sans-serif !important;
+    color:#253B59; font-family:'Montserrat',sans-serif !important;
 }
-[data-testid="stWidgetLabel"] p,
-[data-testid="stWidgetLabel"] label {
-    color:#172B4D !important;
-    font-size:13px !important;
-    font-weight:700 !important;
+[data-testid="stWidgetLabel"] p,[data-testid="stWidgetLabel"] label {
+    color:#172B4D !important; font-size:13px !important; font-weight:700 !important;
 }
-[data-baseweb="select"] > div,
-[data-testid="stNumberInput"] input {
-    background:#F0F2F6 !important;
-    border:1px solid #E7EAF0 !important;
-    border-radius:10px !important;
-    box-shadow:none !important;
-    min-height:42px !important;
+[data-baseweb="select"] > div,[data-testid="stNumberInput"] input {
+    background:#F0F2F6 !important; border:1px solid #E7EAF0 !important;
+    border-radius:10px !important; min-height:42px !important; box-shadow:none !important;
 }
 [data-baseweb="select"] > div:focus-within,
 [data-testid="stNumberInput"] input:focus {
-    border-color:#0067FC !important;
-    box-shadow:0 0 0 2px rgba(0,103,252,.10) !important;
+    border-color:#0067FC !important; box-shadow:0 0 0 2px rgba(0,103,252,.10) !important;
+}
+[data-baseweb="tag"] { background:#0067FC !important; border-radius:6px !important; }
+[data-baseweb="tag"] *,[data-baseweb="tag"] span { color:#FFFFFF !important; }
+.st-key-rec_filters {
+    background:#FFFFFF !important; border:1px solid #DCE7F6 !important;
+    border-radius:14px !important; padding:14px 16px !important;
+    box-shadow:0 4px 14px rgba(16,43,80,.045) !important;
+}
+.st-key-rec_filters [data-testid="stVerticalBlockBorderWrapper"] {
+    border:0 !important; box-shadow:none !important;
+}
+.rec-filter-heading,.rec-section-heading {
+    color:#172B4D !important; font-size:17px !important;
+    font-weight:800 !important; margin:0 0 10px !important;
+}
+.rec-filter-heading span,.rec-section-heading span { color:#0067FC !important; }
+.rec-meta-row {
+    display:grid; grid-template-columns:1.4fr 1fr 1fr 1.2fr;
+    gap:18px; align-items:start; margin:14px 0 8px;
+}
+.rec-meta-item { color:#172B4D; font-size:14px; font-weight:700; line-height:1.55; }
+.rec-meta-item strong { color:#172B4D; font-weight:800; }
+.rec-competencia {
+    color:#172B4D; font-size:14px; font-weight:700; margin:10px 0 18px;
+}
+.rec-items-heading {
+    color:#172B4D !important; font-size:22px !important;
+    line-height:1.25 !important; font-weight:800 !important; margin:0 0 12px !important;
+}
+.rec-items-list { margin:0 0 10px 0; padding-left:22px; color:#253B59; }
+.rec-items-list li { padding:7px 0; font-size:15px; font-weight:600; }
+.rec-total {
+    color:#172B4D; font-size:15px; font-weight:800; margin-top:8px;
 }
 [data-testid="stAppViewContainer"] .stButton > button,
 [data-testid="stFormSubmitButton"] button {
-    min-height:42px !important;
-    border-radius:9px !important;
-    font-family:'Montserrat',sans-serif !important;
-    font-weight:700 !important;
-    background:#0067FC !important;
-    border:1px solid #0067FC !important;
-    color:#FFFFFF !important;
+    min-height:40px !important; border-radius:9px !important;
+    font-family:'Montserrat',sans-serif !important; font-weight:700 !important;
+    background:#0067FC !important; border:1px solid #0067FC !important; color:#FFFFFF !important;
 }
 [data-testid="stAppViewContainer"] .stButton > button:hover,
 [data-testid="stFormSubmitButton"] button:hover {
-    background:#0058DC !important;
-    border-color:#0058DC !important;
+    background:#0058DC !important; border-color:#0058DC !important;
 }
 [data-testid="stForm"] {
-    border:1px solid #DCE7F6 !important;
-    border-radius:12px !important;
-    padding:14px !important;
-    background:#FFFFFF !important;
+    border:1px solid #DCE7F6 !important; border-radius:12px !important;
+    padding:14px !important; background:#FFFFFF !important;
 }
-[data-testid="stDataFrame"] {
-    border:1px solid #DCE7F6 !important;
-    border-radius:10px !important;
-}
+[data-testid="stDataFrame"] { border:1px solid #DCE7F6 !important; border-radius:10px !important; }
 [data-testid="stAlert"] { border-radius:10px !important; }
-hr {
-    border-color:#DCE7F6 !important;
-    margin:22px 0 !important;
-}
+hr { border-color:#DCE7F6 !important; margin:22px 0 !important; }
 @media(max-width:900px) {
-    [data-testid="stAppViewBlockContainer"] { padding:18px 14px 28px !important; }
+    [data-testid="stAppViewBlockContainer"] { padding:16px 14px 28px !important; }
+    .rec-meta-row { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+    .rec-page-title { font-size:27px !important; }
 }
 </style>
         """,
@@ -162,18 +188,29 @@ def _card_devolucao(dev: dict, quem: str):
     itens = [{"tipo": r["tipo"], "qtd_declarada": int(r["qtd_declarada"])}
              for _, r in itens_df.iterrows()]
 
-    st.markdown(f"### {dev['id']}")
-    c1, c2, c3, c4 = st.columns(4)
-    c1.markdown(f"**Operação:** {dev.get('usuario','')}")
-    c2.markdown(f"**Destino:** {dev.get('destino','')}")
-    c3.markdown(f"**Placa:** {dev.get('placa','') or '—'}")
-    c4.markdown(f"**Emissão:** {dev.get('data_criacao','')}")
+    st.markdown(
+        f'<div class="rec-section-heading"><span>▦</span> &nbsp; {dev["id"]}</div>',
+        unsafe_allow_html=True,
+    )
+    meta = [
+        ("Operação", dev.get("usuario", "")),
+        ("Destino", dev.get("destino", "")),
+        ("Placa", dev.get("placa") or "—"),
+        ("Emissão", dev.get("data_criacao", "")),
+    ]
+    st.markdown(
+        '<div class="rec-meta-row">' + "".join(
+            f'<div class="rec-meta-item"><strong>{label}:</strong> {value}</div>'
+            for label, value in meta
+        ) + '</div>',
+        unsafe_allow_html=True,
+    )
     comp = str(dev.get("competencia", "") or "")
     comp_txt = dp.rotulo_mes(comp) if len(comp) == 7 else "—"
-    extra = f"**Competência:** {comp_txt}"
+    competencia_txt = f"Competência: {comp_txt}"
     if dev.get("local_devolucao"):
-        extra += f"  ·  **Devolvendo para:** {dev.get('local_devolucao')}"
-    st.markdown(extra)
+        competencia_txt += f" &nbsp; · &nbsp; Devolvendo para: {dev.get('local_devolucao')}"
+    st.markdown(f'<div class="rec-competencia">{competencia_txt}</div>', unsafe_allow_html=True)
 
     # Já processada?
     if dev.get("status") != dp.STATUS_TRANSITO:
@@ -189,10 +226,16 @@ def _card_devolucao(dev: dict, quem: str):
         )
         return
 
-    st.markdown("#### Itens declarados")
-    for it in itens:
-        st.markdown(f"- **{it['tipo'].title()}**: {_fmt(it['qtd_declarada'])}")
-    st.markdown(f"**Total declarado:** {_fmt(sum(i['qtd_declarada'] for i in itens))}")
+    st.markdown('<div class="rec-items-heading">Itens declarados</div>', unsafe_allow_html=True)
+    itens_html = "".join(
+        f"<li><strong>{it['tipo'].title()}:</strong> {_fmt(it['qtd_declarada'])}</li>"
+        for it in itens
+    )
+    st.markdown(f'<ul class="rec-items-list">{itens_html}</ul>', unsafe_allow_html=True)
+    st.markdown(
+        f'<div class="rec-total">Total declarado: {_fmt(sum(i["qtd_declarada"] for i in itens))}</div>',
+        unsafe_allow_html=True,
+    )
 
     st.markdown("---")
     col_a, col_b = st.columns(2)
@@ -235,7 +278,12 @@ def page_4(scan_id: str | None = None, scan_token: str | None = None):
     _injetar_css()
     user = st.session_state.get("usuario") or {}
     quem = user.get("nome", user.get("usuario", ""))
-    st.subheader("Recebimento de devoluções")
+    st.markdown('<div class="rec-breadcrumb">PORTAL LEVES &nbsp;/&nbsp; RECEBIMENTO</div>', unsafe_allow_html=True)
+    st.markdown('<div class="rec-page-title">Recebimento de devoluções</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="rec-page-description">Aponte a câmera no QR do romaneio ou selecione uma devolução em trânsito abaixo.</div>',
+        unsafe_allow_html=True,
+    )
 
     devs = dp.devolucoes_df()
 
@@ -263,7 +311,6 @@ def page_4(scan_id: str | None = None, scan_token: str | None = None):
         st.info("Nenhuma devolução registrada.")
         return
     pendentes = devs[devs["status"] == dp.STATUS_TRANSITO].sort_values("dt_criacao")
-    st.caption("Aponte a câmera no QR do romaneio ou selecione uma devolução em trânsito abaixo.")
     if pendentes.empty:
         st.success("Nenhuma devolução em trânsito no momento.")
         return
@@ -272,7 +319,9 @@ def page_4(scan_id: str | None = None, scan_token: str | None = None):
         f"{r['id']} — {r['usuario']} ({r['destino']}) · {_fmt(r['total_declarado'])} itens": r["id"]
         for _, r in pendentes.iterrows()
     }
-    escolha = st.selectbox("Devoluções em trânsito", list(opcoes.keys()))
+    with st.container(border=True, key="rec_filters"):
+        st.markdown('<div class="rec-filter-heading"><span>⚙</span> Filtros</div>', unsafe_allow_html=True)
+        escolha = st.selectbox("Devoluções em trânsito", list(opcoes.keys()))
     if escolha:
         dev = devs[devs["id"] == opcoes[escolha]].iloc[0].to_dict()
         st.markdown("---")
