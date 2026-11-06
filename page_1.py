@@ -567,14 +567,20 @@ def page_1():
                     hovertemplate="<b>%{label}</b><br>Quantidade: %{value:,.0f}<br>Participação: %{percent}<extra></extra>",
                     sort=False,
                 )
+                # Reserva a faixa direita para a legenda e fixa o centro do donut.
+                fig_tipo.update_traces(domain=dict(x=[0.02, 0.78], y=[0.02, 0.98]))
                 fig_tipo.update_layout(
                     height=285, showlegend=True, font=dict(family="Montserrat", color="#243B5B", size=11),
                     paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
                     margin=dict(l=8, r=8, t=8, b=8),
-                    legend=dict(orientation="v", y=0.5, yanchor="middle", x=1.02, xanchor="left"),
-                    annotations=[dict(text=f"<b>{_fmt(total_geral)}</b><br><span style='font-size:11px'>insumos</span>",
-                                      x=0.39, y=0.5, showarrow=False,
-                                      font=dict(family="Montserrat", size=20, color="#102B50"))],
+                    legend=dict(orientation="v", y=0.5, yanchor="middle", x=0.84, xanchor="left"),
+                    annotations=[dict(
+                        text=f"<b>{_fmt(total_geral)}</b><br><span style='font-size:11px'>insumos</span>",
+                        x=0.40, y=0.50, xref="paper", yref="paper",
+                        xanchor="center", yanchor="middle", align="center",
+                        showarrow=False,
+                        font=dict(family="Montserrat", size=20, color="#102B50"),
+                    )],
                 )
                 st.plotly_chart(fig_tipo, width="stretch", config={"displayModeBar": False})
             else:
