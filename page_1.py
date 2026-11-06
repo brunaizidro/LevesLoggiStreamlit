@@ -168,6 +168,17 @@ div[data-testid="stHorizontalBlock"] {
     font-weight: 600 !important;
 }
 
+/* Dashboard de envios — visual compacto e corporativo */
+.leves-chart-title { color:#102B50 !important; font-family:Montserrat,sans-serif !important; font-size:17px !important; font-weight:800 !important; margin:0 0 8px 0 !important; }
+.leves-kpi { min-height:112px !important; display:flex; flex-direction:column; justify-content:center; }
+.leves-kpi-total { background:linear-gradient(135deg,#0873F9 0%,#0758DB 100%) !important; border-color:#0873F9 !important; }
+.leves-kpi-total .leves-kpi-top,.leves-kpi-total .leves-kpi-value,.leves-kpi-total .leves-kpi-sub { color:#FFFFFF !important; }
+.leves-kpi-total .leves-kpi-icon { color:#FFFFFF !important; background:rgba(255,255,255,.18) !important; }
+.leves-table-heading { color:#102B50; font-family:Montserrat,sans-serif; font-size:17px; font-weight:800; margin:0 0 10px 0; }
+[data-testid="stDataFrame"] { border:1px solid #E0EAF8; border-radius:12px; overflow:hidden; }
+[data-testid="stTextInput"] input { border-radius:10px !important; border-color:#D6E2F2 !important; }
+[data-testid="stDownloadButton"] button { border-radius:10px !important; border:1px solid #D6E2F2 !important; color:#075BEA !important; font-weight:700 !important; }
+
 /* Cards dos gráficos */
 .leves-chart-card {
     background: #ffffff;
@@ -492,157 +503,141 @@ def page_1():
     # ============================================================
     # KPIs
     # ============================================================
-    st.markdown(
-        '<div class="leves-section-label leves-summary-heading">▥ &nbsp; Resumo do período</div>',
-        unsafe_allow_html=True,
-    )
+    st.markdown('<div class="leves-section-label leves-summary-heading">▦ &nbsp; Resumo do período</div>', unsafe_allow_html=True)
 
     total_geral = int(dfx["total"].sum())
     por_tipo = dfx.groupby("tipo")["total"].sum().to_dict()
-    kpis = [("Total de insumos", total_geral, "📦", "no período")]
-    for t in tipos_disp:
-        # Os cards individuais ficam sem emoji; apenas o total usa ícone.
-        kpis.append((str(t).title(), por_tipo.get(t, 0), "", "enviados"))
+    ordem_tipos = ["SACA", "GAYLORD", "PALLET"]
+    tipos_kpi = [t for t in ordem_tipos if t in set(dfx["tipo"])]
+    tipos_kpi += [t for t in sorted(dfx["tipo"].unique()) if t not in tipos_kpi]
+    nomes_tipo = {"SACA": "Sacas", "GAYLORD": "Gaylords", "PALLET": "Pallets"}
+    kpis = [("Total de insumos", total_geral, "🚚", "no período")]
+    for t in tipos_kpi:
+        kpis.append((nomes_tipo.get(t, str(t).title()), por_tipo.get(t, 0), "", "enviados"))
+
     cols = st.columns(len(kpis))
-    for col, (nome, valor, icone, subtitulo) in zip(cols, kpis):
+    for idx, (col, (nome, valor, icone, subtitulo)) in enumerate(zip(cols, kpis)):
         with col:
+            classe_total = "leves-kpi-total" if idx == 0 else ""
             st.markdown(
-                f'<div class="leves-kpi {"leves-kpi-total" if icone else ""}">'
-                f'<div class="leves-kpi-top">'
+                f'<div class="leves-kpi {classe_total}"><div class="leves-kpi-top">'
                 f'<span class="leves-kpi-icon" style="display:{"inline-flex" if icone else "none"};">{icone}</span>'
-                f'{html.escape(nome)}</div>'
-                f'<div class="leves-kpi-value">{_fmt(valor)}</div>'
-                f'<div class="leves-kpi-sub">{html.escape(subtitulo)}</div>'
-                f'</div>',
+                f'{html.escape(nome)}</div><div class="leves-kpi-value">{_fmt(valor)}</div>'
+                f'<div class="leves-kpi-sub">{html.escape(subtitulo)}</div></div>',
                 unsafe_allow_html=True,
             )
-    # ============================================================
-    # Gráficos
-    # ============================================================
-    st.markdown('<div style="height:18px"></div>', unsafe_allow_html=True)
-    g1, g2 = st.columns(2)
 
-    tdf = (
-        dfx.groupby("tipo", as_index=False)["total"]
-        .sum()
-        .sort_values("total", ascending=False)
-    )
-    fig_tipo = px.bar(
-        tdf,
-        x="tipo",
-        y="total",
-        color="tipo",
-        color_discrete_map={"SACA": "#0866F5", "GAYLORD": "#19BCEB", "PALLET": "#174A9A"},
-        labels={"tipo": "Tipo", "total": "Total"},
-    )
-    fig_tipo.update_layout(
-        showlegend=False,
-        height=285,
-        font_family="Montserrat",
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-        margin=dict(l=10, r=10, t=15, b=10),
-        xaxis=dict(showgrid=False, zeroline=False, showline=False, title=None, tickfont=dict(color="#536789", size=11)),
-        yaxis=dict(showgrid=False, zeroline=False, showline=False, title=None, tickfont=dict(color="#536789", size=10)),
-    )
-    fig_tipo.update_traces(
-        text=[_fmt(v) for v in tdf["total"]],
-        textposition="outside",
-        textfont=dict(family="Montserrat", size=12, color="#102B50"),
-        cliponaxis=False,
-    )
+    # Distribuição por tipo e evolução diária
+    st.markdown('<div style="height:15px"></div>', unsafe_allow_html=True)
+    g1, g2 = st.columns([0.88, 1.22], gap="large")
+    paleta = {"SACA": "#0866F5", "GAYLORD": "#16B9ED", "PALLET": "#8DD8FA"}
+    for tipo in dfx["tipo"].unique():
+        paleta.setdefault(tipo, "#6D9FE8")
+
+    tdf = dfx.groupby("tipo", as_index=False)["total"].sum().query("total > 0").sort_values("total", ascending=False)
     with g1:
         with st.container(border=True):
-            st.markdown('<div class="leves-chart-title">Total por tipo de insumo</div>', unsafe_allow_html=True)
-            st.plotly_chart(fig_tipo, width="stretch", config={"displayModeBar": False})
+            st.markdown('<div class="leves-chart-title">Distribuição por tipo de insumo</div>', unsafe_allow_html=True)
+            if not tdf.empty:
+                fig_tipo = px.pie(tdf, names="tipo", values="total", hole=0.66, color="tipo", color_discrete_map=paleta)
+                fig_tipo.update_traces(
+                    texttemplate="%{percent:.1%}", textposition="inside",
+                    textfont=dict(family="Montserrat", size=12, color="#FFFFFF"),
+                    hovertemplate="<b>%{label}</b><br>Quantidade: %{value:,.0f}<br>Participação: %{percent}<extra></extra>",
+                    sort=False,
+                )
+                fig_tipo.update_layout(
+                    height=285, showlegend=True, font=dict(family="Montserrat", color="#243B5B", size=11),
+                    paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+                    margin=dict(l=8, r=8, t=8, b=8),
+                    legend=dict(orientation="v", y=0.5, yanchor="middle", x=1.02, xanchor="left"),
+                    annotations=[dict(text=f"<b>{_fmt(total_geral)}</b><br><span style='font-size:11px'>insumos</span>",
+                                      x=0.39, y=0.5, showarrow=False,
+                                      font=dict(family="Montserrat", size=20, color="#102B50"))],
+                )
+                st.plotly_chart(fig_tipo, width="stretch", config={"displayModeBar": False})
+            else:
+                st.info("Não há quantidades para exibir.")
+
     ddf = dfx.groupby(["dia", "tipo"], as_index=False)["total"].sum()
-    fig_dia = px.bar(
-        ddf,
-        x="dia",
-        y="total",
-        color="tipo",
-        color_discrete_map=dp.CORES_TIPO,
-        labels={"dia": "Data", "total": "Total", "tipo": "Tipo"},
-    )
-    fig_dia.update_layout(
-        height=285,
-        font_family="Montserrat",
-        legend_title_text="Tipo",
-        barmode="stack",
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-        margin=dict(l=10, r=10, t=15, b=10),
-        xaxis=dict(showgrid=False, zeroline=False, showline=False, title=None, tickfont=dict(color="#536789", size=11)),
-        yaxis=dict(showgrid=False, zeroline=False, showline=False, title=None, tickfont=dict(color="#536789", size=10)),
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, font=dict(family="Montserrat", size=10, color="#344766")),
-    )
-    fig_dia.update_traces(
-        texttemplate="%{y:,.0f}",
-        textposition="inside",
-        insidetextanchor="middle",
-        textfont=dict(family="Montserrat", size=10, color="#FFFFFF"),
-        cliponaxis=False,
-    )
     with g2:
         with st.container(border=True):
-            st.markdown('<div class="leves-chart-title">Envios por dia</div>', unsafe_allow_html=True)
-            st.plotly_chart(fig_dia, width="stretch", config={"displayModeBar": False})
-    # ============================================================
-    # Admin — ranking
-    # ============================================================
+            st.markdown('<div class="leves-chart-title">Evolução dos envios (por dia)</div>', unsafe_allow_html=True)
+            if not ddf.empty:
+                fig_dia = px.line(ddf, x="dia", y="total", color="tipo", markers=True,
+                                  color_discrete_map=paleta,
+                                  labels={"dia": "Data", "total": "Quantidade", "tipo": "Tipo"})
+                fig_dia.update_traces(
+                    line=dict(width=3), marker=dict(size=7, line=dict(width=1.5, color="#FFFFFF")),
+                    hovertemplate="<b>%{fullData.name}</b><br>%{x|%d/%m/%Y}<br>Quantidade: %{y:,.0f}<extra></extra>",
+                )
+                fig_dia.update_layout(
+                    height=285, font=dict(family="Montserrat", color="#536789", size=11),
+                    paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+                    margin=dict(l=12, r=12, t=8, b=8), hovermode="x unified",
+                    xaxis=dict(title=None, showgrid=False, zeroline=False, tickformat="%d/%m", linecolor="#DCE6F3"),
+                    yaxis=dict(title=None, rangemode="tozero", gridcolor="#E8EFF8", zeroline=False),
+                    legend=dict(orientation="h", y=1.12, yanchor="bottom", x=1, xanchor="right",
+                                font=dict(family="Montserrat", size=10, color="#344766")),
+                )
+                st.plotly_chart(fig_dia, width="stretch", config={"displayModeBar": False})
+            else:
+                st.info("Não há envios diários para exibir.")
+
+    # Ranking de destinos + tabela detalhada
+    st.markdown('<div style="height:14px"></div>', unsafe_allow_html=True)
     if eh_admin:
-        st.markdown('<div style="height:18px"></div>', unsafe_allow_html=True)
-        st.markdown('<div class="leves-section-label">Destinos</div>', unsafe_allow_html=True)
-        rank = (
-            dfx.groupby("destino", as_index=False)["total"]
-            .sum()
-            .sort_values("total", ascending=True)
-            .tail(15)
-        )
-        fig_dest = px.bar(
-            rank,
-            x="total",
-            y="destino",
-            orientation="h",
-            labels={"total": "Total", "destino": "Destino"},
-        )
-        fig_dest.update_traces(
-            marker_color=AZUL,
-            text=[_fmt(v) for v in rank["total"]],
-            textposition="outside",
-            textfont=dict(family="Montserrat", size=11, color="#102B50"),
-            cliponaxis=False,
-        )
-        fig_dest.update_layout(
-            height=400,
-            font_family="Montserrat",
-            paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(0,0,0,0)",
-            margin=dict(l=10, r=10, t=15, b=10),
-            xaxis=dict(showgrid=False, zeroline=False, showline=False, title=None, tickfont=dict(color="#536789", size=10)),
-            yaxis=dict(showgrid=False, zeroline=False, showline=False, title=None, tickfont=dict(color="#536789", size=10)),
-        )
-        st.plotly_chart(fig_dest, width="stretch", config={"displayModeBar": False})
-    # ============================================================
-    # Tabela detalhada
-    # ============================================================
-    st.markdown('<div style="height:12px"></div>', unsafe_allow_html=True)
-    with st.expander("Ver tabela detalhada"):
-        cols_tab = ["dt", "tipo", "destino", "total"] if (eh_admin or eh_gdl) else ["dt", "tipo", "total"]
-        tab = dfx[cols_tab].sort_values("dt", ascending=False).copy()
-        tab["dt"] = tab["dt"].dt.strftime("%d/%m/%Y")
-        nomes = {
-            "dt": "Data",
-            "tipo": "Tipo de insumo",
-            "destino": "Destino",
-            "total": "Total",
-        }
-        tab = tab.rename(columns=nomes)
-        st.dataframe(tab, width="stretch", hide_index=True)
-        st.download_button(
-            "Baixar CSV",
-            tab.to_csv(index=False).encode("utf-8-sig"),
-            file_name="ativos_leves.csv",
-            mime="text/csv",
-            key="dl_envios",
-        )
+        rank_col, table_col = st.columns([0.78, 1.22], gap="large")
+    else:
+        table_col = st.container()
+        rank_col = None
+
+    if eh_admin and rank_col is not None:
+        with rank_col:
+            with st.container(border=True):
+                st.markdown('<div class="leves-chart-title">Top 10 destinos</div>', unsafe_allow_html=True)
+                rank = (dfx.groupby("destino", as_index=False)["total"].sum()
+                        .sort_values("total", ascending=False).head(10).sort_values("total", ascending=True))
+                if not rank.empty:
+                    fig_dest = px.bar(rank, x="total", y="destino", orientation="h", text="total",
+                                      labels={"total": "Quantidade", "destino": "Destino"})
+                    fig_dest.update_traces(
+                        marker=dict(color=["#9CCBFF", "#8ABFFF", "#78B3FF", "#66A7FF", "#559BFF",
+                                           "#438DFA", "#327FF2", "#2072E9", "#1166E0", "#075BEA"][-len(rank):]),
+                        texttemplate="%{x:,.0f}", textposition="outside",
+                        textfont=dict(family="Montserrat", size=11, color="#102B50"), cliponaxis=False,
+                        hovertemplate="<b>%{y}</b><br>Quantidade: %{x:,.0f}<extra></extra>",
+                    )
+                    fig_dest.update_layout(
+                        height=335, font=dict(family="Montserrat", color="#536789", size=11),
+                        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+                        margin=dict(l=8, r=32, t=8, b=8),
+                        xaxis=dict(title=None, showgrid=False, zeroline=False, showticklabels=False),
+                        yaxis=dict(title=None, showgrid=False, zeroline=False, autorange="reversed"),
+                    )
+                    st.plotly_chart(fig_dest, width="stretch", config={"displayModeBar": False})
+                else:
+                    st.info("Não há destinos para classificar.")
+
+    with table_col:
+        with st.container(border=True):
+            st.markdown('<div class="leves-table-heading">Detalhamento dos envios</div>', unsafe_allow_html=True)
+            busca = st.text_input("Buscar destino, operação ou tipo", placeholder="Buscar destino...",
+                                  label_visibility="collapsed", key="busca_envios_detalhados")
+            cols_tab = ["dt", "destino", "tipo", "total"] if (eh_admin or eh_gdl) else ["dt", "tipo", "total"]
+            tab = dfx[cols_tab].copy()
+            if busca.strip():
+                termo = busca.strip().lower()
+                colunas_busca = [col for col in ["destino", "tipo"] if col in tab.columns]
+                mask = False
+                for coluna in colunas_busca:
+                    mask = mask | tab[coluna].astype(str).str.lower().str.contains(termo, na=False)
+                tab = tab[mask]
+            tab = tab.sort_values("dt", ascending=False).copy()
+            tab["dt"] = tab["dt"].dt.strftime("%d/%m/%Y")
+            tab = tab.rename(columns={"dt": "Data", "tipo": "Tipo de insumo",
+                                      "destino": "Destino", "total": "Quantidade"})
+            st.dataframe(tab, width="stretch", hide_index=True, height=335)
+            st.download_button("Baixar CSV", tab.to_csv(index=False).encode("utf-8-sig"),
+                               file_name="ativos_leves.csv", mime="text/csv", key="dl_envios")
+
