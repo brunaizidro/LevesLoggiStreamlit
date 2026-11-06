@@ -1117,186 +1117,6 @@ def tela_login():
         )
 
 
-
-
-# ---------------------------------------------------------------------------
-# Tela inicial — seleção visual dos módulos
-# ---------------------------------------------------------------------------
-def tela_modulos(user, opcoes):
-    """Exibe os módulos em cards, seguindo a identidade visual Loggi."""
-    st.markdown(
-        """
-        <style>
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
-        html, body, [data-testid="stApp"], [data-testid="stApp"] * {
-            font-family: 'Montserrat', sans-serif !important;
-        }
-        [data-testid="stAppViewContainer"] {
-            background: #F7FAFF !important;
-        }
-        [data-testid="stHeader"], [data-testid="stToolbar"] {
-            background: transparent !important;
-        }
-        [data-testid="stAppViewBlockContainer"] {
-            max-width: 1320px !important;
-            padding: 0 28px 48px !important;
-        }
-        .leves-home-hero {
-            position: relative;
-            margin: 0 -28px 0;
-            padding: 26px 34px 100px;
-            min-height: 180px;
-            background: linear-gradient(112deg,#0759EF 0%,#0878F8 58%,#08A8EE 100%);
-            color: #fff;
-            overflow: hidden;
-        }
-        .leves-home-brand {
-            display:flex; align-items:center; justify-content:space-between;
-            max-width:1260px; margin:0 auto; gap:20px;
-        }
-        .leves-home-brand img { width:132px; height:auto; object-fit:contain; filter:brightness(0) invert(1); }
-        .leves-home-user {
-            color:#075BEA; background:#fff; border-radius:12px;
-            padding:12px 18px; font-size:13px; font-weight:700;
-        }
-        .leves-home-panel {
-            position:relative; z-index:2; max-width:1180px;
-            margin:-62px auto 0; background:#fff;
-            border:1px solid #DCE8F8; border-radius:28px;
-            overflow:hidden; box-shadow:0 18px 48px rgba(20,61,120,.12);
-        }
-        .leves-home-panel-head {
-            padding:27px 34px 25px;
-            color:#fff; background:linear-gradient(105deg,#073B83 0%,#0759D9 55%,#087BFA 100%);
-        }
-        .leves-home-panel-head h1 {
-            margin:0 0 7px; color:#fff; font-size:32px;
-            line-height:1.2; font-weight:800; text-align:left;
-        }
-        .leves-home-panel-head p { margin:0; color:#EAF4FF; font-size:14px; font-weight:600; }
-        .leves-home-grid {
-            padding:28px; display:grid;
-            grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px;
-        }
-        .leves-home-card {
-            min-height:190px; padding:21px 20px 18px;
-            border:1px solid #DCE8F8; border-radius:22px;
-            background:#fff; box-shadow:0 8px 22px rgba(20,61,120,.07);
-        }
-        .leves-home-card:hover { border-color:#83B9FF; }
-        .leves-home-icon {
-            width:48px;height:48px;display:flex;align-items:center;justify-content:center;
-            border-radius:15px;background:#EAF4FF;color:#0875F5;
-            border:1px solid #D2E6FF;font-size:24px;margin-bottom:15px;
-        }
-        .leves-home-card h3 {
-            margin:0 0 9px;color:#06458F;font-size:15px;
-            font-weight:800;line-height:1.25;
-        }
-        .leves-home-card p {
-            margin:0;color:#64748B;font-size:12px;
-            font-weight:600;line-height:1.5;
-        }
-        [data-testid="stVerticalBlock"] [data-testid="stButton"] button {
-            border-radius:11px !important; min-height:42px !important;
-            border:1px solid #D7E7FA !important; background:#F5F9FF !important;
-            color:#075BEA !important; font-weight:800 !important;
-        }
-        [data-testid="stVerticalBlock"] [data-testid="stButton"] button:hover {
-            background:#EAF4FF !important; border-color:#0875F5 !important;
-        }
-        @media(max-width:1000px) {
-            .leves-home-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
-        }
-        @media(max-width:600px) {
-            [data-testid="stAppViewBlockContainer"] { padding:0 12px 28px !important; }
-            .leves-home-hero { margin:0 -12px; padding:20px 18px 86px; }
-            .leves-home-brand img { width:105px; }
-            .leves-home-user { font-size:10px; padding:9px 11px; }
-            .leves-home-panel { margin:-54px auto 0; border-radius:20px; }
-            .leves-home-panel-head { padding:22px 20px; }
-            .leves-home-panel-head h1 { font-size:25px; }
-            .leves-home-grid { padding:16px; grid-template-columns:1fr; gap:12px; }
-            .leves-home-card { min-height:155px; }
-        }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    base = os.path.dirname(os.path.abspath(__file__))
-    caminho_logo = os.path.join(base, LOGO_LOGIN_PATH)
-    logo_base64 = get_base64_image(caminho_logo) if os.path.exists(caminho_logo) else ""
-    logo_html = (
-        f'<img src="data:image/png;base64,{logo_base64}" alt="Loggi">'
-        if logo_base64 else '<div style="color:white;font-size:30px;font-weight:800">Loggi</div>'
-    )
-    st.markdown(
-        f"""
-        <div class="leves-home-hero">
-          <div class="leves-home-brand">
-            {logo_html}
-            <div class="leves-home-user">Olá, {user.get('nome','usuário')} · {user.get('email','')}</div>
-          </div>
-        </div>
-        <div class="leves-home-panel">
-          <div class="leves-home-panel-head">
-            <h1>Portal LEVES</h1>
-            <p>Escolha o módulo que deseja acessar.</p>
-          </div>
-          <div class="leves-home-grid">
-        """,
-        unsafe_allow_html=True,
-    )
-
-    descricoes = {
-        "Envios": ("📦", "Consulte e acompanhe os envios de insumos para as operações."),
-        "Recebimento": ("📥", "Registre e acompanhe os recebimentos de materiais."),
-        "Conciliação": ("🧾", "Confira movimentações, saldos e possíveis divergências."),
-        "Cobranças": ("💰", "Consulte valores e acompanhe as cobranças."),
-        "Devoluções": ("↩️", "Registre devoluções e acompanhe os saldos a devolver."),
-        "Pendências": ("🔔", "Acompanhe itens e tratativas que precisam de atenção."),
-        "Usuários": ("👥", "Gerencie os usuários e seus acessos ao portal."),
-        "Relatórios": ("📊", "Acesse os indicadores e relatórios do portal."),
-        "Configurações": ("⚙️", "Consulte e ajuste as configurações disponíveis."),
-    }
-    cols = st.columns(4)
-    for i, opcao in enumerate(opcoes):
-        nome = opcao.split(" ", 1)[-1]
-        icone, descricao = descricoes.get(nome, ("📁", "Acesse este módulo do portal."))
-        with cols[i % 4]:
-            st.markdown(
-                f"""
-                <div class="leves-home-card">
-                  <div class="leves-home-icon">{icone}</div>
-                  <h3>{nome.upper()}</h3>
-                  <p>{descricao}</p>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-            if st.button("Acessar módulo →", key=f"home_mod_{i}", width="stretch"):
-                st.session_state["pagina_ativa"] = opcao
-                st.rerun()
-
-    st.markdown("</div></div>", unsafe_allow_html=True)
-    a, b, c = st.columns([1, 1, 1])
-    with a:
-        if st.button("↻ Atualizar dados", width="stretch", key="home_refresh"):
-            import data_extraction
-            data_extraction.limpar_cache()
-            st.rerun()
-    with b:
-        if st.button("📘 Manual de devolução", width="stretch", key="home_manual"):
-            manual.botao_manual(key="manual_home")
-    with c:
-        if st.button("Sair", width="stretch", key="home_logout"):
-            logout()
-            st.session_state.pop("pagina_ativa", None)
-            st.rerun()
-
-
-
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
@@ -1318,39 +1138,80 @@ def main():
     scan_id = st.query_params.get("dev")
     scan_token = st.query_params.get("t")
 
-    if scan_id and (eh_admin or eh_receb):
-        pagina = "📥 Recebimento"
-        st.session_state["pagina_ativa"] = pagina
-    else:
+    sidebar()
+
+    with st.sidebar:
+        papel = {"admin": "Administrador", "recebimento": "Recebimento"}.get(
+            perfil, f"Destino: {user['destino']}"
+        )
+
+        st.markdown(
+            f"<div class='sb-card'><div class='nome'>{user['nome']}</div>"
+            f"<div class='papel'>{papel}</div></div>",
+            unsafe_allow_html=True,
+        )
+
         if eh_receb:
             opcoes = ["📥 Recebimento"]
         elif eh_admin:
             opcoes = [
-                "📦 Envios", "📥 Recebimento", "🧾 Conciliação", "💰 Cobranças",
-                "↩️ Devoluções", "🔔 Pendências", "👥 Usuários",
-                "📊 Relatórios", "⚙️ Configurações",
+                "📦 Envios",
+                "📥 Recebimento",
+                "🧾 Conciliação",
+                "💰 Cobranças",
+                "↩️ Devoluções",
+                "🔔 Pendências",
+                "👥 Usuários",
+                "📊 Relatórios",
+                "⚙️ Configurações",
             ]
-        elif perfil == "gdl":
-            opcoes = ["📦 Envios", "🧾 Conciliação", "↩️ Devoluções", "👥 Usuários"]
+        elif user.get("perfil") == "gdl":
+            opcoes = [
+                "📦 Envios",
+                "🧾 Conciliação",
+                "↩️ Devoluções",
+                "👥 Usuários",
+            ]
         else:
             opcoes = ["📦 Envios", "↩️ Devoluções", "💰 Cobranças"]
 
-        pagina = st.session_state.get("pagina_ativa")
-        if pagina not in opcoes:
-            st.session_state.pop("pagina_ativa", None)
-            tela_modulos(user, opcoes)
-            return
+        # Se veio de um QR, já abre o Recebimento.
+        idx = 0
+        if scan_id and (eh_admin or eh_receb):
+            idx = next(
+                (i for i, o in enumerate(opcoes) if "Recebimento" in o),
+                0,
+            )
 
-    topo_voltar, topo_usuario = st.columns([1, 5])
-    with topo_voltar:
-        if st.button("← Módulos", key="voltar_modulos"):
-            st.session_state.pop("pagina_ativa", None)
+        if len(opcoes) > 1:
+            pagina = st.radio(
+                "Navegação",
+                opcoes,
+                index=idx,
+                label_visibility="collapsed",
+            )
+        else:
+            pagina = opcoes[0]
+
+        st.markdown("<hr class='sb-sep'>", unsafe_allow_html=True)
+
+        manual.botao_manual(key="manual_side")
+
+        if st.button("↻ Atualizar dados", width="stretch"):
+            import data_extraction
+            data_extraction.limpar_cache()
             st.rerun()
-    with topo_usuario:
-        st.markdown(
-            f"<div style='text-align:right;color:#64748B;font-size:13px;font-weight:700;padding-top:10px'>{user.get('nome','')} · {pagina}</div>",
-            unsafe_allow_html=True,
-        )
+
+        if st.button("Sair", width="stretch"):
+            logout()
+            st.rerun()
+
+        with st.expander("💬 Dúvidas / suporte"):
+            contato.form_contato(
+                key="app",
+                nome=user.get("nome", ""),
+                email=user.get("email", ""),
+            )
 
     try:
         if "Usuários" in pagina:
