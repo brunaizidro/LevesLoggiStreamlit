@@ -14,94 +14,104 @@ class PageStyler:
         pass
 
     def apply_general_css(self):
-        """Aplica o CSS geral: fonte Montserrat, cores da marca e layout."""
+        """Aplica o CSS geral do portal sem expor o código na interface."""
         st.markdown(
+            "<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">"
+            "<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>"
+            "<link href=\"https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap\" rel=\"stylesheet\">"
             """
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap"
-              rel="stylesheet">
-        <style>
-        /* Tipografia única do Portal LEVES: Montserrat em todos os módulos. */
-        html, body, [data-testid="stApp"],
-        [data-testid="stApp"] p,
-        [data-testid="stApp"] span,
-        [data-testid="stApp"] div,
-        [data-testid="stApp"] label,
-        [data-testid="stApp"] input,
-        [data-testid="stApp"] textarea,
-        [data-testid="stApp"] select,
-        [data-testid="stApp"] option,
-        [data-testid="stApp"] button,
-        [data-testid="stApp"] a,
-        [data-testid="stApp"] li,
-        [data-testid="stApp"] small,
-        [data-testid="stApp"] strong,
-        [data-testid="stApp"] em,
-        [data-testid="stApp"] h1,
-        [data-testid="stApp"] h2,
-        [data-testid="stApp"] h3,
-        [data-testid="stApp"] h4,
-        [data-testid="stApp"] h5,
-        [data-testid="stApp"] h6,
-        [data-testid="stApp"] td,
-        [data-testid="stApp"] th,
-        [data-testid="stApp"] [data-testid="stMarkdownContainer"],
-        [data-testid="stApp"] [data-testid="stMarkdownContainer"] * {
-            font-family: 'Montserrat', sans-serif !important;
-        }
+<style>
+/* Tipografia global — Montserrat em todos os módulos */
+html, body, [data-testid="stApp"], [data-testid="stApp"] * {
+    font-family: 'Montserrat', sans-serif !important;
+}
 
-        /* Preserva os glifos dos ícones do Streamlit e Material Symbols. */
-        [data-testid="stApp"] .material-icons,
-        [data-testid="stApp"] .material-symbols,
-        [data-testid="stApp"] .material-symbols-outlined,
-        [data-testid="stApp"] .material-symbols-rounded,
-        [data-testid="stApp"] [data-testid="stIconMaterial"] {
-            font-family: 'Material Symbols Rounded', 'Material Icons' !important;
-        }
+/* Preserva os ícones do Streamlit e Material Symbols */
+.material-icons,
+.material-symbols,
+.material-symbols-outlined,
+.material-symbols-rounded,
+[data-testid="stIconMaterial"] {
+    font-family: 'Material Symbols Rounded', 'Material Icons' !important;
+}
 
-        li, span, input, label, small {
-            font-family: Montserrat, sans-serif;
-        }
-        li, input, label, small { font-size: 16px; }
-        [data-testid=textInputRootElement] { font-family: Montserrat, sans-serif; }
-        .st-emotion-cache-1jmvea6 p {
-            word-break: break-word; margin-bottom: 0px; font-size: 16px;
-        }
-        /* Subtítulos em azul da marca */
-        h2, .stSubheader {
-            font-family: Montserrat, sans-serif;
-            font-size: 40px; font-weight: bold; color: #0067fc;
-        }
-        .tool-subtitle {
-            font-family: Montserrat, sans-serif;
-            font-size: 16px; font-weight: bold; color: #00baff; text-decoration: underline;
-        }
-        .page-title {
-            font-family: Montserrat, sans-serif;
-            font-size: 30px; font-weight: 400; text-align: center; color: #000000;
-        }
-        p { font-family: Montserrat, sans-serif; font-size: 16px; }
-        [data-testid=stCheckbox] { font-size: 16px; }
-        .custom-text { font-family: Montserrat, sans-serif; text-align: justify; }
-        .css-1y4p8pa { max-width: 975px; }
-        .st-emotion-cache-1y4p8pa { max-width: 62rem; }
-        h1 {
-            text-align: center; font-size: 30px;
-            font-family: Montserrat, sans-serif; font-weight: 400;
-        }
-        .custom-sidebar-footer {
-            position: relative; bottom: 0px; left: 0; width: 100%;
-            font-size: 14px; text-align: left;
-        }
-        .custom-sidebar-footer a:hover { text-decoration: underline; }
-        .subtitle { font-family: Montserrat, sans-serif; font-size: 20px; font-weight: bold; }
-        .descricao { font-family: Montserrat, sans-serif; max-width: 200px; text-align: justify; }
-        [data-testid=stAppViewBlockContainer] { padding-left: 50px; padding-top: 0; }
-        .streamlit-expanderHeader { background-color: #f0f2f6; }
-        .streamlit-expanderContent { background-color: #ffffff; }
-        </style>
-        """,
+li, input, label, small { font-size: 16px; }
+[data-testid="textInputRootElement"] { font-family: 'Montserrat', sans-serif !important; }
+
+.st-emotion-cache-1jmvea6 p {
+    word-break: break-word;
+    margin-bottom: 0;
+    font-size: 16px;
+}
+
+/* Subtítulos e títulos */
+h2, .stSubheader {
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: 40px;
+    font-weight: 700;
+    color: #0067fc;
+}
+.tool-subtitle {
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: 16px;
+    font-weight: 700;
+    color: #00baff;
+    text-decoration: underline;
+}
+.page-title {
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: 30px;
+    font-weight: 400;
+    text-align: center;
+    color: #000000;
+}
+p { font-family: 'Montserrat', sans-serif !important; font-size: 16px; }
+[data-testid="stCheckbox"] { font-size: 16px; }
+.custom-text { font-family: 'Montserrat', sans-serif !important; text-align: justify; }
+.css-1y4p8pa { max-width: 975px; }
+.st-emotion-cache-1y4p8pa { max-width: 62rem; }
+h1 {
+    text-align: center;
+    font-size: 30px;
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 400;
+}
+.custom-sidebar-footer {
+    position: relative;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    font-size: 14px;
+    text-align: left;
+}
+.custom-sidebar-footer a:hover { text-decoration: underline; }
+.subtitle {
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: 20px;
+    font-weight: 700;
+}
+.descricao {
+    font-family: 'Montserrat', sans-serif !important;
+    max-width: 200px;
+    text-align: justify;
+}
+[data-testid="stAppViewBlockContainer"] { padding-left: 50px; padding-top: 0; }
+.streamlit-expanderHeader { background-color: #f0f2f6; }
+.streamlit-expanderContent { background-color: #ffffff; }
+
+/* Campos, botões, tabelas e componentes interativos */
+[data-testid="stApp"] input,
+[data-testid="stApp"] textarea,
+[data-testid="stApp"] button,
+[data-testid="stApp"] select,
+[data-testid="stApp"] option,
+[data-testid="stApp"] table,
+[data-testid="stApp"] th,
+[data-testid="stApp"] td {
+    font-family: 'Montserrat', sans-serif !important;
+}
+</style>
+""",
             unsafe_allow_html=True,
         )
 
