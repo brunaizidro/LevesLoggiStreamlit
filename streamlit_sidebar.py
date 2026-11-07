@@ -25,7 +25,7 @@ def _estilos_extra():
 [data-testid="stSidebarCollapsedControl"], [data-testid="collapsedControl"] {display:none !important;}
 [data-testid="stSidebar"] button[aria-label*="Close"], [data-testid="stSidebar"] button[aria-label*="Fechar"], [data-testid="stSidebar"] button[title*="Close"], [data-testid="stSidebar"] button[title*="Fechar"] {display:none !important;}
 section[data-testid="stSidebar"] + div {margin-left:0 !important;}
-.leves-sb-logo {text-align:center;margin:-24px auto 2px;line-height:0;}
+.leves-sb-logo {text-align:center;margin:-44px auto 2px;line-height:0;}
 .leves-sb-logo img {width:116px;max-width:72%;height:auto;object-fit:contain;}
 .leves-sb-title {color:#fff !important;display:flex !important;align-items:center !important;justify-content:center !important;gap:8px !important;text-align:center;font-family:Montserrat,sans-serif !important;font-size:22px !important;font-weight:800 !important;letter-spacing:-.5px;margin:5px 0 2px !important;}
 .leves-sb-title .leves-sb-cube {display:inline-flex;align-items:center;justify-content:center;width:23px;height:23px;flex:0 0 23px;}
