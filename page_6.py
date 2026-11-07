@@ -369,10 +369,10 @@ def page_6():
     else:
         if usa_valor:
             piv_disp["VALOR TOTAL"] = piv_disp["VALOR TOTAL"].map(dp.fmt_brl)
-        st.dataframe(
-            piv_disp,
-            width="stretch",
-            column_config=_centralizar_tabela(piv_disp),
+        piv_html = piv_disp.to_html(index=True, escape=True, border=0, classes="concil-html-table")
+        st.markdown(
+            f'<div class="concil-html-table-wrap">{piv_html}</div>',
+            unsafe_allow_html=True,
         )
 
     # ---- Exportação Excel ----
