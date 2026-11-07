@@ -158,8 +158,11 @@ def page_3():
         )
 
     if manual.disponivel():
-        with st.expander("Manual de devolução (treinamento)"):
-            manual.botao_manual(key="manual_page3")
+        st.markdown(
+            "<div class='dev-section-title' style='margin-top:12px;'>Manual de devolução (treinamento)</div>",
+            unsafe_allow_html=True,
+        )
+        manual.botao_manual(key="manual_page3", label="Baixar manual em PDF")
 
     # ---- Competência selecionada (antes do saldo) ----
     if not eh_gdl:
