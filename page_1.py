@@ -480,7 +480,7 @@ def page_1():
             else:
                 st.info("Não há envios diários para exibir.")
 
-    # Ranking de destinos + tabela detalhada
+    # Ranking de bases por valor financeiro dos insumos
     st.markdown('<div style="height:14px"></div>', unsafe_allow_html=True)
     if eh_admin:
         rank_col, table_col = st.columns([0.78, 1.22], gap="large")
@@ -491,25 +491,41 @@ def page_1():
     if eh_admin and rank_col is not None:
         with rank_col:
             with st.container(border=True):
-                st.markdown('<div class="leves-chart-title">Top 10 destinos</div>', unsafe_allow_html=True)
-                rank = (dfx.groupby("destino", as_index=False)["total"].sum()
-                        .sort_values("total", ascending=False).head(10).sort_values("total", ascending=True, kind="stable"))
+                st.markdown('<div class="leves-chart-title">Top 10 bases por valor de insumos</div>', unsafe_allow_html=True)
+                precos_unitarios = dp.precos()
+                rank_base = dfx.copy()
+                rank_base["valor_insumo"] = (
+                    rank_base["total"] * rank_base["tipo"].map(precos_unitarios).fillna(0)
+                )
+                rank = (
+                    rank_base.groupby("destino", as_index=False)["valor_insumo"]
+                    .sum()
+                    .nlargest(10, "valor_insumo")
+                    .sort_values("valor_insumo", ascending=True, kind="stable")
+                )
                 if not rank.empty:
-                    fig_dest = px.bar(rank, x="total", y="destino", orientation="h", text="total",
-                                      labels={"total": "Quantidade", "destino": "Destino"})
-                    fig_dest.update_traces(
-                        marker=dict(color=["#9CCBFF", "#8ABFFF", "#78B3FF", "#66A7FF", "#559BFF",
-                                           "#438DFA", "#327FF2", "#2072E9", "#1166E0", "#075BEA"][-len(rank):]),
-                        texttemplate="%{x:,.0f}", textposition="inside",
-                        insidetextanchor="middle",
-                        textfont=dict(family="Montserrat", size=11, color="#FFFFFF"), cliponaxis=False,
-                        hovertemplate="<b>%{y}</b><br>Quantidade: %{x:,.0f}<extra></extra>",
+                    rank["valor_label"] = rank["valor_insumo"].map(dp.fmt_brl)
+                    fig_dest = px.bar(
+                        rank, x="valor_insumo", y="destino", orientation="h",
+                        text="valor_label",
+                        labels={"valor_insumo": "Valor dos insumos", "destino": "Base"},
                     )
+                    fig_dest.update_traces(
+                        marker=dict(color="#075BEA"),
+                        textposition="outside",
+                        textfont=dict(family="Montserrat", size=11, color="#243B5B"),
+                        cliponaxis=False,
+                        hovertemplate="<b>%{y}</b><br>Valor dos insumos: R$ %{x:,.2f}<extra></extra>",
+                    )
+                    maior_valor = float(rank["valor_insumo"].max() or 0)
                     fig_dest.update_layout(
                         height=335, font=dict(family="Montserrat", color="#536789", size=11),
                         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                        margin=dict(l=8, r=32, t=8, b=8),
-                        xaxis=dict(title=None, showgrid=False, zeroline=False, showticklabels=False),
+                        margin=dict(l=8, r=82, t=8, b=8),
+                        xaxis=dict(
+                            title=None, showgrid=False, zeroline=False, showticklabels=False,
+                            range=[0, maior_valor * 1.28 if maior_valor > 0 else 1],
+                        ),
                         yaxis=dict(
                             title=None, showgrid=False, zeroline=False,
                             categoryorder="array",
@@ -518,9 +534,19 @@ def page_1():
                         ),
                     )
                     st.plotly_chart(fig_dest, width="stretch", config={"displayModeBar": False})
+                    tipos_sem_preco = sorted(
+                        tipo for tipo in dfx["tipo"].dropna().unique()
+                        if precos_unitarios.get(tipo, 0) <= 0
+                    )
+                    if tipos_sem_preco:
+                        st.caption(
+                            "Atenção: tipos sem preço cadastrado não entram no valor do ranking: "
+                            + ", ".join(tipos_sem_preco)
+                            + "."
+                        )
                 else:
-                    st.info("Não há destinos para classificar.")
-
+                    st.info("Não há bases para classificar.")
+                
     with table_col:
         with st.container(border=True):
             st.markdown('<div class="leves-table-heading">Detalhamento dos envios</div>', unsafe_allow_html=True)
