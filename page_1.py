@@ -491,7 +491,7 @@ def page_1():
     if eh_admin and rank_col is not None:
         with rank_col:
             with st.container(border=True):
-                st.markdown('<div class="leves-chart-title">Top 10 bases por valor de insumos</div>', unsafe_allow_html=True)
+                st.markdown('<div class="leves-chart-title" style="color:#000000 !important;">Top 10 bases por valor de insumos</div>', unsafe_allow_html=True)
                 precos_unitarios = dp.precos()
                 rank_base = dfx.copy()
                 rank_base["valor_insumo"] = (
@@ -511,7 +511,7 @@ def page_1():
                         labels={"valor_insumo": "Valor dos insumos", "destino": "Base"},
                     )
                     fig_dest.update_traces(
-                        marker=dict(color="#075BEA"),
+                        marker=dict(color=["#6F91B8", "#7899BE", "#82A3C7", "#8DADD0", "#98B8D9", "#A3C2E0", "#AECBE6", "#B9D4EB", "#C5DDF0", "#D1E6F5"]),
                         textposition="outside",
                         textfont=dict(family="Montserrat", size=11, color="#243B5B"),
                         cliponaxis=False,
