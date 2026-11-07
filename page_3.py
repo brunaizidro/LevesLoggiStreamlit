@@ -93,10 +93,40 @@ def page_3():
     eh_gdl = user.get("perfil") == "gdl"
     destino = user.get("destino", "")
 
-    st.subheader("Devoluções")
+    st.markdown(
+        """
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+        [data-testid="stApp"] * { font-family: 'Montserrat', sans-serif !important; }
+        .dev-page-kicker { color:#6383aa; font-size:12px; font-weight:700; letter-spacing:1.1px; text-transform:uppercase; margin:0 0 5px; }
+        .dev-page-title { color:#102f59; font-size:36px; line-height:1.18; font-weight:800; letter-spacing:-1px; margin:0 0 5px; }
+        .dev-page-subtitle { color:#7188a6; font-size:16px; line-height:1.5; font-weight:600; margin:0 0 18px; }
+        .dev-section-title { color:#12345d; background:#eaf3ff; border:1px solid #d4e6ff; border-radius:12px; padding:12px 16px; font-size:19px; font-weight:750; margin:16px 0 12px; }
+        .dev-balance-card { background:linear-gradient(135deg,#f0f6ff 0%,#e6f1ff 100%); border:1px solid #d5e6ff; border-radius:15px; padding:19px 20px; min-height:132px; box-shadow:0 3px 12px rgba(25,91,170,.05); }
+        .dev-balance-label { color:#315d91; font-size:14px; font-weight:700; margin-bottom:7px; }
+        .dev-balance-qty { color:#102f59; font-size:30px; line-height:1.1; font-weight:800; margin-bottom:9px; }
+        .dev-balance-caption { color:#6683a8; font-size:12px; font-weight:600; margin-bottom:2px; }
+        .dev-balance-value { color:#12345d; font-size:18px; font-weight:800; }
+        .dev-total-banner { background:#e7f2ff; border:1px solid #cfe3ff; border-radius:12px; padding:14px 18px; margin:16px 0 20px; color:#164b88; font-size:16px; font-weight:700; }
+        div[data-testid="stSelectbox"] label, div[data-testid="stNumberInput"] label, div[data-testid="stTextInput"] label { color:#17385f !important; font-weight:650 !important; }
+        div[data-testid="stSelectbox"] > div > div, div[data-testid="stNumberInput"] input, div[data-testid="stTextInput"] input { border-radius:10px !important; }
+        div[data-testid="stExpander"] { border:1px solid #d5e6ff !important; border-radius:12px !important; background:#f7faff !important; }
+        div[data-testid="stForm"] { border:1px solid #d5e6ff; border-radius:15px; padding:20px 18px 12px; background:#fbfdff; }
+        div[data-testid="stFormSubmitButton"] button { background:#075BEA !important; color:white !important; border:0 !important; border-radius:10px !important; font-weight:700 !important; padding:10px 22px !important; }
+        div[data-testid="stAlert"][kind="success"] { background:#e8f8f2 !important; border:1px solid #c9efdf !important; color:#126b62 !important; border-radius:11px !important; }
+        hr.sb-sep { border-color:#d8e7f8 !important; margin:22px 0 !important; }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        "<div class='dev-page-kicker'>Portal Leves&nbsp; / &nbsp;Devoluções</div>"
+        "<h1 class='dev-page-title'>Devoluções</h1>",
+        unsafe_allow_html=True,
+    )
     if eh_admin or eh_gdl:
         st.markdown(
-            "<p class='custom-text'>Selecione a operação e registre uma devolução manual "
+            "<p class='dev-page-subtitle'>Selecione a operação e registre uma devolução manual "
             "em nome dela. O saldo e a competência serão calculados para a operação selecionada.</p>",
             unsafe_allow_html=True,
         )
@@ -121,7 +151,7 @@ def page_3():
 
     else:
         st.markdown(
-            "<p class='custom-text'>Declare o que está devolvendo, gere o romaneio com "
+            "<p class='dev-page-subtitle'>Declare o que está devolvendo, gere o romaneio com "
             "QR e envie impresso junto com os itens.</p>",
             unsafe_allow_html=True,
         )
@@ -139,7 +169,7 @@ def page_3():
             return
 
         rot_mes = {m: dp.rotulo_mes(m) for m in elegiveis}
-        st.markdown("#### 📅 Devolução referente ao saldo de qual mês?")
+        st.markdown("<div class='dev-section-title'>📅 &nbsp; Devolução referente ao saldo de qual mês?</div>", unsafe_allow_html=True)
         if len(elegiveis) > 1:
             st.info("Marque o mês de competência ao qual os itens devolvidos pertencem.")
 
@@ -190,7 +220,7 @@ def page_3():
             st.info("Nenhum ativo enviado para a sua operação até o momento.")
         return
 
-    st.markdown("#### Saldo a devolver" if eh_gdl else f"#### Saldo a devolver — {escolha_mes}")
+    st.markdown("<div class='dev-section-title'>Saldo a devolver" + ("" if eh_gdl else f" — {escolha_mes}") + "</div>", unsafe_allow_html=True)
     pr = dp.precos()
     cols = st.columns(max(len(saldo), 1))
     for i, (_, r) in enumerate(saldo.iterrows()):
@@ -204,19 +234,22 @@ def page_3():
             ajuda += f" · {dp.fmt_brl(valor_total_insumo)}"
 
         with cols[i]:
-            st.metric(tipo.title(), _fmt(qtd_saldo), help=ajuda)
-            if valor_unitario > 0:
-                st.markdown(
-                    f"""
-                    <div style="margin-top:-6px; padding-top:3px;">
-                        <div style="font-size:0.86rem; color:#6f747c; margin-bottom:4px;">Valor do saldo</div>
-                        <div style="font-size:1.28rem; line-height:1.2; font-weight:650; color:#343840;">
-                            {dp.fmt_brl(valor_total_insumo)}
-                        </div>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
+            icone = {"GAYLORD": "📦", "PALLET": "▤", "SACA": "♧"}.get(str(tipo).upper(), "📦")
+            valor_html = (
+                f"<div class='dev-balance-caption'>Valor do saldo</div>"
+                f"<div class='dev-balance-value'>{dp.fmt_brl(valor_total_insumo)}</div>"
+                if valor_unitario > 0 else ""
+            )
+            st.markdown(
+                f"""
+                <div class="dev-balance-card" title="{ajuda}">
+                    <div class="dev-balance-label">{icone} &nbsp; {tipo.title()}</div>
+                    <div class="dev-balance-qty">{_fmt(qtd_saldo)}</div>
+                    {valor_html}
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
     if dp.tem_precos():
         total_val = sum(
@@ -224,9 +257,7 @@ def page_3():
             for _, r in saldo.iterrows()
         )
         st.markdown(
-            f"<div style='margin-top:38px; padding-top:10px; font-size:1.18rem; line-height:1.4;'>"
-            f"<strong>Valor total a devolver:</strong> <strong>{dp.fmt_brl(total_val)}</strong>"
-            f"</div>",
+            f"<div class='dev-total-banner'>💰 &nbsp; Valor total a devolver: <strong>{dp.fmt_brl(total_val)}</strong></div>",
             unsafe_allow_html=True,
         )
 
@@ -237,7 +268,7 @@ def page_3():
         _minhas_devolucoes(destino, eh_admin=False, eh_gdl=True)
         return
 
-    st.markdown("#### Nova devolução")
+    st.markdown("<div class='dev-section-title'>＋ &nbsp; Nova devolução</div>", unsafe_allow_html=True)
     pend = {t: q for t, q in dp.pending_mes_tipo(destino, mes_ref).items() if q > 0}
     if not pend:
         st.success(f"Sem pendência de devolução para {escolha_mes}. 🎉")
