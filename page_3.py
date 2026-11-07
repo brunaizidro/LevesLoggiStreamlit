@@ -100,7 +100,7 @@ def page_3():
         [data-testid="stApp"] * { font-family: 'Montserrat', sans-serif !important; }
         .dev-page-kicker { color:#6383aa; font-size:12px; font-weight:700; letter-spacing:1.1px; text-transform:uppercase; margin:0 0 5px; }
         .dev-title-wrap { width:100%; display:block; text-align:left; }
-        .dev-page-title { color:#102f59; display:block; width:100%; font-size:36px; line-height:1.18; font-weight:800; letter-spacing:-1px; margin:0 0 5px; text-align:left !important; }
+        .dev-page-title { color:#172B4D !important; display:block; width:100%; font-size:clamp(28px,2.3vw,34px) !important; line-height:1.18 !important; font-weight:800 !important; letter-spacing:-.8px !important; margin:0 !important; text-align:left !important; }
         .dev-page-subtitle { color:#7188a6; font-size:16px; line-height:1.5; font-weight:600; margin:0 0 18px; text-align:center; }
         .dev-section-title { color:#12345d; background:#eaf3ff; border:1px solid #d4e6ff; border-radius:12px; padding:12px 16px; font-size:19px; font-weight:750; margin:16px 0 12px; }
         .dev-balance-card { background:linear-gradient(135deg,#f0f6ff 0%,#e6f1ff 100%); border:1px solid #d5e6ff; border-radius:15px; padding:19px 20px; min-height:132px; box-shadow:0 3px 12px rgba(25,91,170,.05); }
