@@ -335,7 +335,11 @@ def page_6():
             x="tipo",
             y="cobravel",
             color="tipo",
-            color_discrete_map=dp.CORES_TIPO,
+            color_discrete_map={
+                "GAYLORD": "#00AEEF",
+                "PALLET": "#1685F8",
+                "SACA": "#0067FC",
+            },
             title="Cobrável por tipo",
             labels={"tipo": "Tipo", "cobravel": "Cobrável"},
             custom_data=["valor_cobravel"],
@@ -362,10 +366,22 @@ def page_6():
             showlegend=False,
             height=330,
             font_family="Montserrat",
-            bargap=0.28,
+            bargap=0.34,
+            margin=dict(l=12, r=18, t=42, b=42),
+            plot_bgcolor="#FFFFFF",
+            paper_bgcolor="rgba(0,0,0,0)",
         )
-        fig.update_xaxes(showgrid=False)
-        fig.update_yaxes(showgrid=False)
+        # Mantém os nomes das categorias e os rótulos de valor,
+        # removendo eixos numéricos, linhas e grades.
+        fig.update_xaxes(
+            title_text="", showgrid=False, showline=False,
+            ticks="", showticklabels=True, zeroline=False,
+            tickfont=dict(family="Montserrat", size=12, color="#526783"),
+        )
+        fig.update_yaxes(
+            title_text="", showgrid=False, showline=False,
+            ticks="", showticklabels=False, zeroline=False,
+        )
         st.plotly_chart(fig, width="stretch")
 
     with g2:
@@ -411,7 +427,7 @@ def page_6():
                 custom_data=["valor_cobravel"],
             )
             figd.update_traces(
-                marker_color="#F08080",
+                marker_color=["#003DA5" if i == 0 else "#0067FC" for i in range(len(rank))],
                 text=rank["valor_label"],
                 textposition="outside",
                 textfont=dict(size=12),
@@ -425,13 +441,23 @@ def page_6():
             figd.update_layout(
                 height=330,
                 font_family="Montserrat",
-                bargap=0.18,
-                margin=dict(l=10, r=150, t=50, b=40),
+                bargap=0.24,
+                margin=dict(l=18, r=145, t=28, b=22),
                 uniformtext_minsize=10,
                 uniformtext_mode="show",
+                plot_bgcolor="#FFFFFF",
+                paper_bgcolor="rgba(0,0,0,0)",
             )
-            figd.update_xaxes(showgrid=False)
-            figd.update_yaxes(showgrid=False)
+            # Mantém as operações e os rótulos financeiros; remove eixo numérico e grades.
+            figd.update_xaxes(
+                title_text="", showgrid=False, showline=False,
+                ticks="", showticklabels=False, zeroline=False,
+            )
+            figd.update_yaxes(
+                title_text="", showgrid=False, showline=False,
+                ticks="", showticklabels=True, zeroline=False,
+                tickfont=dict(family="Montserrat", size=12, color="#526783"),
+            )
             st.plotly_chart(figd, width="stretch")
 
     # ---- Tabela detalhada (destino × tipo) ----
