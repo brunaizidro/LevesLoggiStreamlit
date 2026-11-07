@@ -39,11 +39,15 @@ def page_10():
         .cob-value{color:#102B50;font-size:clamp(21px,2vw,29px);font-weight:800;letter-spacing:-.5px;white-space:nowrap;}
         .cob-filter-title{background:#EAF3FF;border:1px solid #D6E6FF;border-radius:12px 12px 0 0;color:#102B50;font-size:17px;font-weight:750;padding:11px 16px;margin:22px 0 0;}
         .cob-filter-body{background:#F7FAFF;border:1px solid #D6E6FF;border-top:0;border-radius:0 0 12px 12px;padding:12px 16px 4px;margin-bottom:16px;}
-        .cob-summary{display:flex;align-items:center;gap:14px;background:#EAF3FF;border:1px solid #D6E6FF;border-radius:12px;padding:14px 18px;margin:16px 0 22px;}
+        .cob-summary{display:flex;align-items:center;gap:14px;background:#EAF3FF;border:1px solid #D6E6FF;border-radius:12px;padding:12px 18px;margin:12px 0 8px;}
         .cob-summary-label{color:#49698F;font-size:14px;font-weight:700;}
         .cob-summary-value{color:#102B50;font-size:25px;font-weight:800;margin-left:auto;}
-        div[data-testid="stDataFrame"]{border:1px solid #D6E6FF;border-radius:12px;overflow:hidden;}
-        div[data-testid="stDataFrame"] [data-testid="glideDataEditor"]{font-family:'Montserrat',sans-serif!important;}
+        .cob-table-wrap{height:335px;overflow:auto;border:1px solid #DCE7F6;border-radius:10px;background:#FFFFFF;margin-bottom:8px;}
+        .cob-html-table{width:100%;border-collapse:separate;border-spacing:0;font-family:'Montserrat',sans-serif!important;font-size:13px;color:#172B4D;}
+        .cob-html-table th{position:sticky;top:0;z-index:2;background:#0067FC!important;color:#FFFFFF!important;font-weight:700!important;text-align:center;padding:11px 12px;white-space:nowrap;}
+        .cob-html-table td{background:#FFFFFF;color:#172B4D;font-weight:500;text-align:center;padding:10px 12px;border-bottom:1px solid #E8EEF7;white-space:nowrap;}
+        .cob-html-table tbody tr:nth-child(even) td{background:#F7FAFF;}
+        .cob-html-table tbody tr:hover td{background:#EEF5FF;}
         div[data-testid="stDownloadButton"] button{background:#EAF3FF!important;color:#0067FC!important;border:1px solid #D6E6FF!important;border-radius:10px!important;font-weight:700!important;padding:9px 16px!important;}
         div[data-testid="stDownloadButton"] button:hover{background:#DCEBFF!important;border-color:#B8D5FF!important;}
         </style>
@@ -113,7 +117,7 @@ def page_10():
         f'<span class="cob-summary-value">{_moeda(filtrada["Valor"].sum())}</span></div>',
         unsafe_allow_html=True,
     )
-    st.markdown('<div class="cob-filter-title" style="border-radius:12px;margin:0 0 10px;">▤ &nbsp; Detalhamento</div>', unsafe_allow_html=True)
+    st.markdown('<div class="cob-filter-title" style="border-radius:12px;margin:0 0 6px;">▤ &nbsp; Detalhamento</div>', unsafe_allow_html=True)
     colunas = ["Sigla", "NC", "Competência", "Valor"]
     if "data" in filtrada.columns:
         colunas.append("data")
@@ -127,7 +131,13 @@ def page_10():
         "gerado_por": "Gerado por",
     }).copy()
     exibicao["Valor"] = filtrada["Valor"].map(_moeda).values
-    st.dataframe(exibicao, width="stretch", hide_index=True)
+    tabela_html = exibicao.to_html(
+        index=False, escape=True, border=0, classes="cob-html-table"
+    )
+    st.markdown(
+        f'<div class="cob-table-wrap">{tabela_html}</div>',
+        unsafe_allow_html=True,
+    )
     st.download_button(
         "Baixar cobranças (CSV)",
         exibicao.to_csv(index=False).encode("utf-8-sig"),
