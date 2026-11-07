@@ -528,7 +528,13 @@ def page_6():
 
     sem_email = [grupo["destino"] for grupo in grupos_email if not grupo["emails"]]
     if sem_email:
-        st.warning("Não há e-mail cadastrado para: " + ", ".join(sem_email))
+        st.markdown(
+            '<div class="concil-info-blue">'
+            '<strong>Não há e-mail cadastrado para:</strong> '
+            + ", ".join(sem_email)
+            + '</div>',
+            unsafe_allow_html=True,
+        )
 
     if not emailer.smtp_configurado():
         st.warning("Configure o servidor SMTP em Configurações para enviar os saldos pendentes.")
