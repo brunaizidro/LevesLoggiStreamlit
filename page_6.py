@@ -41,6 +41,14 @@ def page_6():
     st.markdown("""
     <style>
     /* Identidade visual alinhada aos módulos Envios e Recebimentos */
+    .concil-info-blue{
+        background:#EAF3FF!important;border:1px solid #D5E6FF!important;
+        border-radius:12px;padding:15px 18px;margin:8px 0 12px;
+        color:#000000!important;font-family:'Montserrat',sans-serif;
+        font-size:15px;line-height:1.6;font-weight:600;
+    }
+    .concil-info-blue strong{color:#000000!important;font-weight:800;}
+
     /* Avisos da conciliação: troca apenas o amarelo por azul-claro e mantém fonte preta */
     [data-testid="stAlert"]{
         background:#EAF3FF!important;
@@ -249,9 +257,13 @@ def page_6():
         else:
             total_valor = sum(int(r["cobravel"]) * pr.get(r["tipo"], 0) for _, r in df.iterrows()) if usa_valor else 0
             aviso_valor = f" ({dp.fmt_brl(total_valor)})" if usa_valor else ""
-            st.warning(
-                f"Ao fechar, **{_fmt(total_cobravel)}** itens não devolvidos até {prazo_txt} serão "
-                f"registrados como cobrados e recebem **baixa definitiva** — saem do saldo e não aceitam mais devolução.{aviso_valor}"
+            st.markdown(
+                f'<div class="concil-info-blue">'
+                f'Ao fechar, <strong>{_fmt(total_cobravel)}</strong> itens não devolvidos até '
+                f'<strong>{prazo_txt}</strong> serão registrados como cobrados e recebem '
+                f'<strong>baixa definitiva</strong> — saem do saldo e não aceitam mais devolução.'
+                f'<strong>{aviso_valor}</strong></div>',
+                unsafe_allow_html=True,
             )
             confirma = st.checkbox("Confirmo o fechamento desta competência (ação irreversível).")
             if st.button("💰 Registrar cobrança e dar baixa", type="primary", disabled=not confirma):
