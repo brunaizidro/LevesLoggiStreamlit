@@ -326,6 +326,8 @@ def page_6():
         tdf["valor_cobravel"] = tdf.apply(
             lambda r: int(r["cobravel"]) * pr.get(r["tipo"], 0), axis=1
         )
+        # Ordena e dimensiona as barras pelo valor financeiro, não pela quantidade.
+        tdf = tdf.sort_values("valor_cobravel", ascending=False, kind="stable")
         tdf["valor_label"] = tdf["valor_cobravel"].map(
             lambda v: f"<b>{dp.fmt_brl(v)}</b>"
         )
@@ -333,8 +335,9 @@ def page_6():
         fig = px.bar(
             tdf,
             x="tipo",
-            y="cobravel",
+            y="valor_cobravel",
             color="tipo",
+            category_orders={"tipo": tdf["tipo"].tolist()},
             color_discrete_map={
                 "GAYLORD": "#00AEEF",
                 "PALLET": "#1685F8",
@@ -361,7 +364,8 @@ def page_6():
                     "<extra></extra>"
                 )
                 trace.textposition = "outside"
-                trace.textfont = dict(size=13)
+                trace.textfont = dict(size=13, family="Montserrat", color="#526783")
+                trace.text = [f"<b>{dp.fmt_brl(valor)}</b>"]
         fig.update_layout(
             showlegend=False,
             height=330,
@@ -395,7 +399,6 @@ def page_6():
             .query("cobravel > 0")
             .sort_values("cobravel", ascending=False)
             .head(5)
-            .sort_values("cobravel", ascending=True)
         )
         if rank.empty:
             st.caption("Nenhum item cobrável no período. 🎉")
@@ -414,27 +417,29 @@ def page_6():
             rank = rank.merge(
                 valores_por_operacao, on="destino", how="left"
             )
+            # O Top 5 também passa a ser ordenado e dimensionado pelo valor em R$.
+            rank = rank.sort_values("valor_cobravel", ascending=True, kind="stable")
             rank["valor_label"] = rank["valor_cobravel"].map(
                 lambda v: f"<b>{dp.fmt_brl(v)}</b>"
             )
 
             figd = px.bar(
                 rank,
-                x="cobravel",
+                x="valor_cobravel",
                 y="destino",
                 orientation="h",
                 labels={"cobravel": "Cobrável", "destino": "Operação"},
-                custom_data=["valor_cobravel"],
+                custom_data=["cobravel"],
             )
             figd.update_traces(
                 marker_color=["#003DA5" if i == 0 else "#0067FC" for i in range(len(rank))],
                 text=rank["valor_label"],
                 textposition="outside",
-                textfont=dict(size=12),
+                textfont=dict(size=12, family="Montserrat", color="#526783"),
                 hovertemplate=(
                     "<b>%{y}</b><br>"
-                    "Cobrável: %{x:,.0f}<br>"
-                    "Valor da cobrança: R$ %{customdata[0]:,.2f}"
+                    "Valor cobrável: R$ %{x:,.2f}<br>"
+                    "Itens cobráveis: %{customdata[0]:,.0f}"
                     "<extra></extra>"
                 ),
             )
