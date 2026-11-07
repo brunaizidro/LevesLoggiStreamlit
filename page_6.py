@@ -42,6 +42,24 @@ def page_6():
     <style>
     /* Identidade visual alinhada aos módulos Envios e Recebimentos */
     /* Tabela no mesmo padrão visual do detalhamento de Envios */
+    /* Ajustes específicos do resumo: cabeçalho simples e sem índice duplicado */
+    .concil-resumo-table-wrap{height:335px;overflow:auto;}
+    .concil-resumo-table{table-layout:auto;min-width:760px;}
+    .concil-resumo-table th{
+        text-transform:none!important;letter-spacing:0;
+        text-align:center!important;padding:12px 14px!important;
+    }
+    .concil-resumo-table td{
+        text-align:center!important;padding:11px 14px!important;
+        font-weight:650!important;
+    }
+    .concil-resumo-table th:first-child,
+    .concil-resumo-table td:first-child{
+        text-align:left!important;font-weight:750!important;
+        position:sticky;left:0;z-index:1;
+    }
+    .concil-resumo-table th:first-child{z-index:3;background:#0067FC!important;}
+
     .concil-html-table-wrap{
         height:335px;overflow:auto;border:1px solid #DCE7F6;
         border-radius:10px;background:#FFFFFF;
@@ -369,9 +387,19 @@ def page_6():
     else:
         if usa_valor:
             piv_disp["VALOR TOTAL"] = piv_disp["VALOR TOTAL"].map(dp.fmt_brl)
-        piv_html = piv_disp.to_html(index=True, escape=True, border=0, classes="concil-html-table")
+
+        # Prepara a visualização sem índice hierárquico, evitando cabeçalhos duplicados.
+        piv_visual = piv_disp.reset_index()
+        piv_visual.columns = [
+            "Destino" if str(col).strip().lower() == "destino"
+            else str(col).strip().title()
+            for col in piv_visual.columns
+        ]
+        piv_html = piv_visual.to_html(
+            index=False, escape=True, border=0, classes="concil-html-table concil-resumo-table"
+        )
         st.markdown(
-            f'<div class="concil-html-table-wrap">{piv_html}</div>',
+            f'<div class="concil-html-table-wrap concil-resumo-table-wrap">{piv_html}</div>',
             unsafe_allow_html=True,
         )
 
