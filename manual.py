@@ -26,9 +26,9 @@ def disponivel() -> bool:
     return _bytes() is not None
 
 
-def botao_manual(key: str, label: str = "📘 Manual de devolução (treinamento)"):
+def botao_manual(key: str, label: str = "Baixar manual em PDF"):
     data = _bytes()
     if not data:
         return
     st.download_button(label, data, file_name=NOME_DOWNLOAD, mime="application/pdf",
-                       key=key, width="stretch")
+                       key=key)
