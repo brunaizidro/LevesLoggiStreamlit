@@ -41,6 +41,27 @@ def page_6():
     st.markdown("""
     <style>
     /* Identidade visual alinhada aos módulos Envios e Recebimentos */
+    /* Tabela no mesmo padrão visual do detalhamento de Envios */
+    .concil-html-table-wrap{
+        height:335px;overflow:auto;border:1px solid #DCE7F6;
+        border-radius:10px;background:#FFFFFF;
+    }
+    .concil-html-table{
+        width:100%;border-collapse:separate;border-spacing:0;
+        font-family:'Montserrat',sans-serif!important;font-size:13px;color:#172B4D;
+    }
+    .concil-html-table th{
+        position:sticky;top:0;z-index:2;background:#0067FC!important;
+        color:#FFFFFF!important;font-weight:700!important;text-align:center;
+        padding:11px 12px;white-space:nowrap;
+    }
+    .concil-html-table td{
+        background:#FFFFFF;color:#172B4D;font-weight:500;text-align:center;
+        padding:10px 12px;border-bottom:1px solid #E8EEF7;white-space:nowrap;
+    }
+    .concil-html-table tbody tr:nth-child(even) td{background:#F7FAFF;}
+    .concil-html-table tbody tr:hover td{background:#EEF5FF;}
+
     .concil-intro{color:#627895;font-size:14px;line-height:1.65;margin:-4px 0 20px;}
     [data-testid="stAppViewContainer"] h2,
     [data-testid="stAppViewContainer"] h3,
@@ -325,11 +346,10 @@ def page_6():
         tab_disp["Valor unitário"] = tab_disp["Valor unitário"].map(dp.fmt_brl)
         tab_disp["Valor cobrável"] = tab_disp["Valor cobrável"].map(dp.fmt_brl)
 
-    st.dataframe(
-        tab_disp,
-        width="stretch",
-        hide_index=True,
-        column_config=_centralizar_tabela(tab_disp),
+    tabela_html = tab_disp.to_html(index=False, escape=True, border=0, classes="concil-html-table")
+    st.markdown(
+        f'<div class="concil-html-table-wrap">{tabela_html}</div>',
+        unsafe_allow_html=True,
     )
 
     # ---- Resumo por operação ----
