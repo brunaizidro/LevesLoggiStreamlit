@@ -44,10 +44,10 @@ def page_6():
     .concil-info-blue{
         background:#EAF3FF!important;border:1px solid #D5E6FF!important;
         border-radius:12px;padding:15px 18px;margin:8px 0 12px;
-        color:#000000!important;font-family:'Montserrat',sans-serif;
+        color:#D62828!important;font-family:'Montserrat',sans-serif;
         font-size:15px;line-height:1.6;font-weight:600;
     }
-    .concil-info-blue strong{color:#000000!important;font-weight:800;}
+    .concil-info-blue strong{color:#D62828!important;font-weight:800;}
 
     /* Avisos da conciliação: troca apenas o amarelo por azul-claro e mantém fonte preta */
     [data-testid="stAlert"]{
