@@ -115,6 +115,16 @@ h1,h2,h3,h4,[data-testid="stMarkdownContainer"] h1,
 [data-testid="stFormSubmitButton"] button:hover {
     background:#0058DC !important; border-color:#0058DC !important;
 }
+
+/* Texto branco nos botões de confirmação */
+[data-testid="stAppViewContainer"] .stButton > button,
+[data-testid="stFormSubmitButton"] button,
+[data-testid="stAppViewContainer"] .stButton > button *,
+[data-testid="stFormSubmitButton"] button * {
+    color:#FFFFFF !important;
+    -webkit-text-fill-color:#FFFFFF !important;
+}
+
 [data-testid="stForm"] {
     border:1px solid #DCE7F6 !important; border-radius:12px !important;
     padding:14px !important; background:#FFFFFF !important;
