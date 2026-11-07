@@ -122,6 +122,27 @@ h1,h2,h3,h4,[data-testid="stMarkdownContainer"] h1,
 [data-testid="stDataFrame"] { border:1px solid #DCE7F6 !important; border-radius:10px !important; }
 [data-testid="stAlert"] { border-radius:10px !important; }
 hr { border-color:#DCE7F6 !important; margin:22px 0 !important; }
+/* Layout aprimorado de conferência */
+.rec-hero {background:linear-gradient(110deg,#EAF3FF 0%,#F5F9FF 100%);border:1px solid #DCEAFF;border-radius:16px;padding:16px 20px;margin:12px 0 18px;}
+.rec-hero-title {display:flex;align-items:center;gap:12px;color:#102B50;font-size:23px;font-weight:800;}
+.rec-status {display:inline-flex;align-items:center;background:#CFE7FF;color:#0058D6;border-radius:20px;padding:6px 13px;font-size:12px;font-weight:800;}
+.rec-meta-panel {display:grid;grid-template-columns:1.5fr .8fr 1fr 1.2fr 1fr;gap:0;background:#FFFFFF;border:1px solid #DCE7F6;border-radius:12px;padding:15px 10px;margin-top:12px;}
+.rec-meta-cell {padding:0 13px;border-right:1px solid #DCE7F6;min-width:0;color:#102B50;font-size:13px;}
+.rec-meta-cell:last-child {border-right:0;}
+.rec-meta-label {display:block;color:#536987;font-size:12px;font-weight:600;margin-bottom:5px;}
+.rec-meta-value {font-weight:800;overflow-wrap:anywhere;}
+.rec-panel {background:#FFFFFF;border:1px solid #DCE7F6;border-radius:15px;padding:17px 16px;box-shadow:0 3px 12px rgba(16,43,80,.035);min-width:0;}
+.rec-panel-title {font-size:18px;font-weight:800;color:#102B50;margin:0 0 14px;display:flex;align-items:center;gap:10px;}
+.rec-panel-title span {color:#0067FC;font-size:22px;}
+.rec-item-row {display:flex;align-items:center;justify-content:space-between;background:#EAF3FF;border-radius:10px;padding:11px 14px;margin:8px 0;color:#102B50;font-weight:700;}
+.rec-item-name {display:flex;align-items:center;gap:12px;}
+.rec-item-icon {color:#0067FC;font-size:20px;width:24px;text-align:center;}
+.rec-item-qty {font-size:19px;font-weight:800;}
+.rec-total-bar {display:flex;justify-content:space-between;align-items:center;background:#0067FC;color:#FFFFFF;border-radius:10px;padding:12px 15px;margin-top:12px;font-weight:800;}
+.rec-actions {background:#FFFFFF;border:1px solid #DCE7F6;border-radius:15px;padding:15px 18px;margin-top:18px;}
+.rec-actions-title {font-size:17px;font-weight:800;color:#102B50;margin-bottom:10px;}
+@media(max-width:900px) {.rec-meta-panel{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.rec-meta-cell{border-right:0;padding:0 6px}.}
+
 @media(max-width:900px) {
     [data-testid="stAppViewBlockContainer"] { padding:16px 14px 28px !important; }
     .rec-meta-row { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
@@ -188,31 +209,28 @@ def _card_devolucao(dev: dict, quem: str):
     itens = [{"tipo": r["tipo"], "qtd_declarada": int(r["qtd_declarada"])}
              for _, r in itens_df.iterrows()]
 
-    st.markdown(
-        f'<div class="rec-section-heading"><span>▦</span> &nbsp; {dev["id"]}</div>',
-        unsafe_allow_html=True,
-    )
-    meta = [
-        ("Operação", dev.get("usuario", "")),
-        ("Destino", dev.get("destino", "")),
-        ("Placa", dev.get("placa") or "—"),
-        ("Emissão", dev.get("data_criacao", "")),
-    ]
-    st.markdown(
-        '<div class="rec-meta-row">' + "".join(
-            f'<div class="rec-meta-item"><strong>{label}:</strong> {value}</div>'
-            for label, value in meta
-        ) + '</div>',
-        unsafe_allow_html=True,
-    )
     comp = str(dev.get("competencia", "") or "")
     comp_txt = dp.rotulo_mes(comp) if len(comp) == 7 else "—"
-    competencia_txt = f"Competência: {comp_txt}"
+    meta = [
+        ("📍", "Operação", dev.get("usuario", "")),
+        ("▱", "Destino", dev.get("destino", "")),
+        ("🚚", "Placa", dev.get("placa") or "—"),
+        ("▣", "Emissão", dev.get("data_criacao", "")),
+        ("▣", "Competência", comp_txt),
+    ]
+    st.markdown(
+        f'<div class="rec-hero"><div class="rec-hero-title">🚚 &nbsp; {dev["id"]} '
+        f'<span class="rec-status">Em conferência</span></div>'
+        '<div class="rec-meta-panel">' + "".join(
+            f'<div class="rec-meta-cell"><span class="rec-meta-label">{ico} &nbsp; {label}</span>'
+            f'<span class="rec-meta-value">{value}</span></div>'
+            for ico, label, value in meta
+        ) + '</div></div>',
+        unsafe_allow_html=True,
+    )
     if dev.get("local_devolucao"):
-        competencia_txt += f" &nbsp; · &nbsp; Devolvendo para: {dev.get('local_devolucao')}"
-    st.markdown(f'<div class="rec-competencia">{competencia_txt}</div>', unsafe_allow_html=True)
+        st.caption(f"Local de devolução: {dev.get('local_devolucao')}")
 
-    # Já processada?
     if dev.get("status") != dp.STATUS_TRANSITO:
         st.warning(
             f"Esta devolução já está **{dp.STATUS_LABEL.get(dev['status'], dev['status'])}**"
@@ -226,29 +244,25 @@ def _card_devolucao(dev: dict, quem: str):
         )
         return
 
-    st.markdown('<div class="rec-items-heading">Itens declarados</div>', unsafe_allow_html=True)
-    itens_html = "".join(
-        f"<li><strong>{it['tipo'].title()}:</strong> {_fmt(it['qtd_declarada'])}</li>"
-        for it in itens
-    )
-    st.markdown(f'<ul class="rec-items-list">{itens_html}</ul>', unsafe_allow_html=True)
-    st.markdown(
-        f'<div class="rec-total">Total declarado: {_fmt(sum(i["qtd_declarada"] for i in itens))}</div>',
-        unsafe_allow_html=True,
-    )
+    total_declarado = sum(i["qtd_declarada"] for i in itens)
+    col_itens, col_contagem = st.columns([1, 1], gap="large")
+    with col_itens:
+        icones = {"GAYLORD": "⬡", "PALLET": "▦", "SACA": "♧"}
+        itens_html = "".join(
+            f'<div class="rec-item-row"><div class="rec-item-name">'
+            f'<span class="rec-item-icon">{icones.get(str(it["tipo"]).upper(), "□")}</span>'
+            f'{it["tipo"].title()}</div><span class="rec-item-qty">{_fmt(it["qtd_declarada"])}</span></div>'
+            for it in itens
+        )
+        st.markdown(
+            '<div class="rec-panel"><div class="rec-panel-title"><span>⬡</span> Itens declarados</div>'
+            + itens_html
+            + f'<div class="rec-total-bar"><span>Total declarado</span><span>{_fmt(total_declarado)}</span></div></div>',
+            unsafe_allow_html=True,
+        )
 
-    st.markdown("---")
-    col_a, col_b = st.columns(2)
-
-    with col_a:
-        st.markdown("**Aceitar o declarado**")
-        if st.button("✅ Confirmar sem contar", type="primary", key=f"semcontar_{dev['id']}"):
-            _confirmar(dev, itens, None, quem)
-            st.success("Recebimento confirmado (declarado aceito).")
-            st.rerun()
-
-    with col_b:
-        st.markdown("**Contar e confirmar**")
+    with col_contagem:
+        st.markdown('<div class="rec-panel"><div class="rec-panel-title"><span>☑</span> Contar e confirmar</div>', unsafe_allow_html=True)
         with st.form(f"contar_{dev['id']}"):
             recebidos = {}
             for it in itens:
@@ -260,7 +274,8 @@ def _card_devolucao(dev: dict, quem: str):
                     value=int(it["qtd_declarada"]),
                     help="A quantidade recebida não pode ultrapassar a quantidade declarada no romaneio.",
                 )
-            ok = st.form_submit_button("Registrar contagem")
+            ok = st.form_submit_button("✓ Confirmar recebimento", type="primary", use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
         if ok:
             try:
                 status = _confirmar(dev, itens, recebidos, quem)
@@ -272,6 +287,12 @@ def _card_devolucao(dev: dict, quem: str):
                 else:
                     st.success("Recebimento **conferido** — quantidades batem.")
                 st.rerun()
+
+    st.markdown('<div class="rec-actions"><div class="rec-actions-title">Aceitar o declarado</div></div>', unsafe_allow_html=True)
+    if st.button("✅ Confirmar sem contar", type="secondary", key=f"semcontar_{dev['id']}"):
+        _confirmar(dev, itens, None, quem)
+        st.success("Recebimento confirmado (declarado aceito).")
+        st.rerun()
 
 
 def page_4(scan_id: str | None = None, scan_token: str | None = None):
