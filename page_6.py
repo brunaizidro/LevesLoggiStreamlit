@@ -55,7 +55,7 @@ def page_6():
     }
     .concil-resumo-table th:first-child,
     .concil-resumo-table td:first-child{
-        text-align:left!important;font-weight:750!important;
+        text-align:center!important;font-weight:750!important;
         position:sticky;left:0;z-index:1;
     }
     .concil-resumo-table th:first-child{z-index:3;background:#0067FC!important;}
