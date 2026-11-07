@@ -40,6 +40,18 @@ section[data-testid="stSidebar"] + div {margin-left:0 !important;}
 [data-testid="stSidebar"] [role="radiogroup"] label:hover {background:rgba(255,255,255,.12) !important;}
 [data-testid="stSidebar"] [role="radiogroup"] label > div:first-child {display:none !important;}
 [data-testid="stSidebar"] [role="radiogroup"] label p {display:flex !important;align-items:center !important;gap:9px !important;color:#fff !important;font-family:Montserrat,sans-serif !important;font-size:13px !important;font-weight:700 !important;margin:0 !important;}
+[data-testid="stSidebar"] [role="radiogroup"] label p:before {font-family:"Material Symbols Rounded" !important;font-size:19px !important;font-weight:500 !important;line-height:1 !important;display:inline-block !important;width:21px !important;text-align:center !important;color:rgba(255,255,255,.96) !important;font-feature-settings:"liga";}
+[data-testid="stSidebar"] [role="radiogroup"] label:nth-of-type(1) p:before {content:"inventory_2";}
+[data-testid="stSidebar"] [role="radiogroup"] label:nth-of-type(2) p:before {content:"move_to_inbox";}
+[data-testid="stSidebar"] [role="radiogroup"] label:nth-of-type(3) p:before {content:"receipt_long";}
+[data-testid="stSidebar"] [role="radiogroup"] label:nth-of-type(4) p:before {content:"payments";}
+[data-testid="stSidebar"] [role="radiogroup"] label:nth-of-type(5) p:before {content:"undo";}
+[data-testid="stSidebar"] [role="radiogroup"] label:nth-of-type(6) p:before {content:"notifications";}
+[data-testid="stSidebar"] [role="radiogroup"] label:nth-of-type(7) p:before {content:"groups";}
+[data-testid="stSidebar"] [role="radiogroup"] label:nth-of-type(8) p:before {content:"bar_chart";}
+[data-testid="stSidebar"] [role="radiogroup"] label:nth-of-type(9) p:before {content:"settings";}
+[data-testid="stSidebar"] [role="radiogroup"] label:nth-of-type(7) {margin-top:25px !important;}
+[data-testid="stSidebar"] [role="radiogroup"] label:nth-of-type(7):after {content:"ADMINISTRAÇÃO";position:absolute;left:0;right:0;top:-24px;padding:0 12px;color:#C8DDFF;font-family:Montserrat,sans-serif;font-size:10px;font-weight:800;letter-spacing:1.6px;pointer-events:none;}
 [data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked) {background:#fff !important;color:#075BEA !important;box-shadow:0 4px 13px rgba(0,0,0,.10) !important;}
 [data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked) p {color:#075BEA !important;}
 [data-testid="stSidebar"] [data-testid="stWidgetLabel"] {display:none !important;}
