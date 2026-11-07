@@ -514,7 +514,7 @@ def page_1():
                         labels={"valor_insumo": "Valor dos insumos", "destino": "Base"},
                     )
                     fig_dest.update_traces(
-                        marker=dict(color=["#1769C2", "#2878CC", "#3987D5", "#4A96DE", "#5BA5E6", "#6CB3EC", "#7DC1F1", "#8ECDF5", "#A2D9F8", "#B8E4FB"]),
+                        marker=dict(color="#0067FC"),
                         textposition="outside",
                         textfont=dict(family="Montserrat", size=11, color="#243B5B"),
                         cliponaxis=False,
