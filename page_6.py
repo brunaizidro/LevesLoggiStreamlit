@@ -38,8 +38,57 @@ def _centralizar_tabela(df):
 
 def page_6():
     st.subheader("Conciliação e cobrança")
+    st.markdown("""
+    <style>
+    /* Identidade visual alinhada aos módulos Envios e Recebimentos */
+    .concil-intro{color:#627895;font-size:14px;line-height:1.65;margin:-4px 0 20px;}
+    [data-testid="stAppViewContainer"] h2,
+    [data-testid="stAppViewContainer"] h3,
+    [data-testid="stAppViewContainer"] h4{color:#102B50;font-weight:800;}
+    [data-testid="stAppViewContainer"] [data-testid="stMetric"]{
+        background:linear-gradient(145deg,#F3F8FF 0%,#EAF3FF 100%);
+        border:1px solid #D9E8FF;border-radius:14px;padding:16px 17px;
+        box-shadow:0 3px 12px rgba(16,43,80,.035);min-height:104px;
+    }
+    [data-testid="stMetricLabel"]{color:#536987!important;font-weight:650!important;}
+    [data-testid="stMetricValue"]{color:#102B50!important;font-weight:850!important;}
+    [data-testid="stMetricDelta"]{font-weight:700!important;}
+    [data-testid="stSelectbox"] label,
+    [data-testid="stCheckbox"] label,
+    [data-testid="stTextInput"] label{color:#102B50!important;font-weight:700!important;}
+    [data-testid="stSelectbox"] [data-baseweb="select"]>div{
+        border:1px solid #D5E4F8;border-radius:10px;background:#FFFFFF;
+    }
+    [data-testid="stDataFrame"],[data-testid="stTable"]{
+        border:1px solid #DCE8FA;border-radius:12px;overflow:hidden;
+    }
+    [data-testid="stPlotlyChart"]{
+        background:#FFFFFF;border:1px solid #DCE8FA;border-radius:14px;
+        padding:10px 10px 2px;box-shadow:0 3px 12px rgba(16,43,80,.03);
+    }
+    [data-testid="stVerticalBlockBorderWrapper"]{
+        border:1px solid #DCE8FA!important;border-radius:15px!important;
+        background:#FFFFFF!important;box-shadow:0 3px 12px rgba(16,43,80,.035);
+    }
+    [data-testid="stButton"] button,[data-testid="stDownloadButton"] button{
+        border-radius:10px!important;font-weight:750!important;min-height:42px;
+    }
+    [data-testid="stButton"] button[kind="primary"],
+    [data-testid="stFormSubmitButton"] button[kind="primary"]{
+        background:#0067FC!important;border-color:#0067FC!important;color:#FFFFFF!important;
+    }
+    [data-testid="stButton"] button[kind="primary"] *,
+    [data-testid="stFormSubmitButton"] button[kind="primary"] *{
+        color:#FFFFFF!important;-webkit-text-fill-color:#FFFFFF!important;
+    }
+    hr{border-color:#DCE8FA!important;}
+    .concil-section-title{display:flex;align-items:center;gap:9px;color:#102B50;
+        font-size:18px;font-weight:800;margin:18px 0 10px;}
+    .concil-section-title .ico{display:inline-flex;color:#0067FC;font-size:20px;}
+    </style>
+    """, unsafe_allow_html=True)
     st.markdown(
-        "<p class='custom-text'>Cobrança por <b>competência de mês</b>. A operação tem até o "
+        "<p class='concil-intro'>Cobrança por <b>competência de mês</b>. A operação tem até o "
         "<b>dia 5 do mês seguinte</b> para devolver os itens do mês. O que não voltar até lá é cobrável.</p>",
         unsafe_allow_html=True,
     )
@@ -258,7 +307,7 @@ def page_6():
             st.plotly_chart(figd, width="stretch")
 
     # ---- Tabela detalhada (destino × tipo) ----
-    st.markdown("#### Detalhamento por operação × tipo")
+    st.markdown("<div class=\"concil-section-title\"><span class=\"ico\">▦</span> Detalhamento por operação × tipo</div>", unsafe_allow_html=True)
     so_cobravel = st.checkbox("Mostrar apenas com cobrável > 0", value=False)
     tab = df_view.copy()
     if so_cobravel:
@@ -284,7 +333,7 @@ def page_6():
     )
 
     # ---- Resumo por operação ----
-    st.markdown("#### Resumo por operação (cobrável por tipo)")
+    st.markdown("<div class=\"concil-section-title\"><span class=\"ico\">▤</span> Resumo por operação (cobrável por tipo)</div>", unsafe_allow_html=True)
     piv = tab.pivot_table(index="destino", columns="tipo", values="cobravel", aggfunc="sum", fill_value=0)
     piv["TOTAL"] = piv.sum(axis=1)
     if usa_valor:
@@ -324,7 +373,7 @@ def page_6():
 
     # ---- Enviar e-mail de saldo pendente da competência ----
     st.markdown("---")
-    st.markdown("#### Enviar saldo pendente por e-mail")
+    st.markdown("<div class=\"concil-section-title\"><span class=\"ico\">✉</span> Enviar saldo pendente por e-mail</div>", unsafe_allow_html=True)
     st.caption(f"O e-mail considera somente os itens ainda pendentes da competência {escolha}; não envia notas de débito da aba Cobrancas.")
 
     pend_email = df.copy()
