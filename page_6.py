@@ -37,7 +37,33 @@ def _centralizar_tabela(df):
 
 
 def page_6():
-    st.subheader("Conciliação e cobrança")
+    st.markdown(
+        """
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+        .concil-breadcrumb{
+            color:#7B8798!important;font-family:'Montserrat',sans-serif!important;
+            font-size:11px!important;font-weight:600!important;
+            letter-spacing:.55px!important;margin:0 0 7px!important;
+        }
+        .concil-page-title{
+            color:#172B4D!important;font-family:'Montserrat',sans-serif!important;
+            font-size:clamp(28px,2.3vw,34px)!important;
+            line-height:1.18!important;font-weight:800!important;
+            letter-spacing:-.8px!important;margin:0 0 6px!important;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        '<div class="concil-breadcrumb">PORTAL LEVES &nbsp;/&nbsp; CONCILIAÇÃO</div>',
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        '<div class="concil-page-title">Conciliação e cobrança</div>',
+        unsafe_allow_html=True,
+    )
     st.markdown("""
     <style>
     /* Identidade visual alinhada aos módulos Envios e Recebimentos */
