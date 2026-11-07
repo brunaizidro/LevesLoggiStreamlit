@@ -25,9 +25,11 @@ def _estilos_extra():
 [data-testid="stSidebarCollapsedControl"], [data-testid="collapsedControl"] {display:none !important;}
 [data-testid="stSidebar"] button[aria-label*="Close"], [data-testid="stSidebar"] button[aria-label*="Fechar"], [data-testid="stSidebar"] button[title*="Close"], [data-testid="stSidebar"] button[title*="Fechar"] {display:none !important;}
 section[data-testid="stSidebar"] + div {margin-left:0 !important;}
-.leves-sb-logo {text-align:center;margin:4px auto 2px;line-height:0;}
+.leves-sb-logo {text-align:center;margin:-12px auto 2px;line-height:0;}
 .leves-sb-logo img {width:116px;max-width:72%;height:auto;object-fit:contain;}
-.leves-sb-title {color:#fff !important;text-align:center;font-family:Montserrat,sans-serif !important;font-size:22px !important;font-weight:800 !important;letter-spacing:-.5px;margin:5px 0 2px !important;}
+.leves-sb-title {color:#fff !important;display:flex !important;align-items:center !important;justify-content:center !important;gap:8px !important;text-align:center;font-family:Montserrat,sans-serif !important;font-size:22px !important;font-weight:800 !important;letter-spacing:-.5px;margin:5px 0 2px !important;}
+.leves-sb-title .leves-sb-cube {display:inline-flex;align-items:center;justify-content:center;width:23px;height:23px;flex:0 0 23px;}
+.leves-sb-title .leves-sb-cube svg {display:block;width:22px;height:22px;stroke:#FFFFFF;}
 .leves-sb-subtitle {color:rgba(255,255,255,.82);text-align:center;font-family:Montserrat,sans-serif;font-size:10px;font-weight:700;letter-spacing:2.1px;margin:0 0 20px;}
 .sb-sep {border:0;border-top:1px solid rgba(255,255,255,.25);margin:14px 0 !important;}
 .sb-section-label {color:#C8DDFF !important;font-family:Montserrat,sans-serif !important;font-size:10px !important;font-weight:800 !important;letter-spacing:1.6px;text-transform:uppercase;margin:8px 4px 8px;}
@@ -291,5 +293,8 @@ def sidebar():
                 f'<div class="leves-sb-logo"><img src="data:image/png;base64,{logo_base64}" alt="Loggi"></div>',
                 unsafe_allow_html=True,
             )
-        st.markdown('<div class="leves-sb-title">Portal LEVES</div>', unsafe_allow_html=True)
+        st.markdown(
+            '<div class="leves-sb-title"><span class="leves-sb-cube"><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M24 4L43 14.5V34L24 44L5 34V14.5L24 4Z" stroke="white" stroke-width="3" stroke-linejoin="round"/><path d="M5.5 14.5L24 25L42.5 14.5M24 25V43.5M14.5 9.5L33.5 20" stroke="white" stroke-width="3" stroke-linejoin="round"/></svg></span><span>Portal LEVES</span></div>',
+            unsafe_allow_html=True,
+        )
         st.markdown('<div class="leves-sb-subtitle">GESTÃO DE INSUMOS</div>', unsafe_allow_html=True)
