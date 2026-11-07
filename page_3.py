@@ -99,8 +99,8 @@ def page_3():
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
         [data-testid="stApp"] * { font-family: 'Montserrat', sans-serif !important; }
         .dev-page-kicker { color:#6383aa; font-size:12px; font-weight:700; letter-spacing:1.1px; text-transform:uppercase; margin:0 0 5px; }
-        .dev-page-title { color:#102f59; font-size:36px; line-height:1.18; font-weight:800; letter-spacing:-1px; margin:0 0 5px; }
-        .dev-page-subtitle { color:#7188a6; font-size:16px; line-height:1.5; font-weight:600; margin:0 0 18px; }
+        .dev-page-title { color:#102f59; font-size:36px; line-height:1.18; font-weight:800; letter-spacing:-1px; margin:0 0 5px; text-align:center; }
+        .dev-page-subtitle { color:#7188a6; font-size:16px; line-height:1.5; font-weight:600; margin:0 0 18px; text-align:center; }
         .dev-section-title { color:#12345d; background:#eaf3ff; border:1px solid #d4e6ff; border-radius:12px; padding:12px 16px; font-size:19px; font-weight:750; margin:16px 0 12px; }
         .dev-balance-card { background:linear-gradient(135deg,#f0f6ff 0%,#e6f1ff 100%); border:1px solid #d5e6ff; border-radius:15px; padding:19px 20px; min-height:132px; box-shadow:0 3px 12px rgba(25,91,170,.05); }
         .dev-balance-label { color:#315d91; font-size:14px; font-weight:700; margin-bottom:7px; }
@@ -234,7 +234,6 @@ def page_3():
             ajuda += f" · {dp.fmt_brl(valor_total_insumo)}"
 
         with cols[i]:
-            icone = {"GAYLORD": "📦", "PALLET": "▤", "SACA": "♧"}.get(str(tipo).upper(), "📦")
             valor_html = (
                 f"<div class='dev-balance-caption'>Valor do saldo</div>"
                 f"<div class='dev-balance-value'>{dp.fmt_brl(valor_total_insumo)}</div>"
@@ -243,7 +242,7 @@ def page_3():
             st.markdown(
                 f"""
                 <div class="dev-balance-card" title="{ajuda}">
-                    <div class="dev-balance-label">{icone} &nbsp; {tipo.title()}</div>
+                    <div class="dev-balance-label">{tipo.title()}</div>
                     <div class="dev-balance-qty">{_fmt(qtd_saldo)}</div>
                     {valor_html}
                 </div>
