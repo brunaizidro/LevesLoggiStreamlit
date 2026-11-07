@@ -41,6 +41,20 @@ def page_6():
     st.markdown("""
     <style>
     /* Identidade visual alinhada aos módulos Envios e Recebimentos */
+    /* Avisos da conciliação em azul-claro, mantendo destaque sem amarelo */
+    [data-testid="stAlert"]{
+        background:#EAF3FF!important;
+        border:1px solid #D5E6FF!important;
+        border-radius:12px!important;
+        color:#164477!important;
+    }
+    [data-testid="stAlert"] [data-testid="stMarkdownContainer"],
+    [data-testid="stAlert"] [data-testid="stMarkdownContainer"] p,
+    [data-testid="stAlert"] [data-testid="stMarkdownContainer"] strong{
+        color:#164477!important;
+    }
+    [data-testid="stAlert"] svg{fill:#0067FC!important;color:#0067FC!important;}
+
     /* Tabela no mesmo padrão visual do detalhamento de Envios */
     /* Valores monetários em padrão contábil, centralizados nas tabelas */
     .concil-html-table th:nth-child(7),
