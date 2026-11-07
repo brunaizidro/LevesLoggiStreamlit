@@ -158,7 +158,7 @@ def page_3():
         )
 
     if manual.disponivel():
-        with st.expander("📘 Manual de devolução (treinamento)"):
+        with st.expander("Manual de devolução (treinamento)"):
             manual.botao_manual(key="manual_page3")
 
     # ---- Competência selecionada (antes do saldo) ----
