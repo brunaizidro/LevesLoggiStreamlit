@@ -133,6 +133,12 @@ h1,h2,h3,h4,[data-testid="stMarkdownContainer"] h1,
 [data-testid="stAlert"] { border-radius:10px !important; }
 hr { border-color:#DCE7F6 !important; margin:22px 0 !important; }
 /* Layout aprimorado de conferência */
+/* Ícones lineares no mesmo padrão da navegação lateral */
+.rec-inline-icon{width:23px;height:23px;stroke:#0067FC;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle;}
+.rec-meta-label{display:flex!important;align-items:center;gap:7px;}
+.rec-meta-icon{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;color:#0067FC;flex:0 0 16px;}
+.rec-meta-icon svg{width:16px;height:16px;stroke:#0067FC;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+
 .rec-hero {background:linear-gradient(110deg,#EAF3FF 0%,#F5F9FF 100%);border:1px solid #DCEAFF;border-radius:16px;padding:16px 20px;margin:12px 0 18px;}
 .rec-hero-title {display:flex;align-items:center;gap:12px;color:#102B50;font-size:23px;font-weight:800;}
 .rec-status {display:inline-flex;align-items:center;background:#CFE7FF;color:#0058D6;border-radius:20px;padding:6px 13px;font-size:12px;font-weight:800;}
@@ -222,17 +228,17 @@ def _card_devolucao(dev: dict, quem: str):
     comp = str(dev.get("competencia", "") or "")
     comp_txt = dp.rotulo_mes(comp) if len(comp) == 7 else "—"
     meta = [
-        ("📍", "Operação", dev.get("usuario", "")),
-        ("▱", "Destino", dev.get("destino", "")),
-        ("🚚", "Placa", dev.get("placa") or "—"),
-        ("▣", "Emissão", dev.get("data_criacao", "")),
-        ("▣", "Competência", comp_txt),
+        ('<svg viewBox="0 0 24 24"><path d="M12 21s7-4.4 7-11a7 7 0 1 0-14 0c0 6.6 7 11 7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>', "Operação", dev.get("usuario", "")),
+        ('<svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5M9 21v-7h6v7"/></svg>', "Destino", dev.get("destino", "")),
+        ('<svg viewBox="0 0 24 24"><path d="M3 7h11v11H3zM14 11h4l3 3v4h-7z"/><circle cx="7.5" cy="18.5" r="1.8"/><circle cx="17.5" cy="18.5" r="1.8"/></svg>', "Placa", dev.get("placa") or "—"),
+        ('<svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>', "Emissão", dev.get("data_criacao", "")),
+        ('<svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M8 3v4M16 3v4M4 10h16M8 14h3M8 17h6"/></svg>', "Competência", comp_txt),
     ]
     st.markdown(
-        f'<div class="rec-hero"><div class="rec-hero-title">🚚 &nbsp; {dev["id"]} '
+        f'<div class="rec-hero"><div class="rec-hero-title"><svg class="rec-inline-icon" viewBox="0 0 24 24"><path d="M3 7h11v11H3zM14 11h4l3 3v4h-7z"/><circle cx="7.5" cy="18.5" r="1.8"/><circle cx="17.5" cy="18.5" r="1.8"/></svg> &nbsp; {dev["id"]} '
         f'<span class="rec-status">Em conferência</span></div>'
         '<div class="rec-meta-panel">' + "".join(
-            f'<div class="rec-meta-cell"><span class="rec-meta-label">{ico} &nbsp; {label}</span>'
+            f'<div class="rec-meta-cell"><span class="rec-meta-label"><span class="rec-meta-icon">{ico}</span>{label}</span>'
             f'<span class="rec-meta-value">{value}</span></div>'
             for ico, label, value in meta
         ) + '</div></div>',
