@@ -42,17 +42,16 @@ def page_6():
     <style>
     /* Identidade visual alinhada aos módulos Envios e Recebimentos */
     /* Tabela no mesmo padrão visual do detalhamento de Envios */
-    /* Valores monetários no padrão contábil: moeda brasileira e alinhamento à direita */
+    /* Valores monetários em padrão contábil, centralizados nas tabelas */
     .concil-html-table th:nth-child(7),
     .concil-html-table td:nth-child(7),
     .concil-html-table th:nth-child(8),
     .concil-html-table td:nth-child(8),
     .concil-resumo-table th:nth-child(6),
     .concil-resumo-table td:nth-child(6){
-        text-align:right!important;
+        text-align:center!important;
         font-variant-numeric:tabular-nums;
         white-space:nowrap;
-        padding-right:20px!important;
     }
     /* Ajustes específicos do resumo: cabeçalho simples e sem índice duplicado */
     .concil-resumo-table-wrap{height:335px;overflow:auto;}
