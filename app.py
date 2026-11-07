@@ -1152,28 +1152,28 @@ def main():
         )
 
         if eh_receb:
-            opcoes = ["📥 Recebimento"]
+            opcoes = ["Recebimento"]
         elif eh_admin:
             opcoes = [
-                "📦 Envios",
-                "📥 Recebimento",
-                "🧾 Conciliação",
-                "💰 Cobranças",
-                "↩️ Devoluções",
-                "🔔 Pendências",
-                "👥 Usuários",
-                "📊 Relatórios",
-                "⚙️ Configurações",
+                "Envios",
+                "Recebimento",
+                "Conciliação",
+                "Cobranças",
+                "Devoluções",
+                "Pendências",
+                "Usuários",
+                "Relatórios",
+                "Configurações",
             ]
         elif user.get("perfil") == "gdl":
             opcoes = [
-                "📦 Envios",
-                "🧾 Conciliação",
-                "↩️ Devoluções",
-                "👥 Usuários",
+                "Envios",
+                "Conciliação",
+                "Devoluções",
+                "Usuários",
             ]
         else:
-            opcoes = ["📦 Envios", "↩️ Devoluções", "💰 Cobranças"]
+            opcoes = ["Envios", "Devoluções", "Cobranças"]
 
         # Se veio de um QR, já abre o Recebimento.
         idx = 0
