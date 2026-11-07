@@ -53,6 +53,24 @@ def page_6():
         font-variant-numeric:tabular-nums;
         white-space:nowrap;
     }
+    /* Tabela de saldo pendente por e-mail no padrão visual do portal */
+    .concil-email-table-wrap{height:335px;overflow:auto;}
+    .concil-email-table{min-width:850px;table-layout:auto;}
+    .concil-email-table th{
+        text-transform:none!important;text-align:center!important;
+        padding:12px 14px!important;white-space:nowrap;
+    }
+    .concil-email-table td{
+        text-align:center!important;padding:11px 14px!important;
+        font-weight:600!important;vertical-align:middle;
+    }
+    .concil-email-table th:nth-child(4),
+    .concil-email-table td:nth-child(4){
+        text-align:center!important;font-variant-numeric:tabular-nums;white-space:nowrap;
+    }
+    .concil-email-table td:nth-child(3){
+        text-align:left!important;white-space:normal;overflow-wrap:anywhere;min-width:300px;
+    }
     /* Ajustes específicos do resumo: cabeçalho simples e sem índice duplicado */
     .concil-resumo-table-wrap{height:335px;overflow:auto;}
     .concil-resumo-table{table-layout:auto;min-width:760px;}
@@ -473,7 +491,14 @@ def page_6():
                 sum(item["pendente"] * pr_email.get(item["tipo"], 0) for item in grupo["itens"])
             )
         resumo_email.append(linha)
-    st.dataframe(pd.DataFrame(resumo_email), width="stretch", hide_index=True)
+    resumo_email_df = pd.DataFrame(resumo_email)
+    resumo_email_html = resumo_email_df.to_html(
+        index=False, escape=True, border=0, classes="concil-html-table concil-email-table"
+    )
+    st.markdown(
+        f'<div class="concil-html-table-wrap concil-email-table-wrap">{resumo_email_html}</div>',
+        unsafe_allow_html=True,
+    )
 
     sem_email = [grupo["destino"] for grupo in grupos_email if not grupo["emails"]]
     if sem_email:
