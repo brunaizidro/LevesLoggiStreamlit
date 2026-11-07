@@ -94,13 +94,12 @@ def page_10():
         )
 
     st.markdown('<div class="cob-filter-title">⌕ &nbsp; Filtros</div>', unsafe_allow_html=True)
-    st.markdown('<div class="cob-filter-body">', unsafe_allow_html=True)
-    f1, f2 = st.columns(2)
-    competencias = sorted(base["Competência"].dropna().astype(str).unique(), reverse=True)
-    siglas = sorted(base["Sigla"].dropna().astype(str).unique())
-    comp_sel = f1.selectbox("Competência", ["Todas"] + competencias)
-    sigla_sel = f2.selectbox("Operação", ["Todas"] + siglas)
-    st.markdown('</div>', unsafe_allow_html=True)
+    with st.container(border=True):
+        f1, f2 = st.columns(2)
+        competencias = sorted(base["Competência"].dropna().astype(str).unique(), reverse=True)
+        siglas = sorted(base["Sigla"].dropna().astype(str).unique())
+        comp_sel = f1.selectbox("Competência", ["Todas"] + competencias)
+        sigla_sel = f2.selectbox("Operação", ["Todas"] + siglas)
 
     filtrada = base.copy()
     if comp_sel != "Todas":
