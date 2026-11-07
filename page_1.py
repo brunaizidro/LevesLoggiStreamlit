@@ -501,7 +501,7 @@ def page_1():
                     rank_base.groupby("destino", as_index=False)["valor_insumo"]
                     .sum()
                     .nlargest(10, "valor_insumo")
-                    .sort_values("valor_insumo", ascending=True, kind="stable")
+                    .sort_values("valor_insumo", ascending=False, kind="stable")
                 )
                 if not rank.empty:
                     rank["valor_label"] = rank["valor_insumo"].map(dp.fmt_brl)
