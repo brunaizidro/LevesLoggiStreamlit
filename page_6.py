@@ -180,6 +180,19 @@ def page_6():
     [data-testid="stButton"] button,[data-testid="stDownloadButton"] button{
         border-radius:10px!important;font-weight:750!important;min-height:42px;
     }
+    /* Botão de exportação: respiro abaixo da tabela e texto azul */
+    [data-testid="stDownloadButton"]{
+        margin-top:14px!important;
+    }
+    [data-testid="stDownloadButton"] button{
+        color:#0067FC!important;
+        border:1px solid #CFE0FF!important;
+        background:#FFFFFF!important;
+    }
+    [data-testid="stDownloadButton"] button *{
+        color:#0067FC!important;
+        -webkit-text-fill-color:#0067FC!important;
+    }
     [data-testid="stButton"] button[kind="primary"],
     [data-testid="stFormSubmitButton"] button[kind="primary"]{
         background:#0067FC!important;border-color:#0067FC!important;color:#FFFFFF!important;
