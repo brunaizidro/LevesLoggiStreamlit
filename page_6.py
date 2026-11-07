@@ -333,8 +333,11 @@ def page_6():
         )
 
         st.markdown(
-            "<div style='text-align:center;font-weight:750;color:#102B50;"
-            "font-size:16px;margin:0 0 10px 0;'>Cobrável por tipo</div>",
+            "<div style='display:flex;align-items:center;justify-content:center;"
+            "text-align:center;font-weight:750;color:#102B50;"
+            "font-size:16px;min-height:42px;padding:8px 12px;margin:0 0 12px 0;"
+            "background:#EAF3FF;border:1px solid #D6E6FF;border-radius:10px;'>"
+            "Cobrável por tipo</div>",
             unsafe_allow_html=True,
         )
         fig = px.bar(
@@ -398,8 +401,11 @@ def page_6():
             else "Cobrável por operação (top 5)"
         )
         st.markdown(
-            f"<div style='text-align:center;font-weight:750;color:#102B50;"
-            f"font-size:16px;margin:0 0 10px 0;'>{titulo_rank}</div>",
+            f"<div style='display:flex;align-items:center;justify-content:center;"
+            f"text-align:center;font-weight:750;color:#102B50;"
+            f"font-size:16px;min-height:42px;padding:8px 12px;margin:0 0 12px 0;"
+            f"background:#EAF3FF;border:1px solid #D6E6FF;border-radius:10px;'>"
+            f"{titulo_rank}</div>",
             unsafe_allow_html=True,
         )
         rank = (
