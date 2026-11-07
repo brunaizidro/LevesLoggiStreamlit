@@ -83,6 +83,9 @@ html, body, [data-testid="stApp"], [data-testid="stApp"] *,
     margin: 6px 0 18px !important;
 }
 
+/* Remove o realce azul de seleção do texto */
+::selection { background: transparent !important; color: #000000 !important; }
+
 /* Títulos e textos */
 .leves-filter-heading,
 .leves-section-label,
@@ -491,7 +494,7 @@ def page_1():
     if eh_admin and rank_col is not None:
         with rank_col:
             with st.container(border=True):
-                st.markdown('<div class="leves-chart-title" style="color:#000000 !important;">Top 10 bases por valor de insumos</div>', unsafe_allow_html=True)
+                st.markdown('<div class="leves-chart-title" style="color:#000000 !important; background:transparent !important;">Top 10 bases por valor de insumos</div>', unsafe_allow_html=True)
                 precos_unitarios = dp.precos()
                 rank_base = dfx.copy()
                 rank_base["valor_insumo"] = (
