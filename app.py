@@ -1166,32 +1166,81 @@ def main():
                 "Configurações",
             ]
         elif user.get("perfil") == "gdl":
-            opcoes = [
-                "Envios",
-                "Conciliação",
-                "Devoluções",
-                "Usuários",
-            ]
+            opcoes = ["Envios", "Conciliação", "Devoluções", "Usuários"]
         else:
             opcoes = ["Envios", "Devoluções", "Cobranças"]
 
-        # Se veio de um QR, já abre o Recebimento.
-        idx = 0
-        if scan_id and (eh_admin or eh_receb):
-            idx = next(
-                (i for i, o in enumerate(opcoes) if "Recebimento" in o),
-                0,
-            )
+        # Mantém a abertura de Recebimentos quando o usuário chega por QR Code.
+        chave_pagina = "pagina_navegacao_leves"
+        if scan_id and (eh_admin or eh_receb) and "Recebimentos" in opcoes:
+            st.session_state[chave_pagina] = "Recebimentos"
 
-        if len(opcoes) > 1:
-            pagina = st.radio(
-                "Navegação",
-                opcoes,
-                index=idx,
-                label_visibility="collapsed",
-            )
-        else:
+        pagina = st.session_state.get(chave_pagina)
+        if pagina not in opcoes:
             pagina = opcoes[0]
+            st.session_state[chave_pagina] = pagina
+
+        icones_menu = {
+            "Envios": ":material/inventory_2:",
+            "Recebimentos": ":material/inbox:",
+            "Conciliação": ":material/receipt_long:",
+            "Cobranças": ":material/paid:",
+            "Devoluções": ":material/undo:",
+            "Pendências": ":material/notifications:",
+            "Usuários": ":material/groups:",
+            "Relatórios": ":material/bar_chart:",
+            "Configurações": ":material/settings:",
+        }
+        slugs_menu = {
+            "Envios": "envios",
+            "Recebimentos": "recebimentos",
+            "Conciliação": "conciliacao",
+            "Cobranças": "cobrancas",
+            "Devoluções": "devolucoes",
+            "Pendências": "pendencias",
+            "Usuários": "usuarios",
+            "Relatórios": "relatorios",
+            "Configurações": "configuracoes",
+        }
+        modulos_operacao = [
+            nome for nome in opcoes
+            if nome in ["Envios", "Recebimentos", "Conciliação", "Cobranças", "Devoluções", "Pendências"]
+        ]
+        modulos_admin = [
+            nome for nome in opcoes
+            if nome in ["Usuários", "Relatórios", "Configurações"]
+        ]
+
+        with st.container(key="leves-nav-menu"):
+            if modulos_operacao:
+                st.markdown('<div class="leves-nav-section">OPERAÇÃO</div>', unsafe_allow_html=True)
+                for nome in modulos_operacao:
+                    if st.button(
+                        nome,
+                        key=f"nav_leves_{slugs_menu[nome]}",
+                        icon=icones_menu[nome],
+                        type="primary" if pagina == nome else "secondary",
+                        width="stretch",
+                    ):
+                        st.session_state[chave_pagina] = nome
+                        st.rerun()
+
+            if modulos_admin:
+                st.markdown(
+                    '<div class="leves-nav-admin"><div class="leves-nav-divider"></div>'
+                    '<div class="leves-nav-section">ADMINISTRAÇÃO</div></div>',
+                    unsafe_allow_html=True,
+                )
+                for nome in modulos_admin:
+                    if st.button(
+                        nome,
+                        key=f"nav_leves_{slugs_menu[nome]}",
+                        icon=icones_menu[nome],
+                        type="primary" if pagina == nome else "secondary",
+                        width="stretch",
+                    ):
+                        st.session_state[chave_pagina] = nome
+                        st.rerun()
 
         st.markdown("<hr class='sb-sep'>", unsafe_allow_html=True)
 
