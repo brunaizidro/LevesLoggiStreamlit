@@ -1218,7 +1218,6 @@ def main():
                     if st.button(
                         nome,
                         key=f"nav_leves_{slugs_menu[nome]}",
-                        icon=icones_menu[nome],
                         type="primary" if pagina == nome else "secondary",
                         width="stretch",
                     ):
@@ -1235,7 +1234,6 @@ def main():
                     if st.button(
                         nome,
                         key=f"nav_leves_{slugs_menu[nome]}",
-                        icon=icones_menu[nome],
                         type="primary" if pagina == nome else "secondary",
                         width="stretch",
                     ):
