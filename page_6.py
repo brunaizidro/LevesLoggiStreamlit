@@ -141,7 +141,18 @@ def page_6():
         box-shadow:0 3px 12px rgba(16,43,80,.035);min-height:104px;
     }
     [data-testid="stMetricLabel"]{color:#536987!important;font-weight:650!important;}
-    [data-testid="stMetricValue"]{color:#102B50!important;font-weight:850!important;}
+    [data-testid="stMetricValue"]{
+        color:#102B50!important;font-weight:850!important;
+        font-size:clamp(23px,1.9vw,31px)!important;
+        line-height:1.15!important;letter-spacing:-.5px;
+        white-space:nowrap;overflow:visible;
+    }
+    [data-testid="stMetricValue"] div{
+        font-size:inherit!important;line-height:inherit!important;
+        white-space:nowrap!important;
+    }
+    [data-testid="stMetric"]{min-width:0!important;overflow:hidden;}
+    [data-testid="stMetricLabel"]{font-size:13px!important;}
     [data-testid="stMetricDelta"]{font-weight:700!important;}
     [data-testid="stSelectbox"] label,
     [data-testid="stCheckbox"] label,
