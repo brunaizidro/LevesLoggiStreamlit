@@ -30,8 +30,8 @@ def page_10():
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
         .cob-page, .cob-page * {font-family:'Montserrat',sans-serif!important;}
         .cob-breadcrumb{color:#7B8798;font-size:11px;font-weight:600;letter-spacing:.65px;margin:0 0 7px;}
-        .cob-title{color:#172B4D;font-size:clamp(28px,2.3vw,34px);line-height:1.18;font-weight:800;letter-spacing:-.8px;margin:0 0 6px;}
-        .cob-description{color:#718096;font-size:15px;font-weight:600;margin:0 0 22px;}
+        .cob-title{color:#172B4D;font-size:clamp(32px,2.5vw,38px);line-height:1.18;font-weight:800;letter-spacing:-.8px;margin:0 0 4px;}
+        .cob-description{color:#718096;font-size:16px;font-weight:600;line-height:1.35;margin:0 0 22px;}
         .cob-card{background:#EAF3FF;border:1px solid #D6E6FF;border-radius:16px;padding:17px 20px;min-height:104px;display:flex;align-items:center;gap:15px;}
         .cob-icon{width:42px;height:42px;display:flex;align-items:center;justify-content:center;color:#0067FC;flex:0 0 42px;}
         .cob-icon svg{width:34px;height:34px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
