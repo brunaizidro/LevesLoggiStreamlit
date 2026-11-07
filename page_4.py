@@ -150,11 +150,18 @@ hr { border-color:#DCE7F6 !important; margin:22px 0 !important; }
 .rec-panel {background:#FFFFFF;border:1px solid #DCE7F6;border-radius:15px;padding:17px 16px;box-shadow:0 3px 12px rgba(16,43,80,.035);min-width:0;}
 .rec-panel-title {font-size:18px;font-weight:800;color:#102B50;margin:0 0 14px;display:flex;align-items:center;gap:10px;}
 .rec-panel-title span {color:#0067FC;font-size:22px;}
-.rec-item-row {display:flex;align-items:center;justify-content:space-between;background:#EAF3FF;border-radius:10px;padding:11px 14px;margin:8px 0;color:#102B50;font-weight:700;}
-.rec-item-name {display:flex;align-items:center;gap:12px;}
-.rec-item-icon {color:#0067FC;font-size:20px;width:24px;text-align:center;}
-.rec-item-qty {font-size:19px;font-weight:800;}
-.rec-total-bar {display:flex;justify-content:space-between;align-items:center;background:#0067FC;color:#FFFFFF;border-radius:10px;padding:12px 15px;margin-top:12px;font-weight:800;}
+.rec-declared-panel{padding:18px 17px 17px;background:#FFFFFF;border-color:#DCE8FA;}
+.rec-declared-heading{display:flex;align-items:center;gap:11px;background:linear-gradient(100deg,#EAF3FF,#F3F8FF);border-radius:11px;padding:12px 14px;margin-bottom:15px;color:#102B50;font-size:18px;font-weight:800;}
+.rec-heading-icon{display:inline-flex;align-items:center;justify-content:center;width:29px;height:29px;color:#0067FC;}
+.rec-heading-icon svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.rec-item-row {display:flex;align-items:center;justify-content:space-between;background:#F2F7FF;border:1px solid #E5EFFF;border-radius:11px;padding:12px 14px;margin:9px 0;color:#102B50;font-weight:700;min-height:58px;transition:background .15s ease;}
+.rec-item-name {display:flex;align-items:center;gap:13px;}
+.rec-item-icon {display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;background:#E1EEFF;border-radius:10px;color:#0067FC;flex:0 0 38px;}
+.rec-item-icon svg {width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+.rec-item-label {font-size:15px;font-weight:750;}
+.rec-item-qty {display:inline-flex;align-items:center;justify-content:center;min-width:48px;height:38px;padding:0 12px;background:#DFECFF;border-radius:10px;color:#102B50;font-size:18px;font-weight:850;}
+.rec-total-bar {display:flex;justify-content:space-between;align-items:center;background:#0067FC;color:#FFFFFF;border-radius:11px;padding:13px 15px;margin-top:14px;font-weight:800;min-height:56px;}
+.rec-total-value{display:inline-flex;align-items:center;justify-content:center;min-width:52px;height:36px;padding:0 12px;border-radius:9px;background:#FFFFFF;color:#0067FC;font-size:18px;font-weight:850;}
 .rec-actions {background:#FFFFFF;border:1px solid #DCE7F6;border-radius:15px;padding:15px 18px;margin-top:18px;}
 .rec-actions-title {font-size:17px;font-weight:800;color:#102B50;margin-bottom:10px;}
 @media(max-width:900px) {.rec-meta-panel{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.rec-meta-cell{border-right:0;padding:0 6px}.}
@@ -263,17 +270,24 @@ def _card_devolucao(dev: dict, quem: str):
     total_declarado = sum(i["qtd_declarada"] for i in itens)
     col_itens, col_contagem = st.columns([1, 1], gap="large")
     with col_itens:
-        icones = {"GAYLORD": "⬡", "PALLET": "▦", "SACA": "♧"}
+        icones_svg = {
+            "GAYLORD": '<svg viewBox="0 0 24 24"><path d="m12 2 9 5v10l-9 5-9-5V7l9-5Z"/><path d="m3 7 9 5 9-5M12 12v10"/></svg>',
+            "PALLET": '<svg viewBox="0 0 24 24"><path d="M3 4h18v12H3zM3 9h18M9 4v12m6-12v12M2 19h20M5 16v3m14-3v3"/></svg>',
+            "SACA": '<svg viewBox="0 0 24 24"><path d="M8 3c1.5 1 6.5 1 8 0l-1 4c3 2 4 5 4 12 0 1-2 2-7 2s-7-1-7-2c0-7 1-10 4-12L8 3Z"/><path d="M9 7h6"/></svg>',
+        }
         itens_html = "".join(
             f'<div class="rec-item-row"><div class="rec-item-name">'
-            f'<span class="rec-item-icon">{icones.get(str(it["tipo"]).upper(), "□")}</span>'
-            f'{it["tipo"].title()}</div><span class="rec-item-qty">{_fmt(it["qtd_declarada"])}</span></div>'
+            f'<span class="rec-item-icon">{icones_svg.get(str(it["tipo"]).upper(), "<svg viewBox=\'0 0 24 24\'><circle cx=\'12\' cy=\'12\' r=\'8\'/></svg>")}</span>'
+            f'<span class="rec-item-label">{it["tipo"].title()}</span></div>'
+            f'<span class="rec-item-qty">{_fmt(it["qtd_declarada"])}</span></div>'
             for it in itens
         )
         st.markdown(
-            '<div class="rec-panel"><div class="rec-panel-title"><span>⬡</span> Itens declarados</div>'
+            '<div class="rec-panel rec-declared-panel">'
+            '<div class="rec-declared-heading"><span class="rec-heading-icon"><svg viewBox="0 0 24 24"><path d="m12 2 9 5v10l-9 5-9-5V7l9-5Z"/><path d="m3 7 9 5 9-5M12 12v10"/></svg></span>'
+            '<span>Itens declarados</span></div>'
             + itens_html
-            + f'<div class="rec-total-bar"><span>Total declarado</span><span>{_fmt(total_declarado)}</span></div></div>',
+            + f'<div class="rec-total-bar"><span>Total declarado</span><span class="rec-total-value">{_fmt(total_declarado)}</span></div></div>',
             unsafe_allow_html=True,
         )
 
