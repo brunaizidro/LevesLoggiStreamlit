@@ -255,6 +255,24 @@ section[data-testid="stSidebar"] + div {margin-left:0 !important;}
 [data-testid="stSidebar"] [data-testid="stDownloadButton"] > button * {
     color:#FFFFFF !important;
 }
+
+/* Mantém a fonte de ícones do Streamlit no chevron do expander.
+   Sem isso, "arrow_drop_down" aparece como texto sobre o título. */
+[data-testid="stSidebar"] [data-testid="stExpander"] summary [data-testid="stIconMaterial"],
+[data-testid="stSidebar"] [data-testid="stExpander"] summary [data-testid="stIconMaterial"] * {
+    font-family:"Material Symbols Rounded" !important;
+    font-size:20px !important;
+    font-weight:normal !important;
+    line-height:1 !important;
+    font-feature-settings:"liga" !important;
+    letter-spacing:normal !important;
+    color:#FFFFFF !important;
+}
+[data-testid="stSidebar"] [data-testid="stExpander"] summary p {
+    font-family:Montserrat,sans-serif !important;
+    color:#FFFFFF !important;
+    font-weight:700 !important;
+}
 </style>
         """,
         unsafe_allow_html=True,
