@@ -176,6 +176,85 @@ section[data-testid="stSidebar"] + div {margin-left:0 !important;}
     background-color:currentColor !important;
     margin:0 !important;
 }
+
+/* Rodapé e suporte: contraste consistente com o fundo azul do portal */
+[data-testid="stSidebar"] [data-testid="stExpander"] {
+    background:rgba(0,48,150,.18) !important;
+    border:1px solid rgba(255,255,255,.22) !important;
+    border-radius:12px !important;
+    overflow:hidden !important;
+}
+[data-testid="stSidebar"] [data-testid="stExpander"] details,
+[data-testid="stSidebar"] [data-testid="stExpander"] details > div {
+    background:transparent !important;
+}
+[data-testid="stSidebar"] [data-testid="stExpander"] summary,
+[data-testid="stSidebar"] [data-testid="stExpander"] summary:hover {
+    background:#075BEA !important;
+    color:#FFFFFF !important;
+}
+[data-testid="stSidebar"] [data-testid="stExpander"] summary *,
+[data-testid="stSidebar"] [data-testid="stExpander"] summary p,
+[data-testid="stSidebar"] [data-testid="stExpander"] summary span {
+    color:#FFFFFF !important;
+    fill:#FFFFFF !important;
+    font-family:Montserrat,sans-serif !important;
+    font-weight:700 !important;
+}
+[data-testid="stSidebar"] [data-testid="stExpander"] [data-testid="stVerticalBlock"],
+[data-testid="stSidebar"] [data-testid="stExpander"] [data-testid="stHorizontalBlock"] {
+    background:transparent !important;
+}
+[data-testid="stSidebar"] [data-testid="stExpander"] label,
+[data-testid="stSidebar"] [data-testid="stExpander"] label p,
+[data-testid="stSidebar"] [data-testid="stExpander"] .stMarkdown,
+[data-testid="stSidebar"] [data-testid="stExpander"] .stMarkdown p {
+    color:#FFFFFF !important;
+    font-family:Montserrat,sans-serif !important;
+}
+[data-testid="stSidebar"] [data-testid="stExpander"] input,
+[data-testid="stSidebar"] [data-testid="stExpander"] textarea,
+[data-testid="stSidebar"] [data-testid="stExpander"] select {
+    background:#FFFFFF !important;
+    color:#17345F !important;
+    -webkit-text-fill-color:#17345F !important;
+    border:1px solid #B8D0F2 !important;
+    border-radius:9px !important;
+    caret-color:#075BEA !important;
+}
+[data-testid="stSidebar"] [data-testid="stExpander"] input::placeholder,
+[data-testid="stSidebar"] [data-testid="stExpander"] textarea::placeholder {
+    color:#64748B !important;
+    -webkit-text-fill-color:#64748B !important;
+    opacity:1 !important;
+}
+[data-testid="stSidebar"] [data-testid="stExpander"] [data-testid="stFormSubmitButton"] button,
+[data-testid="stSidebar"] [data-testid="stExpander"] button[kind="primary"] {
+    background:#0068F5 !important;
+    color:#FFFFFF !important;
+    border:1px solid #0068F5 !important;
+    border-radius:10px !important;
+    font-family:Montserrat,sans-serif !important;
+    font-weight:800 !important;
+}
+[data-testid="stSidebar"] [data-testid="stExpander"] [data-testid="stFormSubmitButton"] button *,
+[data-testid="stSidebar"] [data-testid="stExpander"] button[kind="primary"] * {
+    color:#FFFFFF !important;
+}
+/* Botões de rodapé (manual, atualizar e sair): azul com texto branco */
+[data-testid="stSidebar"] .stButton:not(.st-key-leves-nav-menu .stButton) > button,
+[data-testid="stSidebar"] [data-testid="stDownloadButton"] > button {
+    background:#0068F5 !important;
+    color:#FFFFFF !important;
+    border:1px solid #0068F5 !important;
+    border-radius:10px !important;
+    font-family:Montserrat,sans-serif !important;
+    font-weight:800 !important;
+}
+[data-testid="stSidebar"] .stButton:not(.st-key-leves-nav-menu .stButton) > button *,
+[data-testid="stSidebar"] [data-testid="stDownloadButton"] > button * {
+    color:#FFFFFF !important;
+}
 </style>
         """,
         unsafe_allow_html=True,
