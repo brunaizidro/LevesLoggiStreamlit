@@ -116,25 +116,31 @@ section[data-testid="stSidebar"] + div {margin-left:0 !important;}
     -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4'/%3E%3C/svg%3E");
     mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4'/%3E%3C/svg%3E");
 }
-/* Separador e título de Administração */
+/* Grupo Administração: divisor, título e somente os três módulos administrativos */
 [data-testid="stSidebar"] [role="radiogroup"] label:nth-of-type(7) {
-    margin-top:25px !important;
+    margin-top:45px !important;
 }
 [data-testid="stSidebar"] [role="radiogroup"] label:nth-of-type(7):before {
     content:"";
     position:absolute;
-    left:-1px;right:-1px;top:-15px;
+    left:-1px;right:-1px;top:-37px;
     height:1px;
     background:rgba(255,255,255,.55);
 }
 [data-testid="stSidebar"] [role="radiogroup"] label:nth-of-type(7):after {
     content:"ADMINISTRAÇÃO";
     position:absolute;
-    left:0;right:0;top:-34px;
+    left:0;right:0;top:-27px;
     color:#C8DDFF;
     font-family:Montserrat,sans-serif;
     font-size:10px;font-weight:800;letter-spacing:1.6px;
     pointer-events:none;
+}
+/* Mantém Usuários, Relatórios e Configurações juntos abaixo do título */
+[data-testid="stSidebar"] [role="radiogroup"] label:nth-of-type(7),
+[data-testid="stSidebar"] [role="radiogroup"] label:nth-of-type(8),
+[data-testid="stSidebar"] [role="radiogroup"] label:nth-of-type(9) {
+    flex-shrink:0 !important;
 }
 /* Usuários — grupo */
 [data-testid="stSidebar"] [role="radiogroup"] label:nth-of-type(7) p:before {
