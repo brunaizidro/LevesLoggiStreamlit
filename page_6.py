@@ -180,18 +180,22 @@ def page_6():
     [data-testid="stButton"] button,[data-testid="stDownloadButton"] button{
         border-radius:10px!important;font-weight:750!important;min-height:42px;
     }
-    /* Botão de exportação: respiro abaixo da tabela e texto azul */
+    /* Botão de exportação igual ao "Baixar CSV" da aba Envios */
     [data-testid="stDownloadButton"]{
-        margin-top:14px!important;
+        margin-top:4px!important;
     }
     [data-testid="stDownloadButton"] button{
-        color:#0067FC!important;
-        border:1px solid #CFE0FF!important;
-        background:#FFFFFF!important;
+        min-height:40px!important;
+        border-radius:9px!important;
+        font-family:'Montserrat',sans-serif!important;
+        font-weight:700!important;
+        color:#075BEA!important;
+        border:1px solid #D5E5FF!important;
+        background:#EEF5FF!important;
     }
     [data-testid="stDownloadButton"] button *{
-        color:#0067FC!important;
-        -webkit-text-fill-color:#0067FC!important;
+        color:#075BEA!important;
+        -webkit-text-fill-color:#075BEA!important;
     }
     [data-testid="stButton"] button[kind="primary"],
     [data-testid="stFormSubmitButton"] button[kind="primary"]{
