@@ -332,6 +332,11 @@ def page_6():
             lambda v: f"<b>{dp.fmt_brl(v)}</b>"
         )
 
+        st.markdown(
+            "<div style='text-align:center;font-weight:750;color:#102B50;"
+            "font-size:16px;margin:0 0 10px 0;'>Cobrável por tipo</div>",
+            unsafe_allow_html=True,
+        )
         fig = px.bar(
             tdf,
             x="tipo",
@@ -343,7 +348,6 @@ def page_6():
                 "PALLET": "#1685F8",
                 "SACA": "#0067FC",
             },
-            title="Cobrável por tipo",
             labels={"tipo": "Tipo", "cobravel": "Cobrável"},
             custom_data=["valor_cobravel"],
         )
@@ -371,7 +375,7 @@ def page_6():
             height=330,
             font_family="Montserrat",
             bargap=0.34,
-            margin=dict(l=12, r=18, t=42, b=42),
+            margin=dict(l=12, r=28, t=12, b=42),
             plot_bgcolor="#FFFFFF",
             paper_bgcolor="rgba(0,0,0,0)",
         )
@@ -393,7 +397,11 @@ def page_6():
             f"Cobrável por operação — {op_escolhida}" if op_escolhida != "Todas as operações"
             else "Cobrável por operação (top 5)"
         )
-        st.markdown(f"**{titulo_rank}**")
+        st.markdown(
+            f"<div style='text-align:center;font-weight:750;color:#102B50;"
+            f"font-size:16px;margin:0 0 10px 0;'>{titulo_rank}</div>",
+            unsafe_allow_html=True,
+        )
         rank = (
             df_view.groupby("destino", as_index=False)["cobravel"].sum()
             .query("cobravel > 0")
@@ -436,6 +444,7 @@ def page_6():
                 text=rank["valor_label"],
                 textposition="outside",
                 textfont=dict(size=12, family="Montserrat", color="#526783"),
+                cliponaxis=False,
                 hovertemplate=(
                     "<b>%{y}</b><br>"
                     "Valor cobrável: R$ %{x:,.2f}<br>"
@@ -447,7 +456,7 @@ def page_6():
                 height=330,
                 font_family="Montserrat",
                 bargap=0.24,
-                margin=dict(l=18, r=145, t=28, b=22),
+                margin=dict(l=18, r=210, t=12, b=22),
                 uniformtext_minsize=10,
                 uniformtext_mode="show",
                 plot_bgcolor="#FFFFFF",
@@ -457,6 +466,7 @@ def page_6():
             figd.update_xaxes(
                 title_text="", showgrid=False, showline=False,
                 ticks="", showticklabels=False, zeroline=False,
+                range=[0, float(rank["valor_cobravel"].max()) * 1.32],
             )
             figd.update_yaxes(
                 title_text="", showgrid=False, showline=False,
