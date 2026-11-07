@@ -143,16 +143,22 @@ def page_6():
     [data-testid="stMetricLabel"]{color:#536987!important;font-weight:650!important;}
     [data-testid="stMetricValue"]{
         color:#102B50!important;font-weight:850!important;
-        font-size:clamp(23px,1.9vw,31px)!important;
-        line-height:1.15!important;letter-spacing:-.5px;
-        white-space:nowrap;overflow:visible;
+        font-size:clamp(19px,1.5vw,25px)!important;
+        line-height:1.15!important;letter-spacing:-.35px;
+        white-space:nowrap;overflow:visible;text-align:center!important;
     }
     [data-testid="stMetricValue"] div{
         font-size:inherit!important;line-height:inherit!important;
-        white-space:nowrap!important;
+        white-space:nowrap!important;text-align:center!important;width:100%;
     }
-    [data-testid="stMetric"]{min-width:0!important;overflow:hidden;}
-    [data-testid="stMetricLabel"]{font-size:13px!important;}
+    [data-testid="stMetric"]{
+        min-width:0!important;overflow:hidden;text-align:center!important;
+        display:flex;flex-direction:column;align-items:center;justify-content:center;
+    }
+    [data-testid="stMetricLabel"]{
+        font-size:13px!important;text-align:center!important;width:100%;
+    }
+    [data-testid="stMetricDelta"]{justify-content:center!important;text-align:center!important;}
     [data-testid="stMetricDelta"]{font-weight:700!important;}
     [data-testid="stSelectbox"] label,
     [data-testid="stCheckbox"] label,
