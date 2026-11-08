@@ -168,7 +168,7 @@ def page_3():
         .dev-status-cancel { background:#fff0f0; color:#bd3e45; }
         .dev-operation { display:flex; align-items:center; gap:8px; color:#243b60; font-family:'Montserrat',sans-serif; font-size:13px; font-weight:600; white-space:nowrap; }
         .dev-operation span { color:#075bea; font-size:18px; font-weight:800; }
-        .dev-quantity { color:#172b4d !important; font-family:'Montserrat',sans-serif !important; font-size:16px !important; font-weight:800 !important; text-align:center; }
+        .dev-quantity-wrap { display:flex !important; align-items:center !important; justify-content:center !important; width:100% !important; min-width:0 !important; text-align:center !important; }\n        .dev-quantity { display:block !important; width:100% !important; color:#172b4d !important; font-family:'Montserrat',sans-serif !important; font-size:16px !important; font-weight:800 !important; text-align:center !important; }
         .dev-row-divider { height:1px; background:#dce5f0; margin:0 2px 10px; }
         div[data-testid="stVerticalBlockBorderWrapper"] { border:1px solid #cfdced !important; border-radius:12px !important; background:#fff !important; }
         div[data-testid="stVerticalBlockBorderWrapper"] > div { padding:12px 14px !important; }
@@ -458,7 +458,7 @@ def _minhas_devolucoes(destino: str, eh_admin: bool = False, eh_gdl: bool = Fals
                 unsafe_allow_html=True,
             )
             c4.markdown(
-                f"<div class='dev-quantity'>{_fmt(d['total_declarado'])}</div>",
+                f"<div class='dev-quantity-wrap'><div class='dev-quantity'>{_fmt(d['total_declarado'])}</div></div>",
                 unsafe_allow_html=True,
             )
             with c5:
