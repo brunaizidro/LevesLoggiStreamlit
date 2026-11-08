@@ -127,7 +127,7 @@ def page_2():
             <div class="modulo-title">{titulo}</div>
             <p class="modulo-subtitle">{subtitulo}</p>
         </div>
-        """,
+        """.replace("{titulo}", titulo).replace("{subtitulo}", subtitulo),
         unsafe_allow_html=True,
     )
 
