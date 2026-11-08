@@ -50,12 +50,12 @@ def page_6():
             color:#172B4D!important;font-family:'Montserrat',sans-serif!important;
             font-size:38px!important;
             line-height:1.18!important;font-weight:800!important;
-            letter-spacing:-.8px!important;margin:0 0 6px!important;
+            letter-spacing:-.8px!important;margin:0!important;
         }
         .concil-intro{
             color:#627895!important;font-family:'Montserrat',sans-serif!important;
             font-size:16px!important;font-weight:600!important;
-            line-height:1.5!important;margin:-4px 0 20px!important;
+            line-height:1.55!important;margin:6px 0 18px!important;
         }
         </style>
         """,
