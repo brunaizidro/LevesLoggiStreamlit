@@ -48,9 +48,14 @@ def page_6():
         }
         .concil-page-title{
             color:#172B4D!important;font-family:'Montserrat',sans-serif!important;
-            font-size:clamp(28px,2.3vw,34px)!important;
+            font-size:38px!important;
             line-height:1.18!important;font-weight:800!important;
             letter-spacing:-.8px!important;margin:0 0 6px!important;
+        }
+        .concil-intro{
+            color:#627895!important;font-family:'Montserrat',sans-serif!important;
+            font-size:16px!important;font-weight:600!important;
+            line-height:1.5!important;margin:-4px 0 20px!important;
         }
         </style>
         """,
@@ -157,7 +162,6 @@ def page_6():
     .concil-html-table tbody tr:nth-child(even) td{background:#F7FAFF;}
     .concil-html-table tbody tr:hover td{background:#EEF5FF;}
 
-    .concil-intro{color:#627895;font-size:14px;line-height:1.65;margin:-4px 0 20px;}
     [data-testid="stAppViewContainer"] h2,
     [data-testid="stAppViewContainer"] h3,
     [data-testid="stAppViewContainer"] h4{color:#102B50;font-weight:800;}
