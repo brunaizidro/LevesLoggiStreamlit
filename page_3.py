@@ -111,8 +111,8 @@ def page_3():
         .dev-balance-qty { color:#142f55; font-family:'Montserrat',sans-serif; font-size:34px; line-height:1.05; font-weight:800; letter-spacing:-1px; margin-bottom:15px; }
         .dev-balance-caption { color:#8192a8; font-family:'Montserrat',sans-serif; font-size:11px; font-weight:700; margin-bottom:3px; padding-top:10px; border-top:1px solid #edf1f6; }
         .dev-balance-value { color:#174b88; font-family:'Montserrat',sans-serif; font-size:17px; font-weight:800; }
-        .dev-total-banner { display:flex; align-items:center; gap:13px; background:linear-gradient(105deg,#153b70 0%,#1c5ca8 100%); border:1px solid #1b5598; border-radius:13px; padding:16px 20px; margin:14px 0 20px; color:#ffffff; font-family:'Montserrat',sans-serif; font-size:14px; font-weight:600; box-shadow:0 4px 12px rgba(21,59,112,.13); }
-        .dev-total-banner strong { color:#ffffff; font-size:19px; font-weight:800; margin-left:4px; }
+        .dev-total-banner { display:flex; align-items:center; gap:13px; background:#eaf3ff; border:1px solid #cfe0ff; border-radius:13px; padding:16px 20px; margin:14px 0 20px; color:#1155cc; font-family:'Montserrat',sans-serif; font-size:14px; font-weight:700; box-shadow:0 3px 10px rgba(17,85,204,.06); }
+        .dev-total-banner strong { color:#17345f; font-size:19px; font-weight:800; margin-left:4px; }
         div[data-testid="stSelectbox"] label, div[data-testid="stNumberInput"] label, div[data-testid="stTextInput"] label { color:#17385f !important; font-weight:650 !important; }
         div[data-testid="stSelectbox"] > div > div, div[data-testid="stNumberInput"] input, div[data-testid="stTextInput"] input { border-radius:10px !important; }
         div[data-testid="stExpander"] { border:1px solid #d5e6ff !important; border-radius:12px !important; background:#f7faff !important; }
