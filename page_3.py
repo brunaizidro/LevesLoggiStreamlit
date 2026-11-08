@@ -354,14 +354,14 @@ def page_3():
                         )
             st.markdown("<div class='dev-field-label'>Placa do veículo</div>", unsafe_allow_html=True)
             with st.container(key="dev-plate-field"):
-                plate_icon, plate_input = st.columns([0.065, 0.935], gap="none", vertical_alignment="center")
+                plate_icon, plate_input = st.columns([0.065, 0.935], gap=0, vertical_alignment="center")
                 with plate_icon:
                     st.markdown("<div class='dev-input-icon'><svg viewBox='0 0 24 24' aria-hidden='true'><path d='M3 7h12v11H3zM15 11h4l3 3v4h-7zM7 18a2 2 0 1 0 4 0m7 0a2 2 0 1 0 4 0' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/></svg></div>", unsafe_allow_html=True)
                 with plate_input:
                     placa = st.text_input("Placa do veículo", placeholder="Ex.: ABC1D23", label_visibility="collapsed")
             st.markdown("<div class='dev-field-label dev-observation-label'>Observação (opcional)</div>", unsafe_allow_html=True)
             with st.container(key="dev-observation-field"):
-                obs_icon, obs_input = st.columns([0.065, 0.935], gap="none", vertical_alignment="center")
+                obs_icon, obs_input = st.columns([0.065, 0.935], gap=0, vertical_alignment="center")
                 with obs_icon:
                     st.markdown("<div class='dev-input-icon dev-textarea-icon'><svg viewBox='0 0 24 24' aria-hidden='true'><rect x='5' y='3' width='14' height='18' rx='1.5' fill='none' stroke='currentColor' stroke-width='1.8'/><path d='M8 8h8M8 12h8M8 16h5' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round'/></svg></div>", unsafe_allow_html=True)
                 with obs_input:
