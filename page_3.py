@@ -117,10 +117,18 @@ def page_3():
         div[data-testid="stFormSubmitButton"] button { background:#075BEA !important; color:white !important; border:0 !important; border-radius:10px !important; font-weight:700 !important; padding:10px 22px !important; }
         div[data-testid="stAlert"][kind="success"] { background:#e8f8f2 !important; border:1px solid #c9efdf !important; color:#126b62 !important; border-radius:11px !important; }
         div[data-testid="stAlert"][kind="info"] { background:#eaf3ff !important; border:1px solid #d8e8ff !important; color:#1155cc !important; border-radius:12px !important; }
-        .dev-list-head { color:#53647c; font-size:12px; font-weight:800; letter-spacing:.45px; padding:8px 10px; }
-        div[data-testid="stVerticalBlockBorderWrapper"] { border:1px solid #d7dfeb !important; border-radius:12px !important; background:#fff !important; }
+        .dev-list-head { color:#627895 !important; font-family:'Montserrat',sans-serif !important; font-size:11px !important; font-weight:800 !important; letter-spacing:.55px !important; padding:8px 10px !important; }
+        .dev-list-title { color:#172b4d !important; font-family:'Montserrat',sans-serif !important; font-size:24px !important; font-weight:800 !important; letter-spacing:-.4px !important; margin:22px 0 12px !important; }
+        .dev-record-id { color:#172b4d !important; font-family:'Montserrat',sans-serif !important; font-size:15px !important; font-weight:800 !important; }
+        .dev-record-meta { color:#7185a0 !important; font-family:'Montserrat',sans-serif !important; font-size:12px !important; font-weight:500 !important; margin-top:3px !important; }
+        .dev-status { display:inline-flex; align-items:center; border-radius:20px; padding:5px 10px; font-family:'Montserrat',sans-serif; font-size:12px; font-weight:700; background:#eaf3ff; color:#1155cc; }
+        .dev-status-ok { background:#e8f8f2; color:#16805d; }
+        .dev-status-cancel { background:#fff0f0; color:#bd3e45; }
+        .dev-quantity { color:#172b4d !important; font-family:'Montserrat',sans-serif !important; font-size:15px !important; font-weight:800 !important; }
+        div[data-testid="stVerticalBlockBorderWrapper"] { border:1px solid #d7e3f2 !important; border-radius:12px !important; background:#fff !important; }
         div[data-testid="stVerticalBlockBorderWrapper"] > div { padding:12px 14px !important; }
-        div[data-testid="stDownloadButton"] button { border:1px solid #cbd6e5 !important; border-radius:10px !important; font-weight:700 !important; color:#172b4d !important; background:#fff !important; }
+        div[data-testid="stDownloadButton"] button { border:1px solid #cbdcf0 !important; border-radius:10px !important; font-family:'Montserrat',sans-serif !important; font-weight:700 !important; color:#172b4d !important; background:#fff !important; }
+        div[data-testid="stDownloadButton"] button:hover { border-color:#1155cc !important; color:#1155cc !important; background:#f5f9ff !important; }
         hr.sb-sep { border-color:#d8e7f8 !important; margin:22px 0 !important; }
         </style>
         """,
@@ -157,28 +165,6 @@ def page_3():
 
         if eh_gdl:
             st.info("Perfil GDL: visualização das devoluções. O registro de novas devoluções é exclusivo do administrador.")
-
-    if manual.disponivel():
-        with st.container(border=True):
-            mc1, mc2, mc3 = st.columns([0.65, 4.8, 1.8], vertical_alignment="center")
-            with mc1:
-                st.markdown(
-                    "<div style='width:48px;height:48px;border-radius:12px;background:#eaf3ff;"
-                    "display:flex;align-items:center;justify-content:center;color:#1155cc;"
-                    "font-size:25px;'>▤</div>",
-                    unsafe_allow_html=True,
-                )
-            with mc2:
-                st.markdown(
-                    "<div style='color:#172b4d;font-size:18px;font-weight:800;'>Manual de devolução</div>"
-                    "<div style='color:#627895;font-size:14px;font-weight:500;'>"
-                    "Consulte o procedimento para realizar devoluções.</div>"
-                    "<div style='margin-top:5px;display:inline-block;background:#e5f2ff;color:#1155cc;"
-                    "border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;'>Treinamento</div>",
-                    unsafe_allow_html=True,
-                )
-            with mc3:
-                manual.botao_manual(key="manual_page3", label="Baixar manual em PDF")
 
     # ---- Competência selecionada (antes do saldo) ----
     if not eh_gdl:
@@ -339,11 +325,9 @@ def page_3():
 
 def _minhas_devolucoes(destino: str, eh_admin: bool = False, eh_gdl: bool = False):
     st.markdown(
-        "<div style='color:#172b4d;font-size:24px;font-weight:800;letter-spacing:-.4px;"
-        "margin:20px 0 12px;'>Devoluções da operação</div>"
-        if (eh_admin or eh_gdl) else
-        "<div style='color:#172b4d;font-size:24px;font-weight:800;letter-spacing:-.4px;"
-        "margin:20px 0 12px;'>Minhas devoluções</div>",
+        "<div class='dev-list-title'>"
+        + ("Devoluções da operação" if (eh_admin or eh_gdl) else "Minhas devoluções")
+        + "</div>",
         unsafe_allow_html=True,
     )
     devs = dp.devolucoes_df()
@@ -366,11 +350,25 @@ def _minhas_devolucoes(destino: str, eh_admin: bool = False, eh_gdl: bool = Fals
         with st.container(border=True):
             c1, c2, c3, c4 = st.columns([2, 1.4, 1, 1.2], vertical_alignment="center")
             comp = d.get("competencia")
-            comp_txt = f"  \n🗓️ {dp.rotulo_mes(comp)}" if comp and len(str(comp)) == 7 else ""
-            c1.markdown(f"**{d['id']}**  \n{d['data_criacao']}{comp_txt}")
-            c2.markdown(dp.STATUS_LABEL.get(d["status"], d["status"])
-                        + (f"  \n🚚 {d.get('placa')}" if d.get("placa") else ""))
-            c3.markdown(f"Total: **{_fmt(d['total_declarado'])}**")
+            comp_txt = dp.rotulo_mes(comp) if comp and len(str(comp)) == 7 else ""
+            c1.markdown(
+                f"<div class='dev-record-id'>{d['id']}</div>"
+                f"<div class='dev-record-meta'>{d['data_criacao']}</div>"
+                + (f"<div class='dev-record-meta'>🗓️ {comp_txt}</div>" if comp_txt else ""),
+                unsafe_allow_html=True,
+            )
+            status_txt = dp.STATUS_LABEL.get(d["status"], d["status"])
+            status_class = (
+                "dev-status-cancel" if "cancel" in str(d["status"]).lower()
+                else "dev-status-ok" if any(x in str(status_txt).lower() for x in ("conferido", "recebido"))
+                else ""
+            )
+            c2.markdown(
+                f"<span class='dev-status {status_class}'>{status_txt}</span>"
+                + (f"<div class='dev-record-meta'>🚚 {d.get('placa')}</div>" if d.get("placa") else ""),
+                unsafe_allow_html=True,
+            )
+            c3.markdown(f"<div class='dev-quantity'>Total: {_fmt(d['total_declarado'])}</div>", unsafe_allow_html=True)
             with c4:
                 itens = dp.itens_da_devolucao(d["id"])
                 itens_l = [{"tipo": r["tipo"], "qtd_declarada": r["qtd_declarada"]}
