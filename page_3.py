@@ -116,6 +116,11 @@ def page_3():
         div[data-testid="stForm"] { border:1px solid #d5e6ff; border-radius:15px; padding:20px 18px 12px; background:#fbfdff; }
         div[data-testid="stFormSubmitButton"] button { background:#075BEA !important; color:white !important; border:0 !important; border-radius:10px !important; font-weight:700 !important; padding:10px 22px !important; }
         div[data-testid="stAlert"][kind="success"] { background:#e8f8f2 !important; border:1px solid #c9efdf !important; color:#126b62 !important; border-radius:11px !important; }
+        div[data-testid="stAlert"][kind="info"] { background:#eaf3ff !important; border:1px solid #d8e8ff !important; color:#1155cc !important; border-radius:12px !important; }
+        .dev-list-head { color:#53647c; font-size:12px; font-weight:800; letter-spacing:.45px; padding:8px 10px; }
+        div[data-testid="stVerticalBlockBorderWrapper"] { border:1px solid #d7dfeb !important; border-radius:12px !important; background:#fff !important; }
+        div[data-testid="stVerticalBlockBorderWrapper"] > div { padding:12px 14px !important; }
+        div[data-testid="stDownloadButton"] button { border:1px solid #cbd6e5 !important; border-radius:10px !important; font-weight:700 !important; color:#172b4d !important; background:#fff !important; }
         hr.sb-sep { border-color:#d8e7f8 !important; margin:22px 0 !important; }
         </style>
         """,
@@ -154,11 +159,26 @@ def page_3():
             st.info("Perfil GDL: visualização das devoluções. O registro de novas devoluções é exclusivo do administrador.")
 
     if manual.disponivel():
-        st.markdown(
-            "<div class='dev-section-title' style='margin-top:12px;'>Manual de devolução (treinamento)</div>",
-            unsafe_allow_html=True,
-        )
-        manual.botao_manual(key="manual_page3", label="Baixar manual em PDF")
+        with st.container(border=True):
+            mc1, mc2, mc3 = st.columns([0.65, 4.8, 1.8], vertical_alignment="center")
+            with mc1:
+                st.markdown(
+                    "<div style='width:48px;height:48px;border-radius:12px;background:#eaf3ff;"
+                    "display:flex;align-items:center;justify-content:center;color:#1155cc;"
+                    "font-size:25px;'>▤</div>",
+                    unsafe_allow_html=True,
+                )
+            with mc2:
+                st.markdown(
+                    "<div style='color:#172b4d;font-size:18px;font-weight:800;'>Manual de devolução</div>"
+                    "<div style='color:#627895;font-size:14px;font-weight:500;'>"
+                    "Consulte o procedimento para realizar devoluções.</div>"
+                    "<div style='margin-top:5px;display:inline-block;background:#e5f2ff;color:#1155cc;"
+                    "border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;'>Treinamento</div>",
+                    unsafe_allow_html=True,
+                )
+            with mc3:
+                manual.botao_manual(key="manual_page3", label="Baixar manual em PDF")
 
     # ---- Competência selecionada (antes do saldo) ----
     if not eh_gdl:
@@ -318,7 +338,14 @@ def page_3():
 
 
 def _minhas_devolucoes(destino: str, eh_admin: bool = False, eh_gdl: bool = False):
-    st.markdown("#### Devoluções da operação" if (eh_admin or eh_gdl) else "#### Minhas devoluções")
+    st.markdown(
+        "<div style='color:#172b4d;font-size:24px;font-weight:800;letter-spacing:-.4px;"
+        "margin:20px 0 12px;'>Devoluções da operação</div>"
+        if (eh_admin or eh_gdl) else
+        "<div style='color:#172b4d;font-size:24px;font-weight:800;letter-spacing:-.4px;"
+        "margin:20px 0 12px;'>Minhas devoluções</div>",
+        unsafe_allow_html=True,
+    )
     devs = dp.devolucoes_df()
     if devs.empty:
         st.caption("Nenhuma devolução registrada ainda.")
@@ -329,9 +356,15 @@ def _minhas_devolucoes(destino: str, eh_admin: bool = False, eh_gdl: bool = Fals
         st.caption("Nenhuma devolução registrada ainda.")
         return
 
+    h1, h2, h3, h4 = st.columns([2, 1.4, 1, 1.2])
+    h1.markdown("<div class='dev-list-head'>REGISTRO</div>", unsafe_allow_html=True)
+    h2.markdown("<div class='dev-list-head'>STATUS</div>", unsafe_allow_html=True)
+    h3.markdown("<div class='dev-list-head'>QUANTIDADE</div>", unsafe_allow_html=True)
+    h4.markdown("<div class='dev-list-head'>&nbsp;</div>", unsafe_allow_html=True)
+
     for _, d in minhas.iterrows():
         with st.container(border=True):
-            c1, c2, c3, c4 = st.columns([2, 1.4, 1, 1.2])
+            c1, c2, c3, c4 = st.columns([2, 1.4, 1, 1.2], vertical_alignment="center")
             comp = d.get("competencia")
             comp_txt = f"  \n🗓️ {dp.rotulo_mes(comp)}" if comp and len(str(comp)) == 7 else ""
             c1.markdown(f"**{d['id']}**  \n{d['data_criacao']}{comp_txt}")
