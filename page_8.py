@@ -34,10 +34,21 @@ def _grupos(pend, competencia_label):
 
 
 def page_8():
-    st.subheader("Pendências de devolução")
     st.markdown(
-        "<p class='custom-text'>Consulte as pendências por mês e envie lembretes "
-        "de cobrança somente da competência selecionada.</p>",
+        """
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+        .modulo-header { font-family:'Montserrat',sans-serif !important; text-align:left; }
+        .modulo-breadcrumb { color:#7B8798 !important; font-family:'Montserrat',sans-serif !important; font-size:11px !important; font-weight:600 !important; letter-spacing:.55px !important; margin:0 0 7px !important; }
+        .modulo-title { color:#172B4D !important; font-family:'Montserrat',sans-serif !important; font-size:38px !important; line-height:1.18 !important; font-weight:800 !important; letter-spacing:-.8px !important; margin:0 !important; text-align:left !important; }
+        .modulo-subtitle { color:#627895 !important; font-family:'Montserrat',sans-serif !important; font-size:16px !important; font-weight:600 !important; line-height:1.55 !important; margin:2px 0 18px !important; text-align:left !important; }
+        </style>
+        <div class="modulo-header">
+            <div class="modulo-breadcrumb">PORTAL LEVES &nbsp;/&nbsp; PENDÊNCIAS</div>
+            <div class="modulo-title">Pendências de devolução</div>
+            <p class="modulo-subtitle">Consulte as pendências por mês e envie lembretes de cobrança somente da competência selecionada.</p>
+        </div>
+        """,
         unsafe_allow_html=True,
     )
 
