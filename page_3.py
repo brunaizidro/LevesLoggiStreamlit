@@ -104,21 +104,24 @@ def page_3():
         .dev-page-title { color:#172B4D !important; display:block !important; width:100% !important; font-size:38px !important; line-height:1.18 !important; font-weight:800 !important; letter-spacing:-.8px !important; margin:0 !important; padding:0 !important; text-align:left !important; }
         .dev-page-subtitle { color:#627895 !important; display:block !important; font-family:'Montserrat',sans-serif !important; font-size:16px !important; line-height:1.55 !important; font-weight:600 !important; margin:2px 0 18px !important; padding:0 !important; position:static !important; top:auto !important; text-align:left !important; }
         .dev-section-title { display:flex; align-items:center; gap:14px; color:#0755c9; background:#e5f6e9; border:1px solid #ccebd4; border-radius:13px; padding:13px 18px; font-family:'Montserrat',sans-serif; font-size:20px; font-weight:800; margin:16px 0 12px; }
-        .dev-section-icon { display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; flex:0 0 34px; border-radius:10px; background:#075DE5; color:#fff; font-size:25px; line-height:1; font-weight:500; }
-        div[data-testid='stForm'] { border:1px solid #d5e6ff !important; border-radius:16px !important; padding:18px 18px 14px !important; background:#fbfdff !important; }
-        [class*="st-key-dev-qtd-"] { background:linear-gradient(180deg,#f1f7ff 0%,#ffffff 100%); border:1px solid #d7e6fb; border-radius:15px; padding:15px 14px 12px; min-height:126px; box-shadow:0 3px 10px rgba(23,75,136,.045); }
-        .dev-qty-head { display:flex; align-items:center; gap:11px; margin:0 0 12px; min-height:40px; }
-        .dev-qty-icon { display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; flex:0 0 38px; border-radius:11px; background:#e1edff; color:#075DE5; font-size:22px; font-weight:800; }
-        .dev-qty-title { display:flex; flex-direction:column; gap:3px; color:#17345f; font-family:'Montserrat',sans-serif; line-height:1.2; }
+        .dev-new-title { display:flex; align-items:center; gap:16px; color:#176B3A; background:#E4F5E8; border:1px solid #C9EBD1; border-radius:15px; padding:10px 18px; min-height:74px; font-family:'Montserrat',sans-serif; font-size:22px; font-weight:800; margin:16px 0 8px; }
+        .dev-section-icon { display:inline-flex; align-items:center; justify-content:center; width:40px; height:40px; flex:0 0 40px; border-radius:11px; background:#075DE5; color:#fff; font-size:27px; line-height:1; font-weight:500; }
+        div[data-testid='stForm'] { border:1px solid #d5e6ff !important; border-radius:17px !important; padding:14px 18px 16px !important; background:linear-gradient(180deg,#fbfdff 0%,#ffffff 100%) !important; }
+        [class*="st-key-dev-qtd-"] { background:linear-gradient(180deg,#f5f8ff 0%,#f9fbff 100%); border:1px solid #D5E2FA; border-radius:15px; padding:12px 11px !important; min-height:80px; box-shadow:0 2px 6px rgba(23,75,136,.055); }
+        [class*="st-key-dev-qtd-"] [data-testid="stHorizontalBlock"] { align-items:center; gap:8px; }
+        .dev-qty-head { display:flex; align-items:center; gap:10px; min-height:52px; margin:0; white-space:nowrap; }
+        .dev-qty-icon { display:inline-flex; align-items:center; justify-content:center; width:50px; height:50px; flex:0 0 50px; border-radius:12px; background:#E3EDFF; color:#075DE5; padding:9px; }
+        .dev-qty-icon svg { width:100%; height:100%; }
+        .dev-qty-title { display:flex; flex-direction:column; gap:4px; color:#0E2C5A; font-family:'Montserrat',sans-serif; line-height:1.15; }
         .dev-qty-title strong { font-size:14px; font-weight:800; }
-        .dev-qty-title small { color:#7890ad; font-size:10px; font-weight:650; }
+        .dev-qty-title small { color:#7890B2; font-size:11px; font-weight:650; }
         [class*="st-key-dev-qtd-"] div[data-testid="stNumberInput"] { margin:0 !important; }
+        [class*="st-key-dev-qtd-"] div[data-testid="stNumberInput"] input { font-size:27px !important; font-weight:800 !important; color:#0E2C5A !important; text-align:center !important; padding:0 2px !important; }
+        [class*="st-key-dev-qtd-"] div[data-testid="stNumberInput"] button { color:#075DE5 !important; border-radius:9px !important; min-width:34px !important; }
         div[data-testid='stNumberInput'] label, div[data-testid='stTextInput'] label, div[data-testid='stTextArea'] label { color:#17385f !important; font-family:'Montserrat',sans-serif !important; font-weight:750 !important; }
-        div[data-testid='stNumberInput'] input { font-size:21px !important; font-weight:800 !important; color:#17345f !important; text-align:center !important; }
-        div[data-testid='stNumberInput'] button { color:#075DE5 !important; border-radius:8px !important; }
         div[data-testid='stNumberInput'] > div, div[data-testid='stTextInput'] > div, div[data-testid='stTextArea'] > div { border-radius:10px !important; }
         div[data-testid='stNumberInput'] input, div[data-testid='stTextInput'] input, div[data-testid='stTextArea'] textarea { border-radius:10px !important; border-color:#cbd8e8 !important; background:#fff !important; font-family:'Montserrat',sans-serif !important; }
-        div[data-testid='stTextArea'] textarea { min-height:76px !important; }
+        div[data-testid='stTextArea'] textarea { min-height:68px !important; }
         div[data-testid='stFormSubmitButton'] button { background:#075DE5 !important; color:#fff !important; border:0 !important; border-radius:10px !important; font-family:'Montserrat',sans-serif !important; font-weight:800 !important; padding:10px 22px !important; }
         div[data-testid='stFormSubmitButton'] button:hover { background:#064fc4 !important; box-shadow:0 4px 12px rgba(7,93,229,.18) !important; }
         .dev-balance-card { position:relative; overflow:hidden; background:#ffffff; border:1px solid #d9e4f2; border-radius:14px; padding:18px 20px 17px; min-height:146px; box-shadow:0 3px 10px rgba(23,52,95,.045); transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
@@ -304,7 +307,7 @@ def page_3():
         _minhas_devolucoes(destino, eh_admin=False, eh_gdl=True)
         return
 
-    st.markdown("<div class='dev-section-title'><span class='dev-section-icon'>＋</span><span>Nova devolução</span></div>", unsafe_allow_html=True)
+    st.markdown("<div class='dev-new-title'><span class='dev-section-icon'>＋</span><span>Nova devolução</span></div>", unsafe_allow_html=True)
     pend = {t: q for t, q in dp.pending_mes_tipo(destino, mes_ref).items() if q > 0}
     if not pend:
         st.success(f"Sem pendência de devolução para {escolha_mes}. 🎉")
@@ -313,21 +316,28 @@ def page_3():
             qtds = {}
             itens_pend = sorted(pend.items())
             fcols = st.columns(len(itens_pend), gap="medium")
-            icones_insumo = {"gaylord": "▦", "pallet": "▤", "saca": "▧"}
+            icones_insumo = {
+                "gaylord": "<svg viewBox='0 0 48 48' aria-hidden='true'><path d='M7 15 24 6l17 9v19L24 43 7 34Z' fill='none' stroke='currentColor' stroke-width='2.6' stroke-linejoin='round'/><path d='m7 15 17 10 17-10M24 25v18M16 10l17 10M32 10 15 20' fill='none' stroke='currentColor' stroke-width='2.4' stroke-linejoin='round'/></svg>",
+                "pallet": "<svg viewBox='0 0 48 48' aria-hidden='true'><path d='m5 17 19-10 19 10-19 10Z M5 25l19 10 19-10M5 33l19 10 19-10' fill='none' stroke='currentColor' stroke-width='2.6' stroke-linejoin='round'/></svg>",
+                "saca": "<svg viewBox='0 0 48 48' aria-hidden='true'><path d='M18 7c2 4 10 4 12 0M18 7l-2 7c-5 4-8 11-8 20 0 5 7 7 16 7s16-2 16-7c0-9-3-16-8-20l-2-7M16 14h16M17 22c4 2 10 2 14 0' fill='none' stroke='currentColor' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/></svg>",
+            }
             for i, (t, q) in enumerate(itens_pend):
                 with fcols[i].container(key=f"dev-qtd-{i}"):
-                    st.markdown(
-                        f"<div class='dev-qty-head'>"
-                        f"<span class='dev-qty-icon'>{icones_insumo.get(str(t).lower(), '＋')}</span>"
-                        f"<span class='dev-qty-title'><strong>{t.title()}</strong>"
-                        f"<small>Máximo disponível: {_fmt(q)}</small></span></div>",
-                        unsafe_allow_html=True,
-                    )
-                    qtds[t] = st.number_input(
-                        f"Quantidade de {t.title()}",
-                        min_value=0, max_value=int(q), step=1, value=0,
-                        label_visibility="collapsed", key=f"dev-quantidade-{i}",
-                    )
+                    qty_cols = st.columns([1.45, 1.0], gap="small", vertical_alignment="center")
+                    with qty_cols[0]:
+                        st.markdown(
+                            f"<div class='dev-qty-head'>"
+                            f"<span class='dev-qty-icon'>{icones_insumo.get(str(t).lower(), '＋')}</span>"
+                            f"<span class='dev-qty-title'><strong>{t.upper()}</strong>"
+                            f"<small>Máx. {_fmt(q)}</small></span></div>",
+                            unsafe_allow_html=True,
+                        )
+                    with qty_cols[1]:
+                        qtds[t] = st.number_input(
+                            f"Quantidade de {t.title()}",
+                            min_value=0, max_value=int(q), step=1, value=0,
+                            label_visibility="collapsed", key=f"dev-quantidade-{i}",
+                        )
             placa = st.text_input("🚚 Placa do veículo", placeholder="Ex.: ABC1D23")
             obs = st.text_area("📝 Observação (opcional)", placeholder="Informe alguma particularidade desta devolução...", height=76)
             enviar = st.form_submit_button("Gerar devolução", type="primary")
