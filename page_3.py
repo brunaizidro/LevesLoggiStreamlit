@@ -175,28 +175,6 @@ def page_3():
         if eh_gdl:
             st.info("Perfil GDL: visualização das devoluções. O registro de novas devoluções é exclusivo do administrador.")
 
-    if manual.disponivel():
-        with st.container(border=True):
-            mc1, mc2, mc3 = st.columns([0.65, 4.8, 1.8], vertical_alignment="center")
-            with mc1:
-                st.markdown(
-                    "<div style='width:48px;height:48px;border-radius:12px;background:#eaf3ff;"
-                    "display:flex;align-items:center;justify-content:center;color:#1155cc;"
-                    "font-size:25px;'>▤</div>",
-                    unsafe_allow_html=True,
-                )
-            with mc2:
-                st.markdown(
-                    "<div style='color:#172b4d;font-size:18px;font-weight:800;'>Manual de devolução</div>"
-                    "<div style='color:#627895;font-size:14px;font-weight:500;'>"
-                    "Consulte o procedimento para realizar devoluções.</div>"
-                    "<div style='margin-top:5px;display:inline-block;background:#e5f2ff;color:#1155cc;"
-                    "border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;'>Treinamento</div>",
-                    unsafe_allow_html=True,
-                )
-            with mc3:
-                manual.botao_manual(key="manual_page3", label="Baixar manual em PDF")
-
     # ---- Competência selecionada (antes do saldo) ----
     if not eh_gdl:
         elegiveis = dp.competencias_elegiveis(destino)
