@@ -122,7 +122,19 @@ def page_3():
         div[data-testid='stNumberInput'] > div, div[data-testid='stTextInput'] > div, div[data-testid='stTextArea'] > div { border-radius:10px !important; }
         div[data-testid='stNumberInput'] input, div[data-testid='stTextInput'] input, div[data-testid='stTextArea'] textarea { border-radius:10px !important; border-color:#cbd8e8 !important; background:#fff !important; font-family:'Montserrat',sans-serif !important; }
         div[data-testid='stTextArea'] textarea { min-height:68px !important; }
-        div[data-testid='stFormSubmitButton'] button { background:#075DE5 !important; color:#fff !important; border:0 !important; border-radius:10px !important; font-family:'Montserrat',sans-serif !important; font-weight:800 !important; padding:10px 22px !important; }
+        .dev-field-label { color:#0E2C5A; font-family:'Montserrat',sans-serif; font-size:16px; font-weight:800; margin:12px 0 6px; }
+        .dev-observation-label { margin-top:14px; }
+        [class*="st-key-dev-plate-field"], [class*="st-key-dev-observation-field"] { border:1px solid #C9D8F3; border-radius:13px; background:linear-gradient(180deg,#FBFDFF 0%,#F8FAFF 100%); padding:0 10px; }
+        [class*="st-key-dev-plate-field"] [data-testid="stHorizontalBlock"], [class*="st-key-dev-observation-field"] [data-testid="stHorizontalBlock"] { align-items:center; gap:0 !important; }
+        .dev-input-icon { display:flex; align-items:center; justify-content:center; width:48px; height:44px; border-right:1px solid #DCE7FA; color:#075DE5; padding:8px 12px 8px 2px; box-sizing:border-box; }
+        .dev-input-icon svg { width:27px; height:27px; }
+        .dev-textarea-icon { height:76px; }
+        [class*="st-key-dev-plate-field"] div[data-testid="stTextInput"], [class*="st-key-dev-observation-field"] div[data-testid="stTextArea"] { margin:0 !important; }
+        [class*="st-key-dev-plate-field"] div[data-testid="stTextInput"] > div, [class*="st-key-dev-observation-field"] div[data-testid="stTextArea"] > div { border:0 !important; box-shadow:none !important; background:transparent !important; }
+        [class*="st-key-dev-plate-field"] input { height:48px !important; padding-left:12px !important; font-size:16px !important; }
+        [class*="st-key-dev-observation-field"] textarea { min-height:76px !important; padding:12px !important; font-size:15px !important; }
+        [class*="st-key-dev-plate-field"] input:focus, [class*="st-key-dev-observation-field"] textarea:focus { box-shadow:none !important; }
+                div[data-testid='stFormSubmitButton'] button { background:#075DE5 !important; color:#fff !important; border:0 !important; border-radius:10px !important; font-family:'Montserrat',sans-serif !important; font-weight:800 !important; padding:10px 22px !important; }
         div[data-testid='stFormSubmitButton'] button:hover { background:#064fc4 !important; box-shadow:0 4px 12px rgba(7,93,229,.18) !important; }
         .dev-balance-card { position:relative; overflow:hidden; background:#ffffff; border:1px solid #d9e4f2; border-radius:14px; padding:18px 20px 17px; min-height:146px; box-shadow:0 3px 10px rgba(23,52,95,.045); transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
         .dev-balance-card:before { content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:#2874df; }
@@ -338,9 +350,21 @@ def page_3():
                             min_value=0, max_value=int(q), step=1, value=0,
                             label_visibility="collapsed", key=f"dev-quantidade-{i}",
                         )
-            placa = st.text_input("🚚 Placa do veículo", placeholder="Ex.: ABC1D23")
-            obs = st.text_area("📝 Observação (opcional)", placeholder="Informe alguma particularidade desta devolução...", height=76)
-            enviar = st.form_submit_button("Gerar devolução", type="primary")
+            st.markdown("<div class='dev-field-label'>Placa do veículo</div>", unsafe_allow_html=True)
+            with st.container(key="dev-plate-field"):
+                plate_icon, plate_input = st.columns([0.075, 0.925], gap="small", vertical_alignment="center")
+                with plate_icon:
+                    st.markdown("<div class='dev-input-icon'><svg viewBox='0 0 24 24' aria-hidden='true'><path d='M3 7h12v11H3zM15 11h4l3 3v4h-7zM7 18a2 2 0 1 0 4 0m7 0a2 2 0 1 0 4 0' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/></svg></div>", unsafe_allow_html=True)
+                with plate_input:
+                    placa = st.text_input("Placa do veículo", placeholder="Ex.: ABC1D23", label_visibility="collapsed")
+            st.markdown("<div class='dev-field-label dev-observation-label'>Observação (opcional)</div>", unsafe_allow_html=True)
+            with st.container(key="dev-observation-field"):
+                obs_icon, obs_input = st.columns([0.075, 0.925], gap="small", vertical_alignment="center")
+                with obs_icon:
+                    st.markdown("<div class='dev-input-icon dev-textarea-icon'><svg viewBox='0 0 24 24' aria-hidden='true'><rect x='5' y='3' width='14' height='18' rx='1.5' fill='none' stroke='currentColor' stroke-width='1.8'/><path d='M8 8h8M8 12h8M8 16h5' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round'/></svg></div>", unsafe_allow_html=True)
+                with obs_input:
+                    obs = st.text_area("Observação", placeholder="Informe alguma particularidade desta devolução...", height=76, label_visibility="collapsed")
+            enviar = st.form_submit_button("▤  Gerar devolução", type="primary")
 
         if enviar:
             itens = [{"tipo": t, "qtd_declarada": int(q)} for t, q in qtds.items() if q > 0]
