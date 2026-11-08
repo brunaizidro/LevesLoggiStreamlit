@@ -117,17 +117,23 @@ def page_3():
         div[data-testid="stFormSubmitButton"] button { background:#075BEA !important; color:white !important; border:0 !important; border-radius:10px !important; font-weight:700 !important; padding:10px 22px !important; }
         div[data-testid="stAlert"][kind="success"] { background:#e8f8f2 !important; border:1px solid #c9efdf !important; color:#126b62 !important; border-radius:11px !important; }
         div[data-testid="stAlert"][kind="info"] { background:#eaf3ff !important; border:1px solid #d8e8ff !important; color:#1155cc !important; border-radius:12px !important; }
-        .dev-list-head { color:#627895 !important; font-family:'Montserrat',sans-serif !important; font-size:11px !important; font-weight:800 !important; letter-spacing:.55px !important; padding:8px 10px !important; }
         .dev-list-title { color:#172b4d !important; font-family:'Montserrat',sans-serif !important; font-size:24px !important; font-weight:800 !important; letter-spacing:-.4px !important; margin:22px 0 12px !important; }
-        .dev-record-id { color:#172b4d !important; font-family:'Montserrat',sans-serif !important; font-size:15px !important; font-weight:800 !important; }
-        .dev-record-meta { color:#7185a0 !important; font-family:'Montserrat',sans-serif !important; font-size:12px !important; font-weight:500 !important; margin-top:3px !important; }
-        .dev-status { display:inline-flex; align-items:center; border-radius:20px; padding:5px 10px; font-family:'Montserrat',sans-serif; font-size:12px; font-weight:700; background:#eaf3ff; color:#1155cc; }
-        .dev-status-ok { background:#e8f8f2; color:#16805d; }
+        .dev-table-header { display:grid; grid-template-columns:31% 18% 18% 15% 18%; align-items:center; background:#eaf3ff; color:#17345f; border-radius:10px 10px 0 0; margin:-1px -1px 0; padding:12px 16px; font-family:'Montserrat',sans-serif; font-size:11px; font-weight:800; letter-spacing:.45px; }
+        .dev-record-cell { display:flex; align-items:center; gap:12px; min-height:46px; }
+        .dev-record-icon { display:flex; align-items:center; justify-content:center; flex:0 0 36px; width:36px; height:36px; border-radius:11px; background:#e5f0ff; color:#075bea; font-size:20px; font-weight:800; }
+        .dev-record-id { display:block; color:#172b4d !important; font-family:'Montserrat',sans-serif !important; font-size:14px !important; font-weight:800 !important; line-height:1.35; }
+        .dev-record-meta { display:block; color:#526985 !important; font-family:'Montserrat',sans-serif !important; font-size:12px !important; font-weight:500 !important; line-height:1.45; margin-top:2px !important; }
+        .dev-status { display:inline-flex; align-items:center; gap:6px; border-radius:8px; padding:6px 10px; font-family:'Montserrat',sans-serif; font-size:12px; font-weight:700; white-space:nowrap; background:#eaf3ff; color:#1155cc; }
+        .dev-status-check { font-size:14px; font-weight:900; }
+        .dev-status-ok { background:#d9f9d4; color:#087b55; }
         .dev-status-cancel { background:#fff0f0; color:#bd3e45; }
-        .dev-quantity { color:#172b4d !important; font-family:'Montserrat',sans-serif !important; font-size:15px !important; font-weight:800 !important; }
-        div[data-testid="stVerticalBlockBorderWrapper"] { border:1px solid #d7e3f2 !important; border-radius:12px !important; background:#fff !important; }
+        .dev-operation { display:flex; align-items:center; gap:8px; color:#243b60; font-family:'Montserrat',sans-serif; font-size:13px; font-weight:600; white-space:nowrap; }
+        .dev-operation span { color:#075bea; font-size:18px; font-weight:800; }
+        .dev-quantity { color:#172b4d !important; font-family:'Montserrat',sans-serif !important; font-size:16px !important; font-weight:800 !important; text-align:center; }
+        .dev-row-divider { height:1px; background:#dce5f0; margin:0 2px 10px; }
+        div[data-testid="stVerticalBlockBorderWrapper"] { border:1px solid #cfdced !important; border-radius:12px !important; background:#fff !important; }
         div[data-testid="stVerticalBlockBorderWrapper"] > div { padding:12px 14px !important; }
-        div[data-testid="stDownloadButton"] button { border:1px solid #cbdcf0 !important; border-radius:10px !important; font-family:'Montserrat',sans-serif !important; font-weight:700 !important; color:#172b4d !important; background:#fff !important; }
+        div[data-testid="stDownloadButton"] button { border:1px solid #075bea !important; border-radius:10px !important; font-family:'Montserrat',sans-serif !important; font-weight:700 !important; color:#17345f !important; background:#fff !important; white-space:nowrap !important; padding:7px 12px !important; }
         div[data-testid="stDownloadButton"] button:hover { border-color:#1155cc !important; color:#1155cc !important; background:#f5f9ff !important; }
         hr.sb-sep { border-color:#d8e7f8 !important; margin:22px 0 !important; }
         </style>
@@ -362,21 +368,26 @@ def _minhas_devolucoes(destino: str, eh_admin: bool = False, eh_gdl: bool = Fals
         st.caption("Nenhuma devolução registrada ainda.")
         return
 
-    h1, h2, h3, h4 = st.columns([2, 1.4, 1, 1.2])
-    h1.markdown("<div class='dev-list-head'>REGISTRO</div>", unsafe_allow_html=True)
-    h2.markdown("<div class='dev-list-head'>STATUS</div>", unsafe_allow_html=True)
-    h3.markdown("<div class='dev-list-head'>QUANTIDADE</div>", unsafe_allow_html=True)
-    h4.markdown("<div class='dev-list-head'>&nbsp;</div>", unsafe_allow_html=True)
-
-    for _, d in minhas.iterrows():
-        with st.container(border=True):
-            c1, c2, c3, c4 = st.columns([2, 1.4, 1, 1.2], vertical_alignment="center")
+    with st.container(border=True):
+        st.markdown(
+            "<div class='dev-table-header'>"
+            "<div>REGISTRO</div><div>STATUS</div><div>OPERAÇÃO</div>"
+            "<div>QUANTIDADE</div><div></div></div>",
+            unsafe_allow_html=True,
+        )
+        for idx, (_, d) in enumerate(minhas.iterrows()):
+            c1, c2, c3, c4, c5 = st.columns(
+                [2.0, 1.15, 1.2, 0.95, 1.0], vertical_alignment="center"
+            )
             comp = d.get("competencia")
             comp_txt = dp.rotulo_mes(comp) if comp and len(str(comp)) == 7 else ""
             c1.markdown(
-                f"<div class='dev-record-id'>{d['id']}</div>"
-                f"<div class='dev-record-meta'>{d['data_criacao']}</div>"
-                + (f"<div class='dev-record-meta'>🗓️ {comp_txt}</div>" if comp_txt else ""),
+                "<div class='dev-record-cell'>"
+                "<span class='dev-record-icon'>▤</span>"
+                "<span><span class='dev-record-id'>" + str(d["id"]) + "</span>"
+                "<span class='dev-record-meta'>" + str(d["data_criacao"]) + "</span>"
+                + (f"<span class='dev-record-meta'>{comp_txt}</span>" if comp_txt else "")
+                + "</span></div>",
                 unsafe_allow_html=True,
             )
             status_txt = dp.STATUS_LABEL.get(d["status"], d["status"])
@@ -386,18 +397,26 @@ def _minhas_devolucoes(destino: str, eh_admin: bool = False, eh_gdl: bool = Fals
                 else ""
             )
             c2.markdown(
-                f"<span class='dev-status {status_class}'>{status_txt}</span>"
-                + (f"<div class='dev-record-meta'>🚚 {d.get('placa')}</div>" if d.get("placa") else ""),
+                f"<span class='dev-status {status_class}'>"
+                f"<span class='dev-status-check'>✓</span>{status_txt}</span>",
                 unsafe_allow_html=True,
             )
-            c3.markdown(f"<div class='dev-quantity'>Total: {_fmt(d['total_declarado'])}</div>", unsafe_allow_html=True)
-            with c4:
+            operacao = str(d.get("placa") or "").strip()
+            c3.markdown(
+                f"<div class='dev-operation'><span>🚚</span>{operacao or '—'}</div>",
+                unsafe_allow_html=True,
+            )
+            c4.markdown(
+                f"<div class='dev-quantity'>{_fmt(d['total_declarado'])}</div>",
+                unsafe_allow_html=True,
+            )
+            with c5:
                 itens = dp.itens_da_devolucao(d["id"])
                 itens_l = [{"tipo": r["tipo"], "qtd_declarada": r["qtd_declarada"]}
                            for _, r in itens.iterrows()]
                 dev_h = d.to_dict()
                 st.download_button(
-                    "📄 Romaneio",
+                    "▤  Romaneio",
                     romaneio.gerar_romaneio_pdf(dev_h, itens_l, dp.base_url()),
                     file_name=f"{d['id']}.pdf", mime="application/pdf",
                     key=f"rom_{d['id']}",
@@ -406,3 +425,5 @@ def _minhas_devolucoes(destino: str, eh_admin: bool = False, eh_gdl: bool = Fals
                     if st.button("Cancelar", key=f"can_{d['id']}"):
                         dados.atualizar_devolucao(d["id"], {"status": dp.STATUS_CANCELADO})
                         st.rerun()
+            if idx < len(minhas) - 1:
+                st.markdown("<div class='dev-row-divider'></div>", unsafe_allow_html=True)
