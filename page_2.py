@@ -110,7 +110,27 @@ def page_2():
         st.error("Acesso não autorizado.")
         return
 
-    st.subheader("Administração de usuários" if eh_admin else "Usuários de Operação")
+    titulo = "Administração de usuários" if eh_admin else "Usuários de Operação"
+    subtitulo = ("Cadastre, consulte e gerencie os acessos ao Portal Leves." if eh_admin
+                 else "Cadastre e gerencie os usuários vinculados à sua operação.")
+    st.markdown(
+        """
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+        .modulo-header { font-family:'Montserrat',sans-serif !important; text-align:left; }
+        .modulo-breadcrumb { color:#7B8798 !important; font-family:'Montserrat',sans-serif !important; font-size:11px !important; font-weight:600 !important; letter-spacing:.55px !important; margin:0 0 7px !important; }
+        .modulo-title { color:#172B4D !important; font-family:'Montserrat',sans-serif !important; font-size:38px !important; line-height:1.18 !important; font-weight:800 !important; letter-spacing:-.8px !important; margin:0 !important; text-align:left !important; }
+        .modulo-subtitle { color:#627895 !important; font-family:'Montserrat',sans-serif !important; font-size:16px !important; font-weight:600 !important; line-height:1.55 !important; margin:2px 0 18px !important; text-align:left !important; }
+        </style>
+        <div class="modulo-header">
+            <div class="modulo-breadcrumb">PORTAL LEVES &nbsp;/&nbsp; USUÁRIOS</div>
+            <div class="modulo-title">{titulo}</div>
+            <p class="modulo-subtitle">{subtitulo}</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
     if eh_gdl:
         st.info("Perfil GDL: você pode cadastrar e ativar/desativar apenas usuários com perfil Operação.")
 
