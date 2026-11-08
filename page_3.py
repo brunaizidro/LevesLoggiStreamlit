@@ -104,12 +104,15 @@ def page_3():
         .dev-page-title { color:#172B4D !important; display:block !important; width:100% !important; font-size:38px !important; line-height:1.18 !important; font-weight:800 !important; letter-spacing:-.8px !important; margin:0 !important; padding:0 !important; text-align:left !important; }
         .dev-page-subtitle { color:#627895 !important; display:block !important; font-family:'Montserrat',sans-serif !important; font-size:16px !important; line-height:1.55 !important; font-weight:600 !important; margin:2px 0 18px !important; padding:0 !important; position:static !important; top:auto !important; text-align:left !important; }
         .dev-section-title { color:#12345d; background:#eaf3ff; border:1px solid #d4e6ff; border-radius:12px; padding:12px 16px; font-size:19px; font-weight:750; margin:16px 0 12px; }
-        .dev-balance-card { background:linear-gradient(135deg,#f0f6ff 0%,#e6f1ff 100%); border:1px solid #d5e6ff; border-radius:15px; padding:19px 20px; min-height:132px; box-shadow:0 3px 12px rgba(25,91,170,.05); }
-        .dev-balance-label { color:#315d91; font-size:14px; font-weight:700; margin-bottom:7px; }
-        .dev-balance-qty { color:#102f59; font-size:30px; line-height:1.1; font-weight:800; margin-bottom:9px; }
-        .dev-balance-caption { color:#6683a8; font-size:12px; font-weight:600; margin-bottom:2px; }
-        .dev-balance-value { color:#12345d; font-size:18px; font-weight:800; }
-        .dev-total-banner { background:#e7f2ff; border:1px solid #cfe3ff; border-radius:12px; padding:14px 18px; margin:16px 0 20px; color:#164b88; font-size:16px; font-weight:700; }
+        .dev-balance-card { position:relative; overflow:hidden; background:#ffffff; border:1px solid #d9e4f2; border-radius:14px; padding:18px 20px 17px; min-height:146px; box-shadow:0 3px 10px rgba(23,52,95,.045); transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+        .dev-balance-card:before { content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:#2874df; }
+        .dev-balance-card:hover { transform:translateY(-2px); border-color:#b8d2f5; box-shadow:0 7px 18px rgba(23,75,136,.09); }
+        .dev-balance-label { color:#607895; font-family:'Montserrat',sans-serif; font-size:12px; font-weight:800; letter-spacing:.45px; text-transform:uppercase; margin-bottom:9px; }
+        .dev-balance-qty { color:#142f55; font-family:'Montserrat',sans-serif; font-size:34px; line-height:1.05; font-weight:800; letter-spacing:-1px; margin-bottom:15px; }
+        .dev-balance-caption { color:#8192a8; font-family:'Montserrat',sans-serif; font-size:11px; font-weight:700; margin-bottom:3px; padding-top:10px; border-top:1px solid #edf1f6; }
+        .dev-balance-value { color:#174b88; font-family:'Montserrat',sans-serif; font-size:17px; font-weight:800; }
+        .dev-total-banner { display:flex; align-items:center; gap:13px; background:linear-gradient(105deg,#153b70 0%,#1c5ca8 100%); border:1px solid #1b5598; border-radius:13px; padding:16px 20px; margin:14px 0 20px; color:#ffffff; font-family:'Montserrat',sans-serif; font-size:14px; font-weight:600; box-shadow:0 4px 12px rgba(21,59,112,.13); }
+        .dev-total-banner strong { color:#ffffff; font-size:19px; font-weight:800; margin-left:4px; }
         div[data-testid="stSelectbox"] label, div[data-testid="stNumberInput"] label, div[data-testid="stTextInput"] label { color:#17385f !important; font-weight:650 !important; }
         div[data-testid="stSelectbox"] > div > div, div[data-testid="stNumberInput"] input, div[data-testid="stTextInput"] input { border-radius:10px !important; }
         div[data-testid="stExpander"] { border:1px solid #d5e6ff !important; border-radius:12px !important; background:#f7faff !important; }
@@ -295,7 +298,7 @@ def page_3():
             for _, r in saldo.iterrows()
         )
         st.markdown(
-            f"<div class='dev-total-banner'>💰 &nbsp; Valor total a devolver: <strong>{dp.fmt_brl(total_val)}</strong></div>",
+            f"<div class='dev-total-banner'><span style='font-size:20px;'>R$</span><span>Valor total a devolver</span><strong>{dp.fmt_brl(total_val)}</strong></div>",
             unsafe_allow_html=True,
         )
 
