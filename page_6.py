@@ -55,7 +55,7 @@ def page_6():
         .concil-intro{
             color:#627895!important;font-family:'Montserrat',sans-serif!important;
             font-size:16px!important;font-weight:600!important;
-            line-height:1.55!important;margin:6px 0 18px!important;
+            line-height:1.55!important;margin:2px 0 18px!important;
         }
         </style>
         """,
