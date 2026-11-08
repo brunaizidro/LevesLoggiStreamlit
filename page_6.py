@@ -66,7 +66,13 @@ def page_6():
         unsafe_allow_html=True,
     )
     st.markdown(
-        '<div class="concil-page-title">Conciliação e cobrança</div>',
+        """
+        <div class="concil-header">
+            <div class="concil-page-title">Conciliação e cobrança</div>
+            <p class="concil-intro">Cobrança por <b>competência de mês</b>. A operação tem até o
+            <b>dia 5 do mês seguinte</b> para devolver os itens do mês. O que não voltar até lá é cobrável.</p>
+        </div>
+        """,
         unsafe_allow_html=True,
     )
     st.markdown("""
@@ -241,12 +247,6 @@ def page_6():
     .concil-section-title .ico{display:inline-flex;color:#0067FC;font-size:20px;}
     </style>
     """, unsafe_allow_html=True)
-    st.markdown(
-        "<p class='concil-intro'>Cobrança por <b>competência de mês</b>. A operação tem até o "
-        "<b>dia 5 do mês seguinte</b> para devolver os itens do mês. O que não voltar até lá é cobrável.</p>",
-        unsafe_allow_html=True,
-    )
-
     env = dp.envios_df()
     if env.empty:
         st.info("Nenhum envio registrado ainda.")
