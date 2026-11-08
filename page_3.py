@@ -99,10 +99,10 @@ def page_3():
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
         [data-testid="stApp"] * { font-family: 'Montserrat', sans-serif !important; }
         .dev-page-kicker { color:#6383aa; font-size:12px; font-weight:700; letter-spacing:1.1px; text-transform:uppercase; margin:0 0 5px; }
-        .dev-header { width:100%; display:flex; flex-direction:column; align-items:flex-start; gap:2px; margin:0 0 18px !important; padding:0 !important; }
-        .dev-title-wrap { width:100%; display:block; text-align:left; margin:0 !important; padding:0 !important; line-height:1.18 !important; }
-        .dev-page-title { color:#172B4D !important; display:block; width:100%; font-size:38px !important; line-height:1.18 !important; font-weight:800 !important; letter-spacing:-.8px !important; margin:0 !important; padding:0 !important; text-align:left !important; }
-        .dev-page-subtitle { color:#627895 !important; font-family:'Montserrat',sans-serif !important; font-size:16px !important; line-height:1.55 !important; font-weight:600 !important; margin:0 !important; padding:0 !important; text-align:left !important; }
+        .dev-header { width:100% !important; display:flex !important; flex-direction:column !important; align-items:flex-start !important; gap:0 !important; margin:0 0 18px !important; padding:0 !important; }
+        .dev-title-wrap { width:100% !important; display:block !important; text-align:left !important; margin:0 !important; padding:0 !important; line-height:1 !important; }
+        .dev-page-title { color:#172B4D !important; display:block !important; width:100% !important; font-size:38px !important; line-height:1 !important; font-weight:800 !important; letter-spacing:-.8px !important; margin:0 !important; padding:0 !important; text-align:left !important; }
+        .dev-page-subtitle { color:#627895 !important; display:block !important; font-family:'Montserrat',sans-serif !important; font-size:16px !important; line-height:1.2 !important; font-weight:600 !important; margin:0 !important; padding:0 !important; text-align:left !important; }
         .dev-section-title { color:#12345d; background:#eaf3ff; border:1px solid #d4e6ff; border-radius:12px; padding:12px 16px; font-size:19px; font-weight:750; margin:16px 0 12px; }
         .dev-balance-card { background:linear-gradient(135deg,#f0f6ff 0%,#e6f1ff 100%); border:1px solid #d5e6ff; border-radius:15px; padding:19px 20px; min-height:132px; box-shadow:0 3px 12px rgba(25,91,170,.05); }
         .dev-balance-label { color:#315d91; font-size:14px; font-weight:700; margin-bottom:7px; }
@@ -130,7 +130,7 @@ def page_3():
         "<div class='dev-header'>"
         "<div class='dev-page-kicker'>PORTAL LEVES &nbsp;/&nbsp; DEVOLUÇÕES</div>"
         "<div class='dev-title-wrap'><div class='dev-page-title'>Devoluções</div></div>"
-        "<p class='dev-page-subtitle'>" + subtitulo + "</p>"
+        "<div class='dev-page-subtitle'>" + subtitulo + "</div>"
         "</div>",
         unsafe_allow_html=True,
     )
