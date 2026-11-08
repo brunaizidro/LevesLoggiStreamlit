@@ -103,7 +103,15 @@ def page_3():
         .dev-title-wrap { width:100% !important; display:block !important; text-align:left !important; margin:0 !important; padding:0 !important; line-height:1 !important; }
         .dev-page-title { color:#172B4D !important; display:block !important; width:100% !important; font-size:38px !important; line-height:1.18 !important; font-weight:800 !important; letter-spacing:-.8px !important; margin:0 !important; padding:0 !important; text-align:left !important; }
         .dev-page-subtitle { color:#627895 !important; display:block !important; font-family:'Montserrat',sans-serif !important; font-size:16px !important; line-height:1.55 !important; font-weight:600 !important; margin:2px 0 18px !important; padding:0 !important; position:static !important; top:auto !important; text-align:left !important; }
-        .dev-section-title { color:#12345d; background:#eaf3ff; border:1px solid #d4e6ff; border-radius:12px; padding:12px 16px; font-size:19px; font-weight:750; margin:16px 0 12px; }
+        .dev-section-title { display:flex; align-items:center; gap:14px; color:#0755c9; background:#e5f6e9; border:1px solid #ccebd4; border-radius:13px; padding:13px 18px; font-family:'Montserrat',sans-serif; font-size:20px; font-weight:800; margin:16px 0 12px; }
+        .dev-section-icon { display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; flex:0 0 34px; border-radius:10px; background:#075DE5; color:#fff; font-size:25px; line-height:1; font-weight:500; }
+        div[data-testid='stForm'] { border:1px solid #d5e6ff !important; border-radius:16px !important; padding:18px 18px 14px !important; background:#fbfdff !important; }
+        div[data-testid='stColumn']:has(div[data-testid='stNumberInput']) { background:linear-gradient(180deg,#f5f9ff 0%,#ffffff 100%); border:1px solid #d9e7fb; border-radius:13px; padding:12px 12px 7px; }
+        div[data-testid='stNumberInput'] label, div[data-testid='stTextInput'] label, div[data-testid='stTextArea'] label { color:#17385f !important; font-family:'Montserrat',sans-serif !important; font-weight:750 !important; }
+        div[data-testid='stNumberInput'] input, div[data-testid='stTextInput'] input, div[data-testid='stTextArea'] textarea { border-radius:10px !important; border-color:#cbd8e8 !important; background:#fff !important; font-family:'Montserrat',sans-serif !important; }
+        div[data-testid='stTextArea'] textarea { min-height:82px !important; }
+        div[data-testid='stFormSubmitButton'] button { background:#075DE5 !important; color:#fff !important; border:0 !important; border-radius:10px !important; font-family:'Montserrat',sans-serif !important; font-weight:800 !important; padding:10px 22px !important; }
+        div[data-testid='stFormSubmitButton'] button:hover { background:#064fc4 !important; box-shadow:0 4px 12px rgba(7,93,229,.18) !important; }
         .dev-balance-card { position:relative; overflow:hidden; background:#ffffff; border:1px solid #d9e4f2; border-radius:14px; padding:18px 20px 17px; min-height:146px; box-shadow:0 3px 10px rgba(23,52,95,.045); transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
         .dev-balance-card:before { content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:#2874df; }
         .dev-balance-card:hover { transform:translateY(-2px); border-color:#b8d2f5; box-shadow:0 7px 18px rgba(23,75,136,.09); }
@@ -287,7 +295,7 @@ def page_3():
         _minhas_devolucoes(destino, eh_admin=False, eh_gdl=True)
         return
 
-    st.markdown("<div class='dev-section-title'>＋ &nbsp; Nova devolução</div>", unsafe_allow_html=True)
+    st.markdown("<div class='dev-section-title'><span class='dev-section-icon'>＋</span><span>Nova devolução</span></div>", unsafe_allow_html=True)
     pend = {t: q for t, q in dp.pending_mes_tipo(destino, mes_ref).items() if q > 0}
     if not pend:
         st.success(f"Sem pendência de devolução para {escolha_mes}. 🎉")
@@ -302,7 +310,7 @@ def page_3():
                     min_value=0, max_value=int(q), step=1, value=0,
                 )
             placa = st.text_input("Placa do veículo", placeholder="ex.: ABC1D23")
-            obs = st.text_input("Observação (opcional)")
+            obs = st.text_area("Observação (opcional)", placeholder="Informe alguma particularidade desta devolução...", height=82)
             enviar = st.form_submit_button("Gerar devolução", type="primary")
 
         if enviar:
