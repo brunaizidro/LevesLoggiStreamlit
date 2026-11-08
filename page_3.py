@@ -106,10 +106,19 @@ def page_3():
         .dev-section-title { display:flex; align-items:center; gap:14px; color:#0755c9; background:#e5f6e9; border:1px solid #ccebd4; border-radius:13px; padding:13px 18px; font-family:'Montserrat',sans-serif; font-size:20px; font-weight:800; margin:16px 0 12px; }
         .dev-section-icon { display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; flex:0 0 34px; border-radius:10px; background:#075DE5; color:#fff; font-size:25px; line-height:1; font-weight:500; }
         div[data-testid='stForm'] { border:1px solid #d5e6ff !important; border-radius:16px !important; padding:18px 18px 14px !important; background:#fbfdff !important; }
-        div[data-testid='stColumn']:has(div[data-testid='stNumberInput']) { background:linear-gradient(180deg,#f5f9ff 0%,#ffffff 100%); border:1px solid #d9e7fb; border-radius:13px; padding:12px 12px 7px; }
+        [class*="st-key-dev-qtd-"] { background:linear-gradient(180deg,#f1f7ff 0%,#ffffff 100%); border:1px solid #d7e6fb; border-radius:15px; padding:15px 14px 12px; min-height:126px; box-shadow:0 3px 10px rgba(23,75,136,.045); }
+        .dev-qty-head { display:flex; align-items:center; gap:11px; margin:0 0 12px; min-height:40px; }
+        .dev-qty-icon { display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; flex:0 0 38px; border-radius:11px; background:#e1edff; color:#075DE5; font-size:22px; font-weight:800; }
+        .dev-qty-title { display:flex; flex-direction:column; gap:3px; color:#17345f; font-family:'Montserrat',sans-serif; line-height:1.2; }
+        .dev-qty-title strong { font-size:14px; font-weight:800; }
+        .dev-qty-title small { color:#7890ad; font-size:10px; font-weight:650; }
+        [class*="st-key-dev-qtd-"] div[data-testid="stNumberInput"] { margin:0 !important; }
         div[data-testid='stNumberInput'] label, div[data-testid='stTextInput'] label, div[data-testid='stTextArea'] label { color:#17385f !important; font-family:'Montserrat',sans-serif !important; font-weight:750 !important; }
+        div[data-testid='stNumberInput'] input { font-size:21px !important; font-weight:800 !important; color:#17345f !important; text-align:center !important; }
+        div[data-testid='stNumberInput'] button { color:#075DE5 !important; border-radius:8px !important; }
+        div[data-testid='stNumberInput'] > div, div[data-testid='stTextInput'] > div, div[data-testid='stTextArea'] > div { border-radius:10px !important; }
         div[data-testid='stNumberInput'] input, div[data-testid='stTextInput'] input, div[data-testid='stTextArea'] textarea { border-radius:10px !important; border-color:#cbd8e8 !important; background:#fff !important; font-family:'Montserrat',sans-serif !important; }
-        div[data-testid='stTextArea'] textarea { min-height:82px !important; }
+        div[data-testid='stTextArea'] textarea { min-height:76px !important; }
         div[data-testid='stFormSubmitButton'] button { background:#075DE5 !important; color:#fff !important; border:0 !important; border-radius:10px !important; font-family:'Montserrat',sans-serif !important; font-weight:800 !important; padding:10px 22px !important; }
         div[data-testid='stFormSubmitButton'] button:hover { background:#064fc4 !important; box-shadow:0 4px 12px rgba(7,93,229,.18) !important; }
         .dev-balance-card { position:relative; overflow:hidden; background:#ffffff; border:1px solid #d9e4f2; border-radius:14px; padding:18px 20px 17px; min-height:146px; box-shadow:0 3px 10px rgba(23,52,95,.045); transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
@@ -303,14 +312,24 @@ def page_3():
         with st.form("nova_devolucao", clear_on_submit=True):
             qtds = {}
             itens_pend = sorted(pend.items())
-            fcols = st.columns(len(itens_pend))
+            fcols = st.columns(len(itens_pend), gap="medium")
+            icones_insumo = {"gaylord": "▦", "pallet": "▤", "saca": "▧"}
             for i, (t, q) in enumerate(itens_pend):
-                qtds[t] = fcols[i].number_input(
-                    f"{t.title()} (máx. {_fmt(q)})",
-                    min_value=0, max_value=int(q), step=1, value=0,
-                )
-            placa = st.text_input("Placa do veículo", placeholder="ex.: ABC1D23")
-            obs = st.text_area("Observação (opcional)", placeholder="Informe alguma particularidade desta devolução...", height=82)
+                with fcols[i].container(key=f"dev-qtd-{i}"):
+                    st.markdown(
+                        f"<div class='dev-qty-head'>"
+                        f"<span class='dev-qty-icon'>{icones_insumo.get(str(t).lower(), '＋')}</span>"
+                        f"<span class='dev-qty-title'><strong>{t.title()}</strong>"
+                        f"<small>Máximo disponível: {_fmt(q)}</small></span></div>",
+                        unsafe_allow_html=True,
+                    )
+                    qtds[t] = st.number_input(
+                        f"Quantidade de {t.title()}",
+                        min_value=0, max_value=int(q), step=1, value=0,
+                        label_visibility="collapsed", key=f"dev-quantidade-{i}",
+                    )
+            placa = st.text_input("🚚 Placa do veículo", placeholder="Ex.: ABC1D23")
+            obs = st.text_area("📝 Observação (opcional)", placeholder="Informe alguma particularidade desta devolução...", height=76)
             enviar = st.form_submit_button("Gerar devolução", type="primary")
 
         if enviar:
