@@ -120,18 +120,18 @@ def page_3():
         """,
         unsafe_allow_html=True,
     )
+    subtitulo = (
+        "Selecione a operação e registre uma devolução manual em nome dela. O saldo e a competência serão calculados para a operação selecionada."
+        if eh_admin or eh_gdl else
+        "Declare o que está devolvendo, gere o romaneio com QR e envie impresso junto com os itens."
+    )
     st.markdown(
-        "<div class='dev-page-kicker'>Portal Leves&nbsp; / &nbsp;Devoluções</div>"
-        "<div class='dev-title-wrap'><h1 class='dev-page-title'>Devoluções</h1></div>",
+        "<div class='dev-page-kicker'>PORTAL LEVES &nbsp;/&nbsp; DEVOLUÇÕES</div>"
+        "<div class='dev-title-wrap'><h1 class='dev-page-title'>Devoluções</h1></div>"
+        "<p class='dev-page-subtitle'>" + subtitulo + "</p>",
         unsafe_allow_html=True,
     )
     if eh_admin or eh_gdl:
-        st.markdown(
-            "<p class='dev-page-subtitle'>Selecione a operação e registre uma devolução manual "
-            "em nome dela. O saldo e a competência serão calculados para a operação selecionada.</p>",
-            unsafe_allow_html=True,
-        )
-
         mapa_operacoes = _operacoes_destinos_envios()
         if not mapa_operacoes:
             st.info("Nenhuma operação encontrada na aba Envios.")
@@ -149,13 +149,6 @@ def page_3():
 
         if eh_gdl:
             st.info("Perfil GDL: visualização das devoluções. O registro de novas devoluções é exclusivo do administrador.")
-
-    else:
-        st.markdown(
-            "<p class='dev-page-subtitle'>Declare o que está devolvendo, gere o romaneio com "
-            "QR e envie impresso junto com os itens.</p>",
-            unsafe_allow_html=True,
-        )
 
     if manual.disponivel():
         st.markdown(
