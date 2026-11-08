@@ -15,10 +15,21 @@ import emailer
 
 
 def page_7():
-    st.subheader("Configurações de e-mail (SMTP)")
     st.markdown(
-        "<p class='custom-text'>Servidor de <b>saída (SMTP)</b> usado para enviar as cobranças. "
-        "IMAP serve apenas para ler a caixa de entrada — para envio, use SMTP.</p>",
+        """
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+        .modulo-header { font-family:'Montserrat',sans-serif !important; text-align:left; }
+        .modulo-breadcrumb { color:#7B8798 !important; font-family:'Montserrat',sans-serif !important; font-size:11px !important; font-weight:600 !important; letter-spacing:.55px !important; margin:0 0 7px !important; }
+        .modulo-title { color:#172B4D !important; font-family:'Montserrat',sans-serif !important; font-size:38px !important; line-height:1.18 !important; font-weight:800 !important; letter-spacing:-.8px !important; margin:0 !important; text-align:left !important; }
+        .modulo-subtitle { color:#627895 !important; font-family:'Montserrat',sans-serif !important; font-size:16px !important; font-weight:600 !important; line-height:1.55 !important; margin:2px 0 18px !important; text-align:left !important; }
+        </style>
+        <div class="modulo-header">
+            <div class="modulo-breadcrumb">PORTAL LEVES &nbsp;/&nbsp; CONFIGURAÇÕES</div>
+            <div class="modulo-title">Configurações</div>
+            <p class="modulo-subtitle">Gerencie os parâmetros do portal, os destinos de devolução e os dados de envio de cobranças.</p>
+        </div>
+        """,
         unsafe_allow_html=True,
     )
 
