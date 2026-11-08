@@ -125,16 +125,17 @@ def page_3():
         .dev-field-label { color:#0E2C5A; font-family:'Montserrat',sans-serif; font-size:16px; font-weight:800; margin:12px 0 6px; }
         .dev-observation-label { margin-top:14px; }
         [class*="st-key-dev-plate-field"], [class*="st-key-dev-observation-field"] { width:100%; box-sizing:border-box; border:1px solid #C9D8F3; border-radius:13px; background:linear-gradient(180deg,#FBFDFF 0%,#F8FAFF 100%); padding:0 8px; overflow:hidden; }
-        [class*="st-key-dev-plate-field"] [data-testid="stHorizontalBlock"], [class*="st-key-dev-observation-field"] [data-testid="stHorizontalBlock"] { width:100% !important; align-items:stretch !important; gap:0 !important; }
-        [class*="st-key-dev-plate-field"] [data-testid="column"], [class*="st-key-dev-observation-field"] [data-testid="column"] { min-width:0 !important; padding:0 !important; }
-        .dev-input-icon { display:flex; align-items:center; justify-content:center; width:100%; height:44px; border-right:1px solid #DCE7FA; color:#075DE5; padding:8px 10px; box-sizing:border-box; }
-        .dev-input-icon svg { width:27px; height:27px; flex:0 0 27px; }
-        .dev-textarea-icon { height:76px; }
-        [class*="st-key-dev-plate-field"] div[data-testid="stTextInput"], [class*="st-key-dev-observation-field"] div[data-testid="stTextArea"] { width:100% !important; min-width:0 !important; margin:0 !important; padding:0 !important; }
-        [class*="st-key-dev-plate-field"] div[data-testid="stTextInput"] > div, [class*="st-key-dev-observation-field"] div[data-testid="stTextArea"] > div { width:100% !important; min-width:0 !important; border:0 !important; box-shadow:none !important; background:transparent !important; padding:0 !important; }
+        [class*="st-key-dev-plate-field"] [data-testid="stHorizontalBlock"], [class*="st-key-dev-observation-field"] [data-testid="stHorizontalBlock"] { display:flex !important; flex-wrap:nowrap !important; width:100% !important; align-items:stretch !important; gap:0 !important; }
+        [class*="st-key-dev-plate-field"] [data-testid="column"]:first-child, [class*="st-key-dev-observation-field"] [data-testid="column"]:first-child { flex:0 0 64px !important; width:64px !important; max-width:64px !important; min-width:64px !important; padding:0 !important; }
+        [class*="st-key-dev-plate-field"] [data-testid="column"]:last-child, [class*="st-key-dev-observation-field"] [data-testid="column"]:last-child { flex:1 1 0% !important; width:calc(100% - 64px) !important; max-width:calc(100% - 64px) !important; min-width:0 !important; padding:0 !important; }
+        .dev-input-icon { display:flex; align-items:center; justify-content:center; width:64px; height:44px; border-right:1px solid #DCE7FA; color:#075DE5; padding:8px; box-sizing:border-box; }
+        .dev-input-icon svg { width:25px; height:25px; flex:0 0 25px; }
+        .dev-textarea-icon { height:64px; }
+        [class*="st-key-dev-plate-field"] div[data-testid="stTextInput"], [class*="st-key-dev-observation-field"] div[data-testid="stTextArea"] { display:block !important; width:100% !important; max-width:100% !important; min-width:0 !important; margin:0 !important; padding:0 !important; }
+        [class*="st-key-dev-plate-field"] div[data-testid="stTextInput"] > div, [class*="st-key-dev-observation-field"] div[data-testid="stTextArea"] > div { display:block !important; width:100% !important; max-width:100% !important; min-width:0 !important; border:0 !important; box-shadow:none !important; background:transparent !important; padding:0 !important; }
         [class*="st-key-dev-plate-field"] input, [class*="st-key-dev-observation-field"] textarea { display:block; width:100% !important; max-width:100% !important; min-width:0 !important; box-sizing:border-box !important; border:0 !important; outline:0 !important; box-shadow:none !important; border-radius:0 !important; background:transparent !important; color:#17345f !important; font-family:'Montserrat',sans-serif !important; }
         [class*="st-key-dev-plate-field"] input { height:44px !important; padding:0 12px !important; font-size:16px !important; }
-        [class*="st-key-dev-observation-field"] textarea { min-height:76px !important; height:76px !important; padding:12px !important; font-size:15px !important; resize:vertical; }
+        [class*="st-key-dev-observation-field"] textarea { min-height:64px !important; height:64px !important; padding:10px 12px !important; font-size:15px !important; resize:none !important; }
         [class*="st-key-dev-plate-field"] input:focus, [class*="st-key-dev-observation-field"] textarea:focus { border:0 !important; box-shadow:none !important; }
                 div[data-testid='stFormSubmitButton'] button { background:#075DE5 !important; color:#fff !important; border:0 !important; border-radius:10px !important; font-family:'Montserrat',sans-serif !important; font-weight:800 !important; padding:10px 22px !important; }
         div[data-testid='stFormSubmitButton'] button:hover { background:#064fc4 !important; box-shadow:0 4px 12px rgba(7,93,229,.18) !important; }
@@ -365,7 +366,7 @@ def page_3():
                 with obs_icon:
                     st.markdown("<div class='dev-input-icon dev-textarea-icon'><svg viewBox='0 0 24 24' aria-hidden='true'><rect x='5' y='3' width='14' height='18' rx='1.5' fill='none' stroke='currentColor' stroke-width='1.8'/><path d='M8 8h8M8 12h8M8 16h5' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round'/></svg></div>", unsafe_allow_html=True)
                 with obs_input:
-                    obs = st.text_area("Observação", placeholder="Informe alguma particularidade desta devolução...", height=76, label_visibility="collapsed")
+                    obs = st.text_area("Observação", placeholder="Informe alguma particularidade desta devolução...", height=64, label_visibility="collapsed")
             enviar = st.form_submit_button("▤  Gerar devolução", type="primary")
 
         if enviar:
