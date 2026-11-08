@@ -219,10 +219,15 @@ def page_3():
             unsafe_allow_html=True,
         )
 
+        # Quando só existe uma competência aberta, seleciona automaticamente.
+        # Isso evita exigir um clique desnecessário após o prazo do mês anterior.
+        if len(elegiveis) == 1:
+            st.session_state["competencia_devolucao"] = rot_mes[elegiveis[0]]
+
         escolha_mes = st.radio(
             "Selecione a competência da devolução",
             options=[rot_mes[m] for m in elegiveis],
-            index=None,
+            index=0 if len(elegiveis) == 1 else None,
             horizontal=True,
             key="competencia_devolucao",
             label_visibility="collapsed",
