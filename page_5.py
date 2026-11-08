@@ -93,7 +93,23 @@ def _recebidos_no_periodo(devs, its, mes: str) -> dict[str, int]:
 
 
 def page_5():
-    st.subheader("Relatórios de devoluções")
+    st.markdown(
+        """
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+        .modulo-header { font-family:'Montserrat',sans-serif !important; text-align:left; }
+        .modulo-breadcrumb { color:#7B8798 !important; font-family:'Montserrat',sans-serif !important; font-size:11px !important; font-weight:600 !important; letter-spacing:.55px !important; margin:0 0 7px !important; }
+        .modulo-title { color:#172B4D !important; font-family:'Montserrat',sans-serif !important; font-size:38px !important; line-height:1.18 !important; font-weight:800 !important; letter-spacing:-.8px !important; margin:0 !important; text-align:left !important; }
+        .modulo-subtitle { color:#627895 !important; font-family:'Montserrat',sans-serif !important; font-size:16px !important; font-weight:600 !important; line-height:1.55 !important; margin:2px 0 18px !important; text-align:left !important; }
+        </style>
+        <div class="modulo-header">
+            <div class="modulo-breadcrumb">PORTAL LEVES &nbsp;/&nbsp; RELATÓRIOS</div>
+            <div class="modulo-title">Relatórios de devoluções</div>
+            <p class="modulo-subtitle">Acompanhe os indicadores de envios, devoluções, recebimentos e divergências por período.</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
     devs = dp.devolucoes_df()
     its = dp.itens_df()
