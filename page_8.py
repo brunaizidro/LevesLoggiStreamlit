@@ -106,9 +106,9 @@ def page_8():
     .pendencias-header {background:linear-gradient(105deg,#064AA6 0%,#0877E8 100%);padding:17px 24px;border-radius:14px;color:#fff;margin:0 0 16px;}
     .pendencias-title {font-size:27px;font-weight:800;color:#fff;margin:0;line-height:1.2;}
     .pendencias-sub {font-size:13px;color:#EAF4FF;margin:4px 0 0;font-weight:600;}
-    div[data-testid="stMetric"] {background:#F3F7FE;border:1px solid #D2E3FC;padding:13px 14px;border-radius:13px;min-height:78px;}
-    div[data-testid="stMetricLabel"] p {font-size:12px;font-weight:700;color:#183B6B;}
-    div[data-testid="stMetricValue"] {font-size:23px;font-weight:800;color:#064AA6;}
+    div[data-testid="stMetric"] {background:#F3F7FE;border:1px solid #D2E3FC;padding:8px 11px;border-radius:11px;min-height:64px;}
+    div[data-testid="stMetricLabel"] p {font-size:11px;font-weight:700;color:#183B6B;margin-bottom:2px;}
+    div[data-testid="stMetricValue"] {font-size:20px;font-weight:800;color:#064AA6;}
     .section-title {font-size:17px;font-weight:800;color:#064AA6;margin:12px 0 10px;}
     div[data-testid="stDataFrame"] {border:1px solid #C8DDF8;border-radius:12px;overflow:hidden;}
     div[data-testid="stSelectbox"] label {font-weight:700;color:#183B6B;}
@@ -174,15 +174,14 @@ def page_8():
     valor_total = valor_devolvido + valor_pendente
 
     st.caption(f"Indicadores e detalhamento da competência {competencia_label}.")
-    k1, k2, k3, k4 = st.columns(4)
+    k1, k2, k3 = st.columns(3)
     k1.metric("Total de Leves", _fmt(total_leves))
     k2.metric("Leves que devolveram", f"{_fmt(devolvidos)} ({devolvidos/total_leves:.1%})")
-    k3.metric("Devolução parcial", f"{_fmt(parciais)} ({parciais/total_leves:.1%})")
-    k4.metric("Leves que não devolveram", f"{_fmt(nao_devolveram)} ({nao_devolveram/total_leves:.1%})")
+    k3.metric("Leves que não devolveram", f"{_fmt(nao_devolveram)} ({nao_devolveram/total_leves:.1%})")
     v1, v2, v3 = st.columns(3)
-    v1.metric("Valor devolvido", dp.fmt_brl(valor_devolvido))
-    v2.metric("Valor pendente", dp.fmt_brl(valor_pendente))
-    v3.metric("Valor total enviado", dp.fmt_brl(valor_total))
+    v1.metric("Valor total enviado", dp.fmt_brl(valor_total))
+    v2.metric("Valor devolvido", dp.fmt_brl(valor_devolvido))
+    v3.metric("Valor pendente", dp.fmt_brl(valor_pendente))
 
     c1, c2, c3 = st.columns([1, 1.08, 1.25])
     with c1:
