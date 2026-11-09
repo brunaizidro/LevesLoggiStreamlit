@@ -49,11 +49,11 @@ def _cabecalho():
     .insumo-label {font-size:11px;color:#71829A;font-weight:600;margin-bottom:3px}
     .insumo-value {font-size:14px;color:#17385F;font-weight:800;white-space:nowrap}
     .monthly-table-wrap {border:1px solid #D7E3F4;border-radius:10px;overflow:hidden;width:100%}
-    .monthly-table {border-collapse:collapse;width:100%;table-layout:fixed;font-size:11px;color:#17385F}
-    .monthly-table th {background:#0754C8;color:#FFFFFF;text-align:center;font-weight:800;padding:8px 4px;border:1px solid #D4E2F7;white-space:nowrap}
+    .monthly-table {border-collapse:collapse;width:100%;table-layout:fixed;font-size:12px;color:#17385F}
+    .monthly-table th {background:#0754C8;color:#FFFFFF;text-align:center;font-weight:800;padding:9px 5px;border:1px solid #D4E2F7;white-space:nowrap;font-size:12px}
     .monthly-table th.month-head {background:#0647AC}
-    .monthly-table td {padding:9px 4px;text-align:center;vertical-align:middle;border:1px solid #E1E8F1;white-space:nowrap;font-size:11px}
-    .monthly-table td.month-cell {text-align:center;font-weight:800;background:#F6F9FE;padding:9px 5px}
+    .monthly-table td {padding:10px 5px;text-align:center;vertical-align:middle;border:1px solid #E1E8F1;white-space:nowrap;font-size:12px}
+    .monthly-table td.month-cell {text-align:center;font-weight:800;background:#F6F9FE;padding:10px 5px;font-size:12px}
     .monthly-table td.pct-cell {font-weight:800;color:#17385F;border-radius:5px;background-image:linear-gradient(115deg,rgba(255,255,255,.68),rgba(255,255,255,0))}
     [data-testid="stDataFrame"] {border:1px solid #DCE7F6;border-radius:10px}
     [data-testid="stMetric"] {background:#F5F8FE;border:1px solid #E0EAF8;border-radius:12px;padding:12px}
@@ -250,7 +250,7 @@ def page_5():
 
         col_tabela, col_grafico = st.columns([1.35, 1], gap="medium")
         with col_tabela:
-            st.markdown("<div style=\"text-align:center;font-weight:800;color:#17385F;font-size:16px;margin-bottom:8px\">Evolução mensal da devolução</div>", unsafe_allow_html=True)
+            st.markdown("<div style=\"text-align:left;font-weight:800;color:#17385F;font-size:17px;margin:0 0 8px 0\">Evolução mensal da devolução</div>", unsafe_allow_html=True)
             st.markdown("".join(html), unsafe_allow_html=True)
         with col_grafico:
             st.markdown("<div style=\"text-align:center;font-weight:800;color:#17385F;font-size:16px;margin-bottom:8px\">% de devolução por insumo</div>", unsafe_allow_html=True)
