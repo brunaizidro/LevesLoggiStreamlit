@@ -286,7 +286,7 @@ def page_5():
                     bargap=0.22, bargroupgap=0.08,
                     legend=dict(title_text="", orientation="h", x=0.5, y=1.16, xanchor="center", yanchor="top", font=dict(size=10, color="#17385F"), bgcolor="rgba(255,255,255,0)"),
                     xaxis=dict(title="", categoryorder="array", categoryarray=ordem_meses, tickfont=dict(size=10, color="#647895"), showgrid=False, showline=False, zeroline=False, automargin=True),
-                    yaxis=dict(title="", range=[0,teto], dtick=10, ticksuffix="%", tickfont=dict(size=10, color="#647895"), showgrid=True, gridcolor="#EAF0F8", gridwidth=1, zeroline=False),
+                    yaxis=dict(title="", range=[0,teto], visible=False, showgrid=False, showticklabels=False, showline=False, zeroline=False),
                     hovermode="x unified"
                 )
                 st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
