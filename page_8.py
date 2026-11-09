@@ -225,10 +225,8 @@ def page_8():
             font=dict(family="Montserrat", size=10, color="#17365F"),
             paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
             title=dict(x=0.03, xanchor="left", font=dict(size=15, color="#123B78")),
-            xaxis=dict(title="Valor", gridcolor="#E6EEF8", zeroline=False,
-                       tickfont=dict(color="#73839A")),
-            yaxis=dict(title="Situação", autorange="reversed",
-                       tickfont=dict(color="#73839A")),
+            xaxis=dict(visible=False, showgrid=False, zeroline=False, showticklabels=False, title=None),
+            yaxis=dict(visible=False, showgrid=False, zeroline=False, showticklabels=False, title=None),
         )
         fig_val.update_traces(textposition="outside", cliponaxis=False,
                               textfont=dict(size=10, color="#17365F"))
@@ -283,11 +281,10 @@ def page_8():
                 font=dict(family="Montserrat", size=10, color="#17365F"),
                 paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
                 legend=dict(orientation="h", y=-0.2, font=dict(size=9)),
-                xaxis=dict(showgrid=False),
-                yaxis=dict(title="Valor (R$)", gridcolor="#E6EEF8", tickformat="~s", rangemode="tozero"),
-                yaxis2=dict(title=dict(text="Devolução (%)", font=dict(color="#0756B8")), overlaying="y", side="right",
-                            range=[0, 110], ticksuffix="%", showgrid=False,
-                            tickfont=dict(color="#0756B8")),
+                xaxis=dict(showgrid=False, showline=False, showticklabels=False, ticks="", title=None, zeroline=False),
+                yaxis=dict(showgrid=False, showline=False, showticklabels=False, ticks="", title=None, zeroline=False, rangemode="tozero"),
+                yaxis2=dict(overlaying="y", side="right", range=[0, 110],
+                            showgrid=False, showline=False, showticklabels=False, ticks="", title=None, zeroline=False),
             )
             st.plotly_chart(fig_ev, use_container_width=True, config={"displayModeBar": False})
         else:
