@@ -118,6 +118,7 @@ def page_8():
     div[data-testid="stDataFrame"] {border:1px solid #C8DDF8;border-radius:12px;overflow:hidden;}
     div[data-testid="stSelectbox"] label {font-weight:700;color:#183B6B;}
     div[data-testid="stButton"] button {border:1px solid #BBD4F5;border-radius:9px;font-weight:700;color:#064AA6;}
+    div[data-testid="stButton"] button[kind="primary"] {color:#FFFFFF!important;}
     .stPlotlyChart {border:1px solid #D6E5FA;border-radius:13px;padding:7px;background:#fff;}
     </style>
     <div class="pendencias">
