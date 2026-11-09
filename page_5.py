@@ -5,6 +5,7 @@ Usa a conciliação oficial da aplicação: envios, recebimentos e cobranças.
 from __future__ import annotations
 
 import pandas as pd
+import plotly.express as px
 import streamlit as st
 
 import data_processing as dp
@@ -33,14 +34,19 @@ def _cabecalho():
     .rel-subtitle {color:#627895;font-size:14px;font-weight:600;line-height:1.55;margin:5px 0 18px}
     .rel-section {color:#172B4D;font-size:18px;font-weight:800;margin:8px 0 4px}
     .rel-caption {color:#71829A;font-size:12px;margin:0 0 12px}
-    .insumo-card {background:#FFFFFF;border:1px solid #DCE7F6;border-radius:13px;padding:16px 16px 14px;height:100%}
+    .insumo-card {background:linear-gradient(180deg,#F4F8FF 0%,#FFFFFF 45%);border:1px solid #CFE0FF;border-radius:16px;padding:0 15px 16px;height:100%;box-shadow:0 2px 8px rgba(30,80,150,.04);overflow:hidden}
+    .insumo-card-head {display:flex;align-items:center;justify-content:space-between;margin:0 -15px 14px;padding:13px 15px;background:#F1F6FF;border-bottom:1px solid #E1EBFA}
+    .insumo-ring {width:76px;height:76px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .insumo-ring-inner {width:58px;height:58px;border-radius:50%;background:white;display:flex;align-items:center;justify-content:center;color:#17385F;font-size:16px;font-weight:800}
+    .insumo-main {display:flex;align-items:center;justify-content:space-between;gap:8px}
+    .insumo-grid {background:#F5F8FD;border:1px solid #ECF1F8;border-radius:11px;padding:12px 10px}
     .insumo-name {font-size:16px;font-weight:800;color:#172B4D;margin:0 0 8px}
-    .insumo-percent {font-size:29px;font-weight:800;line-height:1.1;margin:0}
+    .insumo-percent {font-size:34px;font-weight:800;line-height:1.05;margin:0;letter-spacing:-1px}
     .insumo-track {height:9px;background:#EAF0F8;border-radius:20px;overflow:hidden;margin:10px 0 14px}
     .insumo-fill {height:100%;border-radius:20px}
     .insumo-grid {display:grid;grid-template-columns:1fr 1fr;gap:13px 10px}
     .insumo-label {font-size:11px;color:#71829A;font-weight:600;margin-bottom:3px}
-    .insumo-value {font-size:15px;color:#17385F;font-weight:800;white-space:nowrap}
+    .insumo-value {font-size:14px;color:#17385F;font-weight:800;white-space:nowrap}
     [data-testid="stDataFrame"] {border:1px solid #DCE7F6;border-radius:10px}
     [data-testid="stMetric"] {background:#F5F8FE;border:1px solid #E0EAF8;border-radius:12px;padding:12px}
     </style>
@@ -133,9 +139,19 @@ def page_5():
         with cards[idx]:
             st.markdown(f"""
             <div class="insumo-card">
-              <div class="insumo-name">{NOMES[tipo]}</div>
-              <div class="insumo-percent" style="color:{cor}">{percentual:.1f}%</div>
-              <div class="insumo-label">do volume enviado já devolvido</div>
+              <div class="insumo-card-head">
+                <div class="insumo-name">{NOMES[tipo]}</div>
+                <div class="insumo-tag">DEVOLUÇÃO</div>
+              </div>
+              <div class="insumo-main">
+                <div>
+                  <div class="insumo-percent" style="color:{cor}">{percentual:.1f}%</div>
+                  <div class="insumo-label">do volume enviado já devolvido</div>
+                </div>
+                <div class="insumo-ring" style="background:conic-gradient({cor} {percentual:.2f}%, #E5ECF5 0)">
+                  <div class="insumo-ring-inner">{percentual:.0f}%</div>
+                </div>
+              </div>
               <div class="insumo-track"><div class="insumo-fill" style="width:{percentual:.2f}%;background:{cor}"></div></div>
               <div class="insumo-grid">
                 <div><div class="insumo-label">Quantidade enviada</div><div class="insumo-value">{_qtd(enviado)}</div></div>
@@ -176,6 +192,24 @@ def page_5():
 
     tabela = pd.DataFrame(linhas)
     st.dataframe(tabela, width="stretch", hide_index=True, height=min(560, max(150, 38 + 38 * len(tabela))))
+
+    if not tabela.empty:
+        st.markdown('<div class="rel-section">Evolução mensal do percentual de devolução</div>', unsafe_allow_html=True)
+        graf = pd.DataFrame(linhas).copy()
+        graf["Percentual"] = graf["% devolução"].str.replace("%", "", regex=False).str.replace(",", ".", regex=False).astype(float)
+        fig = px.line(
+            graf, x="Competência", y="Percentual", color="Insumo", markers=True,
+            color_discrete_map={"Saca": CORES["SACA"], "Gaylord": CORES["GAYLORD"], "Pallet": CORES["PALLET"]},
+            category_orders={"Insumo": ["Saca", "Gaylord", "Pallet"]},
+        )
+        fig.update_layout(
+            height=340, margin=dict(l=8, r=8, t=15, b=8), font_family="Montserrat",
+            paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+            legend_title_text="", xaxis_title="", yaxis_title="Devolução (%)",
+            yaxis=dict(range=[0, 100], ticksuffix="%"),
+        )
+        fig.update_traces(line=dict(width=3), marker=dict(size=7))
+        st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
 
     st.download_button(
         "Baixar análise mensal (CSV)",
