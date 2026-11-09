@@ -264,37 +264,53 @@ def page_8():
                     rotulos_taxa.append(f"{taxa:.1f}% {seta} {abs(delta):.1f} p.p.")
             fig_ev = go.Figure()
 
-            # Linha curva com gradiente em uma única família de azul.
-            cor_inicio = (5, 72, 160)    # azul mais profundo
-            cor_fim = (76, 151, 245)     # azul mais claro
+            # Área azul translúcida sob a curva, como um reflexo que suaviza até a base.
+            cor_inicio = (5, 72, 160)
+            cor_fim = (76, 151, 245)
             taxas = ev["Taxa de devolução"].astype(float).tolist()
             quantidade = len(taxas)
+            curva_x, curva_y = [], []
+
             if quantidade >= 2:
                 for idx in range(quantidade - 1):
                     p0 = taxas[max(0, idx - 1)]
                     p1 = taxas[idx]
                     p2 = taxas[idx + 1]
                     p3 = taxas[min(quantidade - 1, idx + 2)]
-                    passos = 36
+
+                    def curva(t):
+                        t2, t3 = t * t, t * t * t
+                        return 0.5 * ((2 * p1) + (-p0 + p2) * t +
+                                      (2*p0 - 5*p1 + 4*p2 - p3) * t2 +
+                                      (-p0 + 3*p1 - 3*p2 + p3) * t3)
+
+                    passos = 48
                     for passo in range(passos):
-                        t0 = passo / passos
-                        t1 = (passo + 1) / passos
+                        t = passo / passos
+                        curva_x.append(idx + t)
+                        curva_y.append(curva(t))
 
-                        def curva(t):
-                            t2, t3 = t * t, t * t * t
-                            return 0.5 * ((2 * p1) + (-p0 + p2) * t +
-                                          (2*p0 - 5*p1 + 4*p2 - p3) * t2 +
-                                          (-p0 + 3*p1 - 3*p2 + p3) * t3)
+                curva_x.append(quantidade - 1)
+                curva_y.append(taxas[-1])
 
-                        progresso = (idx + (t0 + t1) / 2) / max(1, quantidade - 1)
-                        rgb = tuple(round(cor_inicio[k] + (cor_fim[k] - cor_inicio[k]) * progresso) for k in range(3))
-                        cor = "#%02X%02X%02X" % rgb
-                        fig_ev.add_scatter(
-                            x=[idx + t0, idx + t1],
-                            y=[curva(t0), curva(t1)],
-                            mode="lines", line=dict(color=cor, width=4.5),
-                            showlegend=False, hoverinfo="skip"
-                        )
+                # Preenchimento em azul claro e baixa opacidade para criar efeito de luz/reflexo.
+                fig_ev.add_scatter(
+                    x=curva_x, y=curva_y, mode="lines",
+                    line=dict(color="rgba(76,151,245,0)", width=0.5),
+                    fill="tozeroy", fillcolor="rgba(76,151,245,0.24)",
+                    showlegend=False, hoverinfo="skip"
+                )
+
+                # Linha principal em gradiente contínuo na mesma família de azul.
+                for idx in range(len(curva_x) - 1):
+                    progresso = (curva_x[idx] + curva_x[idx + 1]) / 2 / max(1, quantidade - 1)
+                    rgb = tuple(round(cor_inicio[k] + (cor_fim[k] - cor_inicio[k]) * progresso) for k in range(3))
+                    cor = "#%02X%02X%02X" % rgb
+                    fig_ev.add_scatter(
+                        x=curva_x[idx:idx + 2], y=curva_y[idx:idx + 2],
+                        mode="lines", line=dict(color=cor, width=4.5),
+                        showlegend=False, hoverinfo="skip"
+                    )
 
             fig_ev.add_scatter(
                 x=list(range(len(ev))), y=ev["Taxa de devolução"], name="% devolvido",
