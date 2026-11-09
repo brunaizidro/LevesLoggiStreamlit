@@ -104,7 +104,16 @@ def page_3():
         .dev-page-title { color:#172B4D !important; display:block !important; width:100% !important; font-size:38px !important; line-height:1.18 !important; font-weight:800 !important; letter-spacing:-.8px !important; margin:0 !important; padding:0 !important; text-align:left !important; }
         .dev-page-subtitle { color:#627895 !important; display:block !important; font-family:'Montserrat',sans-serif !important; font-size:16px !important; line-height:1.55 !important; font-weight:600 !important; margin:2px 0 18px !important; padding:0 !important; position:static !important; top:auto !important; text-align:left !important; }
         .dev-section-title { display:flex; align-items:center; gap:14px; color:#173F78; background:#EAF2FF; border:1px solid #CFE0FF; border-radius:13px; padding:13px 18px; font-family:'Montserrat',sans-serif; font-size:20px; font-weight:800; margin:16px 0 12px; }
-        .dev-new-title { display:flex; align-items:center; gap:16px; color:#173F78; background:#EAF2FF; border:1px solid #CFE0FF; border-radius:15px; padding:10px 18px; min-height:74px; font-family:'Montserrat',sans-serif; font-size:22px; font-weight:800; margin:16px 0 8px; }
+        .dev-new-title { position:relative; display:flex; align-items:center; gap:16px; color:#123f7c; background:linear-gradient(105deg,#eaf3ff 0%,#f5f9ff 58%,#e2efff 100%); border:2px solid #6da8ff; border-radius:17px; padding:13px 22px; min-height:86px; font-family:'Montserrat',sans-serif; font-size:25px; font-weight:800; margin:18px 0 10px; box-shadow:0 5px 15px rgba(7,93,229,.09); overflow:hidden; }
+        .dev-new-title-copy { display:flex; flex-direction:column; gap:4px; position:relative; z-index:1; }
+        .dev-new-title-copy strong { color:#123f7c; font-size:24px; line-height:1.15; font-weight:850; }
+        .dev-new-title-copy small { color:#54749b; font-size:13px; line-height:1.3; font-weight:650; }
+        .dev-new-truck { display:flex; align-items:center; justify-content:center; position:absolute; right:22px; bottom:0; width:205px; height:72px; color:#1680f5; opacity:.9; }
+        .dev-new-truck:before { content:''; position:absolute; right:-20px; bottom:-28px; width:235px; height:90px; border-radius:60% 0 0 0; background:linear-gradient(110deg,rgba(191,220,255,.35),rgba(141,190,255,.55)); }
+        .dev-new-truck svg { position:relative; z-index:1; width:100%; height:100%; }
+        div[data-testid='stForm'] { border:2px solid #c7dcff !important; border-radius:17px !important; padding:16px 18px 16px !important; background:linear-gradient(180deg,#f8fbff 0%,#ffffff 100%) !important; box-shadow:0 5px 16px rgba(30,91,165,.07) !important; }
+        div[data-testid='stFormSubmitButton'] button { min-height:48px !important; padding:11px 25px !important; border-radius:12px !important; font-size:16px !important; box-shadow:0 4px 10px rgba(7,93,229,.2) !important; }
+        @media (max-width:700px) { .dev-new-title { min-height:74px; padding:12px 14px; } .dev-new-title-copy strong { font-size:20px; } .dev-new-title-copy small { font-size:11px; max-width:240px; } .dev-new-truck { opacity:.2; right:4px; width:120px; } }
         .dev-section-icon { display:inline-flex; align-items:center; justify-content:center; width:40px; height:40px; flex:0 0 40px; border-radius:11px; background:#075DE5; color:#fff; font-size:27px; line-height:1; font-weight:500; }
         div[data-testid='stForm'] { border:1px solid #d5e6ff !important; border-radius:17px !important; padding:14px 18px 16px !important; background:linear-gradient(180deg,#fbfdff 0%,#ffffff 100%) !important; }
         [class*="st-key-dev-qtd-"] { background:linear-gradient(180deg,#f5f8ff 0%,#f9fbff 100%); border:1px solid #D5E2FA; border-radius:15px; padding:12px 11px !important; min-height:80px; box-shadow:0 2px 6px rgba(23,75,136,.055); }
@@ -369,7 +378,7 @@ def page_3():
         _minhas_devolucoes(destino, eh_admin=False, eh_gdl=True)
         return
 
-    st.markdown("<div class='dev-new-title'><span class='dev-section-icon'>＋</span><span>Nova devolução</span></div>", unsafe_allow_html=True)
+    st.markdown("""<div class="dev-new-title"><span class="dev-section-icon">＋</span><span class="dev-new-title-copy"><strong>Nova devolução</strong><small>Registre uma nova devolução de insumos</small></span><span class="dev-new-truck" aria-hidden="true"><svg viewBox="0 0 240 90" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 57V34h116v40H18V57Z" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/><path d="M134 47h42l26 25v2h-68V47Z" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/><path d="M151 49v24m-127 0a13 13 0 1 0 26 0 13 13 0 0 0-26 0Zm133 0a13 13 0 1 0 26 0 13 13 0 0 0-26 0Z" stroke="currentColor" stroke-width="5"/><path d="M18 44h116M176 48v23" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path d="M205 45h18v28h-18zM209 34h10v11h-10zM199 57h30" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/></svg></span></div>""", unsafe_allow_html=True)
     pend = {t: q for t, q in dp.pending_mes_tipo(destino, mes_ref).items() if q > 0}
     if not pend:
         st.success(f"Sem pendência de devolução para {escolha_mes}. 🎉")
