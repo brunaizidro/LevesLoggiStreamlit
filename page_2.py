@@ -237,68 +237,27 @@ def _tabela_usuarios(eh_gdl: bool = False):
         return
 
     df = pd.DataFrame(linhas)
-    # Tabela HTML: ao contrário do st.data_editor (que desenha o texto em canvas),
-    # permite aplicar Montserrat e o mesmo padrão visual das demais tabelas.
-    tabela_html = df.to_html(index=False, escape=True, border=0, classes="usuarios-html-table")
-    html_tabela = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-    <meta charset="utf-8">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-      * {{ box-sizing:border-box; }}
-      body {{ margin:0; padding:0; font-family:'Montserrat',Arial,sans-serif; }}
-      .usuarios-html-wrap {{
-        height:430px; overflow:auto; border:1px solid #DCE7F6;
-        border-radius:10px; background:#FFFFFF;
-      }}
-      .usuarios-html-table {{
-        width:100%; min-width:1000px; border-collapse:separate; border-spacing:0;
-        font-family:'Montserrat',Arial,sans-serif; font-size:13px; color:#172B4D;
-      }}
-      .usuarios-html-table thead th {{
-        position:sticky; top:0; z-index:2; background:#0067FC; color:#FFFFFF;
-        font-family:'Montserrat',Arial,sans-serif; font-weight:700;
-        text-align:center; padding:11px 12px; white-space:nowrap;
-      }}
-      .usuarios-html-table tbody td {{
-        font-family:'Montserrat',Arial,sans-serif; color:#172B4D;
-        font-weight:600; padding:10px 12px; border-bottom:1px solid #E8EEF7;
-        white-space:nowrap; background:#FFFFFF;
-      }}
-      .usuarios-html-table tbody tr:nth-child(even) td {{ background:#F7FAFF; }}
-      .usuarios-html-table tbody tr:hover td {{ background:#EEF5FF; }}
-      .usuarios-html-table th:first-child,.usuarios-html-table td:first-child {{
-        text-align:left; min-width:260px;
-      }}
-      .usuarios-html-table th:nth-child(4),.usuarios-html-table td:nth-child(4) {{
-        text-align:left; min-width:280px;
-      }}
-      .usuarios-html-table th:not(:first-child):not(:nth-child(4)),
-      .usuarios-html-table td:not(:first-child):not(:nth-child(4)) {{
-        text-align:center;
-      }}
-    </style>
-    </head>
-    <body>
-      <div class="usuarios-html-wrap">{tabela_html}</div>
-    </body>
-    </html>
-    """
-    components.html(html_tabela, height=445, scrolling=True)
-
-
-    st.markdown("**Gerenciar status dos usuários**")
-    st.caption("Marque/desmarque os usuários e clique em salvar. Os demais dados são somente leitura.")
-    novos_status = {}
-    for idx, u in enumerate(usuarios):
-        nome_exibicao = f"{u['nome']} ({u['usuario']})"
-        col = st.columns([3, 1])
-        novos_status[u["usuario"]] = col[0].checkbox(
-            nome_exibicao, value=bool(u["ativo"]), key=f"status_user_{u['usuario']}"
-        )
-        col[1].caption("Ativo" if novos_status[u["usuario"]] else "Inativo")
+    # A coluna Ativo fica editável dentro da própria tabela.
+    edited = st.data_editor(
+        df,
+        hide_index=True,
+        use_container_width=True,
+        height=430,
+        disabled=["Nome", "Login", "Destino", "E-mail", "Perfil"],
+        column_config={
+            "Nome": st.column_config.TextColumn("Nome", width="large"),
+            "Login": st.column_config.TextColumn("Login", width="small"),
+            "Destino": st.column_config.TextColumn("Destino", width="small"),
+            "E-mail": st.column_config.TextColumn("E-mail", width="large"),
+            "Perfil": st.column_config.TextColumn("Perfil", width="medium"),
+            "Ativo": st.column_config.CheckboxColumn("Ativo", help="Marque para ativar ou desmarque para inativar."),
+        },
+        key="usuarios_tabela_status",
+    )
+    novos_status = {
+        row["Login"]: bool(row["Ativo"])
+        for _, row in edited.iterrows()
+    }
 
     c1, c2 = st.columns([1, 2])
     if c1.button("Salvar alterações", type="primary", width="stretch"):
