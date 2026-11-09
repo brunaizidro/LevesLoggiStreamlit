@@ -240,7 +240,7 @@ def _tabela_usuarios(eh_gdl: bool = False):
 
     # Tabela com checkbox integrado, cabeçalho contínuo e grade azul-clara.
     widths = [3.8, 1.0, 0.95, 3.6, 1.2, 0.55]
-    with st.container(height=500, border=False, gap=0):
+    with st.container(height=500, border=False, gap=0, key="usuarios_tabela_compacta"):
         st.markdown("""
         <style>
         .usuarios-grid-header {
@@ -270,13 +270,27 @@ def _tabela_usuarios(eh_gdl: bool = False):
         }
         .usuarios-grid-cell.centro {text-align:center;justify-content:center;white-space:nowrap;}
         /* Remove o espaçamento automático entre as linhas da grade. */
-        [data-testid="stVerticalBlock"]:has(.usuarios-grid-header) {
+        /* Zera o espaçamento real entre cabeçalho e linhas dentro da tabela. */
+        .st-key-usuarios_tabela_compacta [data-testid="stVerticalBlock"] {
             gap:0 !important;row-gap:0 !important;
         }
-        [data-testid="stVerticalBlock"]:has(.usuarios-grid-header) > [data-testid="stElementContainer"] {
+        .st-key-usuarios_tabela_compacta [data-testid="stElementContainer"] {
             margin:0 !important;padding:0 !important;
         }
-        [data-testid="stHorizontalBlock"] {gap:0 !important;}
+        .st-key-usuarios_tabela_compacta [data-testid="stHorizontalBlock"] {
+            gap:0 !important;margin:0 !important;padding:0 !important;
+            align-items:stretch !important;
+        }
+        .st-key-usuarios_tabela_compacta [data-testid="stColumn"] {
+            padding:0 !important;margin:0 !important;
+        }
+        .st-key-usuarios_tabela_compacta .usuarios-grid-cell {
+            box-sizing:border-box !important;min-height:44px !important;
+            height:44px !important;margin:0 !important;
+        }
+        .st-key-usuarios_tabela_compacta .usuarios-grid-header {
+            box-sizing:border-box !important;margin:0 !important;
+        }
         [data-testid="stCheckbox"] {
             display:flex;justify-content:center!important;align-items:center;
             min-height:44px;width:100%;margin:0!important;padding:0!important;
