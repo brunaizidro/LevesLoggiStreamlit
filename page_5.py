@@ -260,7 +260,7 @@ def page_5():
         col_tabela, col_grafico = st.columns([1, 1], gap="medium")
         with col_tabela:
             with st.container(height=390, border=True):
-                st.markdown("<div style=\"text-align:left;font-weight:800;color:#17385F;font-size:17px;margin:2px 0 12px 2px\">Evolução mensal da devolução</div>", unsafe_allow_html=True)
+                st.markdown("<div style=\"display:flex;align-items:center;gap:10px;font-weight:800;color:#17385F;font-size:18px;margin:1px 0 14px 1px\"><span style=\"width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;border-radius:10px;background:#E8F1FF;color:#0754C8;font-size:20px\">▥</span><span>Evolução mensal da devolução</span></div>", unsafe_allow_html=True)
                 st.markdown("".join(html), unsafe_allow_html=True)
         with col_grafico:
             with st.container(height=390, border=True):
