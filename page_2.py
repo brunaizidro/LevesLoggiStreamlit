@@ -11,6 +11,7 @@ import io
 
 import pandas as pd
 import streamlit as st
+import streamlit.components.v1 as components
 
 import auth
 import data_extraction as dados
@@ -239,42 +240,50 @@ def _tabela_usuarios(eh_gdl: bool = False):
     # Tabela HTML: ao contrário do st.data_editor (que desenha o texto em canvas),
     # permite aplicar Montserrat e o mesmo padrão visual das demais tabelas.
     tabela_html = df.to_html(index=False, escape=True, border=0, classes="usuarios-html-table")
-    st.markdown(
-        """
-        <style>
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
-        .usuarios-html-wrap{
-            height:430px;overflow:auto;border:1px solid #DCE7F6;
-            border-radius:10px;background:#FFFFFF;
-        }
-        .usuarios-html-table{
-            width:100%;min-width:900px;border-collapse:separate;border-spacing:0;
-            font-family:'Montserrat',sans-serif!important;font-size:13px;
-        }
-        .usuarios-html-table thead th{
-            position:sticky;top:0;z-index:2;background:#0756B8;color:#FFFFFF;
-            font-family:'Montserrat',sans-serif!important;font-weight:700;
-            text-align:center;padding:12px 10px;border-right:1px solid #D6E5FA;
-            white-space:nowrap;
-        }
-        .usuarios-html-table tbody td{
-            font-family:'Montserrat',sans-serif!important;color:#183B6B;
-            font-weight:600;padding:10px;border-right:1px solid #E1EAF5;
-            border-bottom:1px solid #E1EAF5;white-space:nowrap;
-            background:#FFFFFF;
-        }
-        .usuarios-html-table tbody tr:nth-child(even) td{background:#F1F6FD;}
-        .usuarios-html-table th:first-child,.usuarios-html-table td:first-child{
-            text-align:left;min-width:260px;
-        }
-        .usuarios-html-table th:not(:first-child),.usuarios-html-table td:not(:first-child){
-            text-align:center;
-        }
-        </style>
-        <div class="usuarios-html-wrap">""" + tabela_html + """</div>
-        """,
-        unsafe_allow_html=True,
-    )
+    html_tabela = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <meta charset="utf-8">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+      * {{ box-sizing:border-box; }}
+      body {{ margin:0; padding:0; font-family:'Montserrat',Arial,sans-serif; }}
+      .usuarios-html-wrap {{
+        height:430px; overflow:auto; border:1px solid #DCE7F6;
+        border-radius:10px; background:#FFFFFF;
+      }}
+      .usuarios-html-table {{
+        width:100%; min-width:900px; border-collapse:separate; border-spacing:0;
+        font-family:'Montserrat',Arial,sans-serif; font-size:13px;
+      }}
+      .usuarios-html-table thead th {{
+        position:sticky; top:0; z-index:2; background:#0756B8; color:#FFFFFF;
+        font-family:'Montserrat',Arial,sans-serif; font-weight:700;
+        text-align:center; padding:12px 10px; border-right:1px solid #D6E5FA;
+        white-space:nowrap;
+      }}
+      .usuarios-html-table tbody td {{
+        font-family:'Montserrat',Arial,sans-serif; color:#183B6B;
+        font-weight:600; padding:10px; border-right:1px solid #E1EAF5;
+        border-bottom:1px solid #E1EAF5; white-space:nowrap; background:#FFFFFF;
+      }}
+      .usuarios-html-table tbody tr:nth-child(even) td {{ background:#F1F6FD; }}
+      .usuarios-html-table th:first-child,.usuarios-html-table td:first-child {{
+        text-align:left; min-width:260px;
+      }}
+      .usuarios-html-table th:not(:first-child),.usuarios-html-table td:not(:first-child) {{
+        text-align:center;
+      }}
+    </style>
+    </head>
+    <body>
+      <div class="usuarios-html-wrap">{tabela_html}</div>
+    </body>
+    </html>
+    """
+    components.html(html_tabela, height=445, scrolling=True)
+
 
     st.markdown("**Gerenciar status dos usuários**")
     st.caption("Marque/desmarque os usuários e clique em salvar. Os demais dados são somente leitura.")
