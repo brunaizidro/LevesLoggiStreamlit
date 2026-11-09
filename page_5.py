@@ -48,13 +48,19 @@ def _cabecalho():
     .insumo-grid {display:grid;grid-template-columns:1fr 1fr;gap:13px 10px}
     .insumo-label {font-size:11px;color:#71829A;font-weight:600;margin-bottom:3px}
     .insumo-value {font-size:14px;color:#17385F;font-weight:800;white-space:nowrap}
-    .monthly-table-wrap {border:1px solid #D7E3F4;border-radius:10px;overflow:hidden;width:100%}
-    .monthly-table {border-collapse:collapse;width:100%;table-layout:fixed;font-size:12px;color:#17385F}
-    .monthly-table th {background:#0754C8;color:#FFFFFF;text-align:center;font-weight:800;padding:10px 6px;border:1px solid #D4E2F7;white-space:nowrap;font-size:12px}
+    .monthly-table-wrap {border:1px solid #D9E6F7;border-radius:13px;overflow:hidden;width:100%;box-shadow:0 2px 8px rgba(20,70,130,.04);background:#FFFFFF}
+    .monthly-table {border-collapse:separate;border-spacing:0;width:100%;table-layout:fixed;font-size:12px;color:#17385F}
+    .monthly-table th {background:linear-gradient(135deg,#0647AC 0%,#0754C8 100%);color:#FFFFFF;text-align:center;font-weight:800;padding:11px 5px;border-right:1px solid rgba(255,255,255,.28);border-bottom:1px solid #D4E2F7;white-space:nowrap;font-size:12px}
+    .monthly-table th:last-child {border-right:0}
     .monthly-table th.month-head {background:#0647AC}
-    .monthly-table td {padding:11px 6px;text-align:center;vertical-align:middle;border:1px solid #E1E8F1;white-space:nowrap;font-size:12px}
-    .monthly-table td.month-cell {text-align:center;font-weight:800;background:#F6F9FE;padding:10px 5px;font-size:12px}
-    .monthly-table td.pct-cell {font-weight:800;color:#17385F;border-radius:5px;background-image:linear-gradient(115deg,rgba(255,255,255,.68),rgba(255,255,255,0))}
+    .monthly-table th.sub-head {background:#EAF3FF;color:#174477;border-right:1px solid #D7E5F7;font-size:11px;padding:9px 3px}
+    .monthly-table td {padding:12px 4px;text-align:center;vertical-align:middle;border-right:1px solid #E3EBF5;border-bottom:1px solid #E3EBF5;white-space:nowrap;font-size:12px;font-weight:650}
+    .monthly-table tbody tr:last-child td {border-bottom:0}
+    .monthly-table td:last-child {border-right:0}
+    .monthly-table td.month-cell {text-align:left;font-weight:800;background:#F3F7FD;padding:12px 8px 12px 12px;font-size:12px}
+    .monthly-table td.pct-cell {font-weight:850;color:#17385F;border-radius:7px;background-image:linear-gradient(115deg,rgba(255,255,255,.62),rgba(255,255,255,0))}
+    [data-testid="stDownloadButton"] button {border:1px solid #B9D4FA!important;border-radius:10px!important;background:linear-gradient(135deg,#F2F7FF,#E5F0FF)!important;color:#12458F!important;font-weight:800!important;padding:10px 17px!important;box-shadow:0 2px 7px rgba(24,83,160,.07)!important}
+    [data-testid="stDownloadButton"] button:hover {border-color:#78AEF5!important;background:#E1EDFF!important;color:#073C88!important}
     [data-testid="stDataFrame"] {border:1px solid #DCE7F6;border-radius:10px}
     [data-testid="stMetric"] {background:#F5F8FE;border:1px solid #E0EAF8;border-radius:12px;padding:12px}
     </style>
@@ -232,7 +238,7 @@ def page_5():
             '<th colspan="3">Saca</th><th colspan="3">Gaylord</th><th colspan="3">Pallet</th></tr><tr>'
         ]
         for _ in TIPOS:
-            html.extend(['<th>Env.</th><th>Dev.</th><th>% Dev.</th>'])
+            html.extend(['<th class="sub-head">Env.</th><th class="sub-head">Dev.</th><th class="sub-head">% Dev.</th>'])
         html.append('</tr></thead><tbody>')
         for mes in meses:
             html.append(f'<tr><td class="month-cell">{dp.rotulo_mes(mes)}</td>')
