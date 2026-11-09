@@ -267,13 +267,13 @@ def _tabela_usuarios(eh_gdl: bool = False):
         """, unsafe_allow_html=True)
 
         headers = ["Nome", "Login", "Destino", "E-mail", "Perfil", "Ativo"]
-        hcols = st.columns(widths, gap="none")
+        hcols = st.columns(widths, gap=None)
         for col, label in zip(hcols, headers):
             col.markdown(f'<div class="usuarios-grid-header">{label}</div>', unsafe_allow_html=True)
 
         for idx, u in enumerate(usuarios):
             alt = " alt" if idx % 2 else ""
-            cells = st.columns(widths, gap="none")
+            cells = st.columns(widths, gap=None)
             values = [
                 (u["nome"], "nome"),
                 (u["usuario"], "centro"),
