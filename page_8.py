@@ -220,8 +220,11 @@ def page_8():
                          text=valores["Valor"].map(dp.fmt_brl),
                          title="Valores (R$)")
         fig_val.update_layout(
-            showlegend=False, height=285,
-            margin=dict(l=8, r=16, t=42, b=8),
+            showlegend=True, height=285,
+            margin=dict(l=8, r=16, t=42, b=38),
+            legend=dict(orientation="h", y=-0.22, x=0.02, xanchor="left",
+                        yanchor="top", font=dict(family="Montserrat", size=10, color="#17365F"),
+                        title_text=""),
             font=dict(family="Montserrat", size=10, color="#17365F"),
             paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
             title=dict(x=0.03, xanchor="left", font=dict(size=15, color="#123B78")),
