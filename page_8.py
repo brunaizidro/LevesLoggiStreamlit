@@ -228,8 +228,9 @@ def page_8():
             xaxis=dict(visible=False, showgrid=False, zeroline=False, showticklabels=False, title=None),
             yaxis=dict(visible=False, showgrid=False, zeroline=False, showticklabels=False, title=None),
         )
-        fig_val.update_traces(textposition="outside", cliponaxis=False,
-                              textfont=dict(size=10, color="#17365F"))
+        # Mantém os valores dentro das barras para não serem cortados nas bordas.
+        fig_val.update_traces(textposition="inside", insidetextanchor="end", cliponaxis=False,
+                              textfont=dict(size=11, color=["#FFFFFF", "#073B78"]))
         st.plotly_chart(fig_val, use_container_width=True, config={"displayModeBar": False})
     with c3:
         # Evolução mensal apenas da taxa de devolução sobre o valor enviado.
@@ -259,22 +260,44 @@ def page_8():
                     seta = "↑" if delta > 0 else ("↓" if delta < 0 else "→")
                     rotulos_taxa.append(f"{taxa:.1f}% {seta} {abs(delta):.1f} p.p.")
             fig_ev = go.Figure()
+
+            # Linha em gradiente azul: desenha pequenos segmentos com transição de cor.
+            cor_inicio = (7, 86, 184)    # azul escuro
+            cor_fim = (53, 182, 232)     # azul claro
+            for idx in range(len(ev) - 1):
+                x0, x1 = idx, idx + 1
+                y0 = float(ev["Taxa de devolução"].iloc[idx])
+                y1 = float(ev["Taxa de devolução"].iloc[idx + 1])
+                passos = 24
+                for passo in range(passos):
+                    t0 = passo / passos
+                    t1 = (passo + 1) / passos
+                    tm = (t0 + t1) / 2
+                    rgb = tuple(round(cor_inicio[k] + (cor_fim[k] - cor_inicio[k]) * ((idx + tm) / max(1, len(ev) - 1))) for k in range(3))
+                    cor = "#%02X%02X%02X" % rgb
+                    fig_ev.add_scatter(
+                        x=[x0 + t0, x0 + t1],
+                        y=[y0 + (y1 - y0) * t0, y0 + (y1 - y0) * t1],
+                        mode="lines", line=dict(color=cor, width=4),
+                        showlegend=False, hoverinfo="skip"
+                    )
+
             fig_ev.add_scatter(
-                x=ev["Mês"], y=ev["Taxa de devolução"], name="% devolvido",
-                mode="lines+markers+text", text=rotulos_taxa, textposition="top center",
-                textfont=dict(size=9, color="#0756B8"),
-                line=dict(color="#0756B8", width=3),
-                marker=dict(size=8, color="#fff", line=dict(color="#0756B8", width=2)),
+                x=list(range(len(ev))), y=ev["Taxa de devolução"], name="% devolvido",
+                mode="markers+text", text=rotulos_taxa, textposition="top center",
+                textfont=dict(size=10, color="#0756B8"),
+                marker=dict(size=9, color="#FFFFFF", line=dict(color="#0756B8", width=2.5)),
             )
             fig_ev.update_layout(
                 title=dict(text="Evolução da taxa de devolução", x=0.03, xanchor="left",
                            font=dict(size=15, color="#123B78")),
-                height=310, margin=dict(l=18,r=18,t=52,b=48),
+                height=310, margin=dict(l=18,r=42,t=58,b=48),
                 font=dict(family="Montserrat", size=10, color="#17365F"),
                 paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
                 legend=dict(orientation="h", y=-0.2, font=dict(size=9)),
                 xaxis=dict(showgrid=False, showline=False, showticklabels=True, ticks="", title=None,
-                           tickfont=dict(color="#64748B", size=10), zeroline=False),
+                           tickmode="array", tickvals=list(range(len(ev))), ticktext=ev["Mês"].tolist(),
+                           tickfont=dict(color="#64748B", size=10), zeroline=False, range=[-0.12, len(ev)-0.88]),
                 yaxis=dict(range=[0, 110], showgrid=False, showline=False, showticklabels=False,
                            ticks="", title=None, zeroline=False),
             )
