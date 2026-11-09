@@ -254,25 +254,29 @@ def _tabela_usuarios(eh_gdl: bool = False):
         border-radius:10px; background:#FFFFFF;
       }}
       .usuarios-html-table {{
-        width:100%; min-width:900px; border-collapse:separate; border-spacing:0;
-        font-family:'Montserrat',Arial,sans-serif; font-size:13px;
+        width:100%; min-width:1000px; border-collapse:separate; border-spacing:0;
+        font-family:'Montserrat',Arial,sans-serif; font-size:13px; color:#172B4D;
       }}
       .usuarios-html-table thead th {{
-        position:sticky; top:0; z-index:2; background:#0756B8; color:#FFFFFF;
+        position:sticky; top:0; z-index:2; background:#0067FC; color:#FFFFFF;
         font-family:'Montserrat',Arial,sans-serif; font-weight:700;
-        text-align:center; padding:12px 10px; border-right:1px solid #D6E5FA;
-        white-space:nowrap;
+        text-align:center; padding:11px 12px; white-space:nowrap;
       }}
       .usuarios-html-table tbody td {{
-        font-family:'Montserrat',Arial,sans-serif; color:#183B6B;
-        font-weight:600; padding:10px; border-right:1px solid #E1EAF5;
-        border-bottom:1px solid #E1EAF5; white-space:nowrap; background:#FFFFFF;
+        font-family:'Montserrat',Arial,sans-serif; color:#172B4D;
+        font-weight:600; padding:10px 12px; border-bottom:1px solid #E8EEF7;
+        white-space:nowrap; background:#FFFFFF;
       }}
-      .usuarios-html-table tbody tr:nth-child(even) td {{ background:#F1F6FD; }}
+      .usuarios-html-table tbody tr:nth-child(even) td {{ background:#F7FAFF; }}
+      .usuarios-html-table tbody tr:hover td {{ background:#EEF5FF; }}
       .usuarios-html-table th:first-child,.usuarios-html-table td:first-child {{
         text-align:left; min-width:260px;
       }}
-      .usuarios-html-table th:not(:first-child),.usuarios-html-table td:not(:first-child) {{
+      .usuarios-html-table th:nth-child(4),.usuarios-html-table td:nth-child(4) {{
+        text-align:left; min-width:280px;
+      }}
+      .usuarios-html-table th:not(:first-child):not(:nth-child(4)),
+      .usuarios-html-table td:not(:first-child):not(:nth-child(4)) {{
         text-align:center;
       }}
     </style>
