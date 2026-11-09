@@ -215,49 +215,49 @@ def page_3():
         div[data-testid="stDownloadButton"] button:hover { border-color:#1155cc !important; color:#1155cc !important; background:#f5f9ff !important; }
         hr.sb-sep { border-color:#d8e7f8 !important; margin:22px 0 !important; }
         
-        /* Painel Nova devolução — composição compacta conforme referência */
+        /* Painel Nova devolução — mais respiro, alinhamento e leitura */
         .st-key-dev-new-panel {
             box-sizing:border-box !important;
             width:100% !important;
             border:2px solid #4b8cff !important;
-            border-radius:14px !important;
-            padding:9px 12px 8px !important;
-            margin:12px 0 16px !important;
+            border-radius:16px !important;
+            padding:16px 18px 18px !important;
+            margin:16px 0 20px !important;
             background:#ffffff !important;
-            box-shadow:0 3px 10px rgba(7,93,229,.07) !important;
+            box-shadow:0 4px 13px rgba(7,93,229,.08) !important;
         }
         .st-key-dev-new-panel, .st-key-dev-new-panel * {
-            font-weight:700 !important;
+            font-weight:800 !important;
         }
         .st-key-dev-new-panel .dev-new-title {
-            min-height:52px !important;
+            min-height:66px !important;
             box-sizing:border-box !important;
-            padding:6px 12px !important;
-            margin:0 0 6px !important;
+            padding:10px 16px !important;
+            margin:0 0 14px !important;
             border:1px solid #c6dcff !important;
-            border-radius:10px !important;
+            border-radius:12px !important;
             background:linear-gradient(100deg,#eaf3ff 0%,#f5f9ff 65%,#e1edff 100%) !important;
             box-shadow:none !important;
-            gap:10px !important;
+            gap:12px !important;
         }
         .st-key-dev-new-panel .dev-section-icon {
-            width:34px !important;
-            height:34px !important;
-            flex-basis:34px !important;
-            border-radius:9px !important;
-            font-size:23px !important;
+            width:40px !important;
+            height:40px !important;
+            flex-basis:40px !important;
+            border-radius:10px !important;
+            font-size:25px !important;
         }
-        .st-key-dev-new-panel .dev-new-title-copy { gap:2px !important; }
+        .st-key-dev-new-panel .dev-new-title-copy { gap:3px !important; }
         .st-key-dev-new-panel .dev-new-title-copy strong {
-            font-size:22px !important;
-            line-height:1.15 !important;
+            font-size:24px !important;
+            line-height:1.2 !important;
             font-weight:800 !important;
             color:#103e79 !important;
         }
         .st-key-dev-new-panel .dev-new-title-copy small {
-            font-size:12px !important;
-            line-height:1.25 !important;
-            font-weight:700 !important;
+            font-size:14px !important;
+            line-height:1.3 !important;
+            font-weight:800 !important;
             color:#52739b !important;
         }
         /* O caminhão foi removido para manter o cabeçalho limpo. */
@@ -269,100 +269,126 @@ def page_3():
             background:transparent !important;
             box-shadow:none !important;
         }
+        .st-key-dev-new-panel div[data-testid="stForm"] [data-testid="stVerticalBlock"] {
+            gap:14px !important;
+        }
         .st-key-dev-new-panel [class*="st-key-dev-qtd-"] {
             box-sizing:border-box !important;
-            min-height:38px !important;
-            padding:4px 7px !important;
+            min-height:58px !important;
+            padding:8px 11px !important;
             border:1px solid #cfe0ff !important;
-            border-radius:9px !important;
+            border-radius:11px !important;
             background:linear-gradient(100deg,#f3f7ff,#fbfdff) !important;
-            box-shadow:0 1px 4px rgba(23,75,136,.05) !important;
+            box-shadow:0 2px 6px rgba(23,75,136,.06) !important;
+            display:flex !important;
+            align-items:center !important;
+            justify-content:center !important;
         }
         .st-key-dev-new-panel [class*="st-key-dev-qtd-"] [data-testid="stHorizontalBlock"] {
-            gap:6px !important;
+            gap:10px !important;
             align-items:center !important;
         }
         .st-key-dev-new-panel .dev-qty-head {
-            min-height:30px !important;
-            gap:7px !important;
+            min-height:42px !important;
+            gap:9px !important;
+            align-items:center !important;
         }
         .st-key-dev-new-panel .dev-qty-icon {
-            width:28px !important;
-            height:28px !important;
-            flex-basis:28px !important;
-            padding:5px !important;
-            border-radius:8px !important;
+            width:34px !important;
+            height:34px !important;
+            flex-basis:34px !important;
+            padding:6px !important;
+            border-radius:9px !important;
+        }
+        .st-key-dev-new-panel .dev-qty-title {
+            display:flex !important;
+            flex-direction:column !important;
+            justify-content:center !important;
+            gap:3px !important;
         }
         .st-key-dev-new-panel .dev-qty-title strong {
-            font-size:14px !important;
+            font-size:16px !important;
+            line-height:1.2 !important;
             font-weight:800 !important;
+            text-align:left !important;
         }
         .st-key-dev-new-panel .dev-qty-title small {
-            font-size:11px !important;
+            font-size:13px !important;
+            line-height:1.2 !important;
             font-weight:800 !important;
+            text-align:left !important;
         }
         .st-key-dev-new-panel [class*="st-key-dev-qtd-"] div[data-testid="stNumberInput"] input {
-            height:28px !important;
-            min-height:28px !important;
-            font-size:27px !important;
+            height:38px !important;
+            min-height:38px !important;
+            font-size:28px !important;
             font-weight:800 !important;
+            text-align:center !important;
         }
         .st-key-dev-new-panel .dev-field-label {
-            font-size:16px !important;
-            line-height:1.25 !important;
+            font-size:18px !important;
+            line-height:1.3 !important;
             font-weight:800 !important;
-            margin:7px 0 3px !important;
+            text-align:center !important;
+            margin:3px 0 7px !important;
             color:#123b6c !important;
         }
         .st-key-dev-new-panel [class*="st-key-dev-plate-field"],
         .st-key-dev-new-panel [class*="st-key-dev-observation-field"] {
             border:1px solid #c9dcff !important;
-            border-radius:9px !important;
+            border-radius:11px !important;
             background:#fff !important;
             overflow:hidden !important;
+            min-height:46px !important;
+            display:flex !important;
+            align-items:center !important;
         }
         .st-key-dev-new-panel .dev-input-icon {
-            min-height:29px !important;
-            height:29px !important;
+            min-height:42px !important;
+            height:42px !important;
             display:flex !important;
             align-items:center !important;
             justify-content:center !important;
         }
         .st-key-dev-new-panel .dev-input-icon svg {
-            width:19px !important;
-            height:19px !important;
+            width:21px !important;
+            height:21px !important;
         }
         .st-key-dev-new-panel div[data-testid="stTextInput"] input,
         .st-key-dev-new-panel div[data-testid="stTextArea"] textarea {
-            font-size:16px !important;
-            font-weight:700 !important;
-            border-radius:7px !important;
+            font-size:17px !important;
+            font-weight:800 !important;
+            border-radius:8px !important;
+            text-align:left !important;
         }
         .st-key-dev-new-panel div[data-testid="stTextInput"] input {
-            min-height:28px !important;
-            height:28px !important;
+            min-height:40px !important;
+            height:40px !important;
         }
         .st-key-dev-new-panel div[data-testid="stTextArea"] textarea {
-            min-height:36px !important;
-            height:36px !important;
-            padding-top:7px !important;
-        }
-        .st-key-dev-new-panel div[data-testid="stFormSubmitButton"] button {
-            min-height:29px !important;
-            height:29px !important;
-            padding:4px 13px !important;
-            border-radius:8px !important;
-            font-size:16px !important;
-            font-weight:800 !important;
-            box-shadow:0 2px 5px rgba(7,93,229,.16) !important;
+            min-height:58px !important;
+            height:58px !important;
+            padding-top:10px !important;
         }
         .st-key-dev-new-panel div[data-testid="stFormSubmitButton"] {
-            margin-top:5px !important;
+            display:flex !important;
+            justify-content:center !important;
+            margin-top:4px !important;
+        }
+        .st-key-dev-new-panel div[data-testid="stFormSubmitButton"] button {
+            min-height:44px !important;
+            height:44px !important;
+            padding:8px 24px !important;
+            border-radius:10px !important;
+            font-size:17px !important;
+            font-weight:800 !important;
+            box-shadow:0 3px 8px rgba(7,93,229,.18) !important;
         }
         @media (max-width:700px) {
-            .st-key-dev-new-panel { padding:7px !important; }
-            .st-key-dev-new-panel .dev-new-title-copy strong { font-size:20px !important; }
-            .st-key-dev-new-panel .dev-new-title-copy small { font-size:11px !important; }
+            .st-key-dev-new-panel { padding:12px !important; }
+            .st-key-dev-new-panel .dev-new-title-copy strong { font-size:21px !important; }
+            .st-key-dev-new-panel .dev-new-title-copy small { font-size:12px !important; }
+            .st-key-dev-new-panel .dev-field-label { font-size:16px !important; }
         }
         </style>
         """,
