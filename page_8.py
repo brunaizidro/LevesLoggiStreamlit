@@ -295,14 +295,14 @@ def page_8():
         table.pendencias-table {
           width: 100%; min-width: 1120px; border-collapse: separate;
           border-spacing: 0; font-family: 'Montserrat', Arial, sans-serif;
-          color: #17365F; font-size: 10px; font-weight: 600;
+          color: #17365F; font-size: 12px; font-weight: 600;
         }
         .pendencias-table thead th {
           position: sticky; top: 0; z-index: 2;
           background: #0866F5 !important; color: #fff !important;
           font-weight: 700 !important; text-align: center !important;
           vertical-align: middle !important; padding: 8px 6px !important;
-          font-family: 'Montserrat', Arial, sans-serif !important; font-size: 10px !important;
+          font-family: 'Montserrat', Arial, sans-serif !important; font-size: 12px !important;
           border-right: 1px solid rgba(255,255,255,.35);
           border-bottom: 1px solid #0757D8; white-space: normal;
         }
