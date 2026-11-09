@@ -249,32 +249,18 @@ def page_3():
         }
         .st-key-dev-new-panel .dev-new-title-copy { gap:2px !important; }
         .st-key-dev-new-panel .dev-new-title-copy strong {
-            font-size:18px !important;
-            line-height:1.1 !important;
+            font-size:22px !important;
+            line-height:1.15 !important;
             font-weight:800 !important;
             color:#103e79 !important;
         }
         .st-key-dev-new-panel .dev-new-title-copy small {
-            font-size:10px !important;
-            line-height:1.15 !important;
-            font-weight:800 !important;
+            font-size:12px !important;
+            line-height:1.25 !important;
+            font-weight:700 !important;
             color:#52739b !important;
         }
-        .st-key-dev-new-panel .dev-new-truck {
-            width:158px !important;
-            height:48px !important;
-            right:8px !important;
-            bottom:0 !important;
-            opacity:1 !important;
-        }
-        .st-key-dev-new-panel .dev-new-truck:before {
-            width:172px !important;
-            height:55px !important;
-            right:-8px !important;
-            bottom:-17px !important;
-            border-radius:60% 0 0 0 !important;
-            background:linear-gradient(100deg,rgba(191,220,255,.28),rgba(141,190,255,.48)) !important;
-        }
+        /* O caminhão foi removido para manter o cabeçalho limpo. */
         .st-key-dev-new-panel div[data-testid="stForm"] {
             border:0 !important;
             border-radius:0 !important;
@@ -308,22 +294,22 @@ def page_3():
             border-radius:8px !important;
         }
         .st-key-dev-new-panel .dev-qty-title strong {
-            font-size:11px !important;
+            font-size:14px !important;
             font-weight:800 !important;
         }
         .st-key-dev-new-panel .dev-qty-title small {
-            font-size:9px !important;
+            font-size:11px !important;
             font-weight:800 !important;
         }
         .st-key-dev-new-panel [class*="st-key-dev-qtd-"] div[data-testid="stNumberInput"] input {
             height:28px !important;
             min-height:28px !important;
-            font-size:19px !important;
+            font-size:22px !important;
             font-weight:800 !important;
         }
         .st-key-dev-new-panel .dev-field-label {
-            font-size:12px !important;
-            line-height:1.2 !important;
+            font-size:15px !important;
+            line-height:1.25 !important;
             font-weight:800 !important;
             margin:7px 0 3px !important;
             color:#123b6c !important;
@@ -348,8 +334,8 @@ def page_3():
         }
         .st-key-dev-new-panel div[data-testid="stTextInput"] input,
         .st-key-dev-new-panel div[data-testid="stTextArea"] textarea {
-            font-size:11px !important;
-            font-weight:800 !important;
+            font-size:14px !important;
+            font-weight:700 !important;
             border-radius:7px !important;
         }
         .st-key-dev-new-panel div[data-testid="stTextInput"] input {
@@ -366,7 +352,7 @@ def page_3():
             height:29px !important;
             padding:4px 13px !important;
             border-radius:8px !important;
-            font-size:11px !important;
+            font-size:14px !important;
             font-weight:800 !important;
             box-shadow:0 2px 5px rgba(7,93,229,.16) !important;
         }
@@ -375,9 +361,8 @@ def page_3():
         }
         @media (max-width:700px) {
             .st-key-dev-new-panel { padding:7px !important; }
-            .st-key-dev-new-panel .dev-new-truck { width:105px !important; opacity:.35 !important; }
-            .st-key-dev-new-panel .dev-new-title-copy strong { font-size:16px !important; }
-            .st-key-dev-new-panel .dev-new-title-copy small { font-size:9px !important; }
+            .st-key-dev-new-panel .dev-new-title-copy strong { font-size:20px !important; }
+            .st-key-dev-new-panel .dev-new-title-copy small { font-size:11px !important; }
         }
         </style>
         """,
@@ -544,7 +529,7 @@ def page_3():
         return
 
     with st.container(key="dev-new-panel"):
-        st.markdown("""<div class="dev-new-title"><span class="dev-section-icon">＋</span><span class="dev-new-title-copy"><strong>Nova devolução</strong><small>Registre uma nova devolução de insumos</small></span><span class="dev-new-truck" aria-hidden="true"><svg viewBox="0 0 240 90" fill="none" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor" stroke-width="4.2" stroke-linejoin="round" stroke-linecap="round"><path d="M18 36h119v37H18z"/><path d="M137 48h39l27 25h-66z"/><path d="M151 49v24"/><path d="M28 36V17h34v19M64 36V9h36v27M102 36V20h30v16"/><path d="m28 17 17-9 17 9M64 9l18-8 18 8M102 20l15-8 15 8"/><path d="M28 17v19M62 17v19M64 9v27M100 9v27M102 20v16M132 20v16"/><circle cx="48" cy="74" r="11"/><circle cx="178" cy="74" r="11"/><path d="M137 48h29v25h-29M176 48v25"/></g></svg></span></div>""", unsafe_allow_html=True)
+        st.markdown("""<div class="dev-new-title"><span class="dev-section-icon">＋</span><span class="dev-new-title-copy"><strong>Nova devolução</strong><small>Registre uma nova devolução de insumos</small></span></div>""", unsafe_allow_html=True)
         pend = {t: q for t, q in dp.pending_mes_tipo(destino, mes_ref).items() if q > 0}
         if not pend:
             st.success(f"Sem pendência de devolução para {escolha_mes}. 🎉")
@@ -620,7 +605,7 @@ def page_3():
                         mime="application/pdf", key=f"dl_{id_dev}", type="primary",
                     )
     
-        _minhas_devolucoes(destino, eh_admin=eh_admin)
+    _minhas_devolucoes(destino, eh_admin=eh_admin)
 
 
 def _minhas_devolucoes(destino: str, eh_admin: bool = False, eh_gdl: bool = False):
