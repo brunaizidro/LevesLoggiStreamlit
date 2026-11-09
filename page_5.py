@@ -1,311 +1,274 @@
 """
-page_5.py — Relatórios de devoluções (admin).
-
-Visão consolidada: status das devoluções, divergências (declarado × recebido),
-percentual de devolução no período e histórico completo com exportação em CSV.
+page_5.py — Relatórios detalhados de devoluções.
+Acompanha o ciclo de SACA, GAYLORD e PALLET usando Envios,
+Devolucoes e Devolucoes_Itens já existentes na planilha.
 """
-
 from __future__ import annotations
 
+import pandas as pd
 import plotly.express as px
 import streamlit as st
 
 import data_processing as dp
 
+
+CORES_TIPO = {"SACA": "#0067FC", "GAYLORD": "#00BAFF", "PALLET": "#B5651D"}
 CORES_STATUS = {
-    dp.STATUS_TRANSITO: "#00baff",
-    dp.STATUS_RECEBIDO: "#0067fc",
-    dp.STATUS_CONFERIDO: "#90EE90",
-    dp.STATUS_DIVERGENTE: "#F08080",
-    dp.STATUS_CANCELADO: "#c9c9c9",
+    dp.STATUS_TRANSITO: "#00BAFF",
+    dp.STATUS_RECEBIDO: "#3987F5",
+    dp.STATUS_CONFERIDO: "#22A06B",
+    dp.STATUS_DIVERGENTE: "#E5A000",
+    dp.STATUS_CANCELADO: "#9AA7B8",
 }
+TIPOS = ["SACA", "GAYLORD", "PALLET"]
 
 
 def _fmt(n) -> str:
-    return f"{int(n):,}".replace(",", ".")
+    try:
+        return f"{int(round(float(n))):,}".replace(",", ".")
+    except (TypeError, ValueError):
+        return "0"
 
 
-def _pct(recebido: int, enviado: int) -> float:
-    """Percentual de devolução: recebido no período ÷ enviado no período."""
-    if enviado <= 0:
-        return 0.0
-    return (recebido / enviado) * 100.0
-
-
-def _competencia_relatorio(devs):
-    """Usa a competência escolhida na devolução; para registros antigos, usa o mês de criação."""
-    import pandas as pd
-
-    d = devs.copy()
-    competencia = d["competencia"].astype(str).str.strip() if "competencia" in d.columns else pd.Series("", index=d.index)
-    competencia_valida = competencia.str.match(r"^\\d{4}-\\d{2}$", na=False)
-
-    if "data_criacao" in d.columns:
-        criacao = pd.to_datetime(d["data_criacao"], errors="coerce")
-        competencia = competencia.where(competencia_valida, criacao.dt.to_period("M").astype(str))
+def _competencia_dev(devs: pd.DataFrame) -> pd.Series:
+    """Competência da devolução; usa a data de criação nos registros antigos."""
+    if "competencia" in devs.columns:
+        comp = devs["competencia"].fillna("").astype(str).str.strip()
     else:
-        competencia = competencia.where(competencia_valida, "")
-
-    return competencia
-
-
-def _meses_relatorio(envios, devs) -> list[str]:
-    """Lista competências de envios e devoluções, não o mês em que a devolução foi recebida."""
-    meses = set()
-
-    if not envios.empty:
-        meses.update(envios["mes"].dropna().astype(str).tolist())
-
-    if not devs.empty:
-        competencia = _competencia_relatorio(devs)
-        meses.update(competencia[competencia.str.match(r"^\\d{4}-\\d{2}$", na=False)].tolist())
-
-    return sorted(meses, reverse=True)
+        comp = pd.Series("", index=devs.index, dtype="object")
+    datas = pd.to_datetime(devs.get("data_criacao", pd.Series(index=devs.index)), errors="coerce", dayfirst=True)
+    fallback = datas.dt.strftime("%Y-%m").fillna("")
+    valid = comp.str.match(r"^\d{4}-\d{2}$", na=False)
+    return comp.where(valid, fallback)
 
 
-def _recebidos_no_periodo(devs, its, mes: str) -> dict[str, int]:
-    """Soma o recebido efetivo pela competência selecionada, independentemente da data de recebimento."""
-    if devs.empty or its.empty:
-        return {}
+def _rotulo_mes(mes: str) -> str:
+    try:
+        return dp.rotulo_mes(mes)
+    except Exception:
+        return mes
 
-    import pandas as pd
 
-    d = devs[devs["status"].isin(dp.STATUS_RECEBIDOS)].copy()
-    if d.empty:
-        return {}
-
-    d["competencia_relatorio"] = _competencia_relatorio(d)
-    d = d[d["competencia_relatorio"] == mes]
-    if d.empty:
-        return {}
-
-    ids = set(d["id"])
-    it = its[its["id_devolucao"].isin(ids)].copy()
-    if it.empty:
-        return {}
-
-    it["qtd_recebida"] = pd.to_numeric(it["qtd_recebida"], errors="coerce")
-    it["qtd_declarada"] = pd.to_numeric(it["qtd_declarada"], errors="coerce").fillna(0)
-    it["q"] = it["qtd_recebida"].fillna(it["qtd_declarada"]).fillna(0)
-    it["tipo"] = it["tipo"].astype(str).str.upper().str.strip()
-
-    return it.groupby("tipo")["q"].sum().astype(int).to_dict()
+def _estilo():
+    st.markdown("""
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+    .modulo-header,.modulo-header * {font-family:'Montserrat',sans-serif!important}
+    .modulo-breadcrumb {color:#7B8798!important;font-size:11px!important;font-weight:700!important;letter-spacing:.6px!important;margin:0 0 7px!important}
+    .modulo-title {color:#172B4D!important;font-size:36px!important;line-height:1.2!important;font-weight:800!important;letter-spacing:-.7px!important;margin:0!important}
+    .modulo-subtitle {color:#627895!important;font-size:14px!important;font-weight:600!important;line-height:1.55!important;margin:5px 0 18px!important}
+    [data-testid="stAppViewContainer"],[data-testid="stAppViewContainer"] * {font-family:'Montserrat',sans-serif}
+    [data-testid="stMetric"] {background:#F5F8FE;border:1px solid #E0EAF8;border-radius:12px;padding:13px 15px}
+    [data-testid="stMetricLabel"] p {color:#60738E!important;font-size:12px!important;font-weight:700!important}
+    [data-testid="stMetricValue"] {color:#17385F!important;font-size:25px!important;font-weight:800!important}
+    [data-testid="stDataFrame"] {border:1px solid #DCE7F6;border-radius:10px}
+    [data-baseweb="select"] > div {border-radius:9px!important;border-color:#D5E1F0!important}
+    .rel-section {color:#172B4D;font-size:18px;font-weight:800;margin:8px 0 4px}
+    .rel-caption {color:#71829A;font-size:12px;font-weight:500;margin:0 0 12px}
+    .rel-chip {display:inline-flex;align-items:center;gap:7px;background:#EFF5FF;border:1px solid #DCEAFF;border-radius:20px;padding:6px 11px;color:#23456F;font-size:11px;font-weight:700;margin:0 5px 7px 0}
+    .rel-dot {width:8px;height:8px;border-radius:50%;display:inline-block}
+    [data-testid="stDownloadButton"] button,[data-testid="stButton"] button {border-radius:9px!important;font-weight:700!important}
+    </style>
+    <div class="modulo-header">
+      <div class="modulo-breadcrumb">PORTAL LEVES &nbsp;/&nbsp; RELATÓRIOS</div>
+      <div class="modulo-title">Relatórios de devoluções</div>
+      <p class="modulo-subtitle">Acompanhe o caminho de cada insumo: enviado, declarado para devolução, recebido, divergente ou cancelado.</p>
+    </div>
+    """, unsafe_allow_html=True)
 
 
 def page_5():
-    st.markdown(
-        """
-        <style>
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
-        .modulo-header { font-family:'Montserrat',sans-serif !important; text-align:left; }
-        .modulo-breadcrumb { color:#7B8798 !important; font-family:'Montserrat',sans-serif !important; font-size:11px !important; font-weight:600 !important; letter-spacing:.55px !important; margin:0 0 7px !important; }
-        .modulo-title { color:#172B4D !important; font-family:'Montserrat',sans-serif !important; font-size:38px !important; line-height:1.18 !important; font-weight:800 !important; letter-spacing:-.8px !important; margin:0 !important; text-align:left !important; }
-        .modulo-subtitle { color:#627895 !important; font-family:'Montserrat',sans-serif !important; font-size:16px !important; font-weight:600 !important; line-height:1.55 !important; margin:2px 0 18px !important; text-align:left !important; }
-        </style>
-        <div class="modulo-header">
-            <div class="modulo-breadcrumb">PORTAL LEVES &nbsp;/&nbsp; RELATÓRIOS</div>
-            <div class="modulo-title">Relatórios de devoluções</div>
-            <p class="modulo-subtitle">Acompanhe os indicadores de envios, devoluções, recebimentos e divergências por período.</p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    devs = dp.devolucoes_df()
-    its = dp.itens_df()
+    _estilo()
     envios = dp.envios_df()
+    devs = dp.devolucoes_df()
+    itens = dp.itens_df()
 
-    # ============================================================
-    # Percentual de devolução no período
-    # ============================================================
-    st.markdown("#### Percentual de devolução no período")
-    st.caption("Percentual = total recebido vinculado à competência selecionada ÷ total enviado na mesma competência. A data de recebimento não altera a competência.")
+    if not envios.empty:
+        envios = envios.copy()
+        envios["tipo"] = envios["tipo"].astype(str).str.upper().str.strip()
+        envios["destino"] = envios["destino"].astype(str).str.strip()
+    if not devs.empty:
+        devs = devs.copy()
+        devs["status"] = devs["status"].astype(str).str.upper().str.strip()
+        devs["competencia_relatorio"] = _competencia_dev(devs)
+        devs["destino"] = devs["destino"].astype(str).str.strip()
+        devs["dt_criacao"] = pd.to_datetime(devs["data_criacao"], errors="coerce", dayfirst=True)
+    if not itens.empty:
+        itens = itens.copy()
+        itens["tipo"] = itens["tipo"].astype(str).str.upper().str.strip()
+        itens["qtd_declarada"] = pd.to_numeric(itens["qtd_declarada"], errors="coerce").fillna(0)
+        itens["qtd_recebida"] = pd.to_numeric(itens["qtd_recebida"], errors="coerce")
 
-    meses = _meses_relatorio(envios, devs)
-    periodo_opts = ["Todo o período"] + [dp.rotulo_mes(m) for m in meses]
-    periodo_sel = st.selectbox("Período", periodo_opts, index=1 if meses else 0, key="rel_periodo")
+    # Filtros globais
+    meses = set()
+    if not envios.empty:
+        meses.update(envios["mes"].dropna().astype(str))
+    if not devs.empty:
+        meses.update(devs["competencia_relatorio"].loc[devs["competencia_relatorio"].astype(str).str.match(r"^\d{4}-\d{2}$", na=False)])
+    meses = sorted(meses, reverse=True)
+    destinos = set()
+    if not envios.empty:
+        destinos.update(envios["destino"].dropna().astype(str))
+    if not devs.empty:
+        destinos.update(devs["destino"].dropna().astype(str))
+    destinos = sorted(d for d in destinos if d.strip())
 
-    env_periodo = envios.copy()
-    if periodo_sel != "Todo o período":
-        mes_sel = next(m for m in meses if dp.rotulo_mes(m) == periodo_sel)
-        env_periodo = env_periodo[env_periodo["mes"] == mes_sel]
-    else:
-        mes_sel = None
+    with st.container(border=True):
+        st.markdown("**Filtros do relatório**")
+        f1, f2, f3 = st.columns([1.1, 1.5, 1])
+        with f1:
+            periodo_opts = ["Todo o período"] + [_rotulo_mes(m) for m in meses]
+            periodo = st.selectbox("Competência", periodo_opts, key="rel5_periodo")
+        with f2:
+            operacao = st.selectbox("Operação / destino", ["Todas"] + destinos, key="rel5_operacao")
+        with f3:
+            tipo_filtro = st.selectbox("Insumo", ["Todos"] + TIPOS, key="rel5_tipo")
 
-    enviados_tipo = {}
-    if not env_periodo.empty:
-        env_periodo["tipo"] = env_periodo["tipo"].astype(str).str.upper().str.strip()
-        env_periodo["total"] = env_periodo["total"].fillna(0)
-        enviados_tipo = env_periodo.groupby("tipo")["total"].sum().astype(int).to_dict()
+    mes_sel = None
+    if periodo != "Todo o período":
+        mes_sel = next((m for m in meses if _rotulo_mes(m) == periodo), None)
 
-    recebidos_tipo = {}
+    env_f = envios.copy()
+    dev_f = devs.copy()
     if mes_sel:
-        recebidos_tipo = _recebidos_no_periodo(devs, its, mes_sel)
-    elif not devs.empty and not its.empty:
-        import pandas as pd
+        if not env_f.empty:
+            env_f = env_f[env_f["mes"] == mes_sel]
+        if not dev_f.empty:
+            dev_f = dev_f[dev_f["competencia_relatorio"] == mes_sel]
+    if operacao != "Todas":
+        if not env_f.empty:
+            env_f = env_f[env_f["destino"].map(dp._normalizar) == dp._normalizar(operacao)]
+        if not dev_f.empty:
+            dev_f = dev_f[dev_f["destino"].map(dp._normalizar) == dp._normalizar(operacao)]
+    if tipo_filtro != "Todos":
+        if not env_f.empty:
+            env_f = env_f[env_f["tipo"] == tipo_filtro]
 
-        # "Todo o período" considera todas as devoluções efetivamente recebidas/conferidas,
-        # agrupadas por tipo. O filtro por competência só é aplicado quando um mês é escolhido.
-        d = devs[devs["status"].isin(dp.STATUS_RECEBIDOS)].copy()
-        if not d.empty:
-            mapa = d["id"].dropna().unique().tolist()
-            it = its[its["id_devolucao"].isin(set(mapa))].copy()
-            if not it.empty:
-                it["qtd_recebida"] = pd.to_numeric(it["qtd_recebida"], errors="coerce")
-                it["qtd_declarada"] = pd.to_numeric(it["qtd_declarada"], errors="coerce").fillna(0)
-                it["q"] = it["qtd_recebida"].fillna(it["qtd_declarada"]).fillna(0)
-                it["tipo"] = it["tipo"].astype(str).str.upper().str.strip()
-                recebidos_tipo = it.groupby("tipo")["q"].sum().astype(int).to_dict()
+    ids_visiveis = set(dev_f["id"].astype(str)) if not dev_f.empty else set()
+    it_f = itens[itens["id_devolucao"].astype(str).isin(ids_visiveis)].copy() if not itens.empty else pd.DataFrame()
+    if tipo_filtro != "Todos" and not it_f.empty:
+        it_f = it_f[it_f["tipo"] == tipo_filtro]
 
-    sacas_env = int(enviados_tipo.get("SACA", 0))
-    sacas_rec = int(recebidos_tipo.get("SACA", 0))
-    gay_env = int(enviados_tipo.get("GAYLORD", 0))
-    gay_rec = int(recebidos_tipo.get("GAYLORD", 0))
+    # Resumo quantitativo do ciclo
+    enviados = env_f.groupby("tipo")["total"].sum().to_dict() if not env_f.empty else {}
+    dev_map = dev_f.set_index("id")["status"].to_dict() if not dev_f.empty else {}
+    if not it_f.empty:
+        it_f["status"] = it_f["id_devolucao"].astype(str).map({str(k): v for k, v in dev_map.items()})
+        em_transito = it_f[it_f["status"] == dp.STATUS_TRANSITO].groupby("tipo")["qtd_declarada"].sum().to_dict()
+        recebidos = it_f[it_f["status"].isin(dp.STATUS_RECEBIDOS)].copy()
+        recebidos["qtd_efetiva"] = recebidos["qtd_recebida"].fillna(recebidos["qtd_declarada"])
+        recebidos_tipo = recebidos.groupby("tipo")["qtd_efetiva"].sum().to_dict()
+        divergentes = it_f[it_f["status"] == dp.STATUS_DIVERGENTE].copy()
+        divergentes["diferenca_abs"] = (divergentes["qtd_recebida"].fillna(0) - divergentes["qtd_declarada"]).abs()
+        divergencia_tipo = divergentes.groupby("tipo")["diferenca_abs"].sum().to_dict()
+        cancelados = it_f[it_f["status"] == dp.STATUS_CANCELADO].groupby("tipo")["qtd_declarada"].sum().to_dict()
+        declarados_comprometidos = it_f[it_f["status"].isin(dp.STATUS_COMPROMETIDOS)].groupby("tipo")["qtd_declarada"].sum().to_dict()
+    else:
+        em_transito, recebidos_tipo, divergencia_tipo, cancelados, declarados_comprometidos = {}, {}, {}, {}, {}
 
-    total_env = sacas_env + gay_env
-    total_rec = sacas_rec + gay_rec
+    qtd_enviada = sum(enviados.values())
+    qtd_transito = sum(em_transito.values())
+    qtd_recebida = sum(recebidos_tipo.values())
+    qtd_divergente = sum(divergencia_tipo.values())
 
-    c1, c2, c3 = st.columns(3)
-    c1.metric("Sacas", f"{_pct(sacas_rec, sacas_env):.1f}%", help=f"Recebidas: {_fmt(sacas_rec)} | Enviadas: {_fmt(sacas_env)}")
-    c2.metric("Gaylords", f"{_pct(gay_rec, gay_env):.1f}%", help=f"Recebidos: {_fmt(gay_rec)} | Enviados: {_fmt(gay_env)}")
-    c3.metric("Total", f"{_pct(total_rec, total_env):.1f}%", help=f"Recebidos: {_fmt(total_rec)} | Enviados: {_fmt(total_env)}")
-
-    # Tabela somente para visualização; conteúdo centralizado.
-    st.markdown(
-        """
-        <style>
-        .tabela-percentual-wrapper {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-        }
-        .tabela-percentual {
-            width: 100%;
-            border-collapse: collapse;
-            border: 1px solid #e6e6e6;
-            border-radius: 6px;
-            overflow: hidden;
-            font-size: 14px;
-        }
-        .tabela-percentual th,
-        .tabela-percentual td {
-            border: 1px solid #e6e6e6;
-            padding: 8px 10px;
-            text-align: center;
-            vertical-align: middle;
-        }
-        .tabela-percentual th {
-            background: #f7f7f7;
-            font-weight: 500;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    linhas = "".join(
-        f"<tr><td>{tipo}</td><td>{enviado}</td><td>{recebido}</td><td>{percentual}</td></tr>"
-        for tipo, enviado, recebido, percentual in [
-            ("SACA", _fmt(sacas_env), _fmt(sacas_rec), f"{_pct(sacas_rec, sacas_env):.1f}%"),
-            ("GAYLORD", _fmt(gay_env), _fmt(gay_rec), f"{_pct(gay_rec, gay_env):.1f}%"),
-            ("TOTAL", _fmt(total_env), _fmt(total_rec), f"{_pct(total_rec, total_env):.1f}%"),
-        ]
-    )
-    st.markdown(
-        f"""
-        <div class="tabela-percentual-wrapper">
-            <table class="tabela-percentual">
-                <thead>
-                    <tr><th>Tipo</th><th>Enviado</th><th>Recebido</th><th>% Devolução</th></tr>
-                </thead>
-                <tbody>{linhas}</tbody>
-            </table>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    st.markdown('<div class="rel-section">Visão geral do período</div>', unsafe_allow_html=True)
+    st.markdown('<div class="rel-caption">As quantidades são calculadas a partir dos registros de envios e das conferências de devolução existentes.</div>', unsafe_allow_html=True)
+    k1, k2, k3, k4 = st.columns(4)
+    k1.metric("Total enviado", _fmt(qtd_enviada))
+    k2.metric("Em trânsito para devolução", _fmt(qtd_transito))
+    k3.metric("Recebido na conferência", _fmt(qtd_recebida))
+    k4.metric("Diferença em divergências", _fmt(qtd_divergente))
 
     st.markdown("---")
+    st.markdown('<div class="rel-section">Detalhamento por insumo</div>', unsafe_allow_html=True)
+    st.markdown('<div class="rel-caption">Compare o volume enviado com o que está em trânsito, foi recebido ou apresentou divergência. Pallet segue a regra de derivação já aplicada na base de envios quando não existe lançamento próprio.</div>', unsafe_allow_html=True)
 
-    # ---- Cartões por status ----
-    cont = devs["status"].value_counts().to_dict() if not devs.empty else {}
-    c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Em trânsito", cont.get(dp.STATUS_TRANSITO, 0))
-    c2.metric(
-        "Recebidas/Conferidas",
-        cont.get(dp.STATUS_RECEBIDO, 0) + cont.get(dp.STATUS_CONFERIDO, 0),
-    )
-    c3.metric("Divergentes", cont.get(dp.STATUS_DIVERGENTE, 0))
-    c4.metric("Canceladas", cont.get(dp.STATUS_CANCELADO, 0))
+    tipos_visiveis = [tipo_filtro] if tipo_filtro != "Todos" else TIPOS
+    linhas_tipo = []
+    for tipo in tipos_visiveis:
+        enviado = float(enviados.get(tipo, 0))
+        transito = float(em_transito.get(tipo, 0))
+        recebido = float(recebidos_tipo.get(tipo, 0))
+        divergencia = float(divergencia_tipo.get(tipo, 0))
+        cancelado = float(cancelados.get(tipo, 0))
+        declarado = float(declarados_comprometidos.get(tipo, 0))
+        linhas_tipo.append({
+            "Insumo": tipo.title(),
+            "Enviado": _fmt(enviado),
+            "Declarado em devolução": _fmt(declarado),
+            "Em trânsito": _fmt(transito),
+            "Recebido": _fmt(recebido),
+            "Diferença": _fmt(divergencia),
+            "Cancelado": _fmt(cancelado),
+            "Envios sem devolução registrada": _fmt(max(enviado - declarado, 0)),
+        })
+    st.dataframe(pd.DataFrame(linhas_tipo), width="stretch", hide_index=True, height=190)
 
-    st.markdown("---")
-
-    # ---- Gráfico por status ----
-    if not devs.empty:
-        sdf = devs["status"].value_counts().reset_index()
-        sdf.columns = ["status", "qtd"]
-        sdf["rotulo"] = sdf["status"].map(lambda s: dp.STATUS_LABEL.get(s, s))
+    # Comparativo visual
+    comparativo = []
+    for tipo in tipos_visiveis:
+        comparativo.extend([
+            {"Insumo": tipo.title(), "Etapa": "Enviado", "Quantidade": float(enviados.get(tipo, 0))},
+            {"Insumo": tipo.title(), "Etapa": "Em trânsito", "Quantidade": float(em_transito.get(tipo, 0))},
+            {"Insumo": tipo.title(), "Etapa": "Recebido", "Quantidade": float(recebidos_tipo.get(tipo, 0))},
+        ])
+    if comparativo and any(x["Quantidade"] for x in comparativo):
         fig = px.bar(
-            sdf,
-            x="rotulo",
-            y="qtd",
-            color="status",
-            color_discrete_map=CORES_STATUS,
-            title="Devoluções por status",
-            labels={"rotulo": "Status", "qtd": "Quantidade"},
+            pd.DataFrame(comparativo), x="Insumo", y="Quantidade", color="Etapa",
+            barmode="group", color_discrete_map={"Enviado": "#B9D4FF", "Em trânsito": "#00BAFF", "Recebido": "#0067FC"},
         )
-        fig.update_layout(showlegend=False, height=330, font_family="Montserrat")
-        st.plotly_chart(fig, width="stretch")
+        fig.update_layout(
+            height=330, margin=dict(l=12, r=12, t=18, b=12),
+            font_family="Montserrat", paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)", legend_title_text="",
+            xaxis_title="", yaxis_title="Quantidade",
+        )
+        st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
     else:
-        st.info("Nenhuma devolução registrada ainda.")
+        st.info("Ainda não há movimentações para os filtros selecionados.")
 
-    # ---- Divergências ----
-    st.markdown("#### Divergências (declarado × recebido)")
-    divs = devs[devs["status"] == dp.STATUS_DIVERGENTE] if not devs.empty else devs
-    if divs.empty or its.empty:
-        st.caption("Nenhuma divergência registrada.")
+    st.markdown("---")
+    st.markdown('<div class="rel-section">Histórico detalhado por devolução</div>', unsafe_allow_html=True)
+    st.markdown('<div class="rel-caption">Cada linha mostra um insumo dentro de uma devolução, permitindo rastrear o que foi declarado e o resultado da conferência.</div>', unsafe_allow_html=True)
+
+    if dev_f.empty or it_f.empty:
+        st.info("Não há itens de devolução registrados para os filtros selecionados.")
     else:
-        it = its[its["id_devolucao"].isin(set(divs["id"]))].copy()
-        it["qtd_recebida"] = it["qtd_recebida"].fillna(0)
-        it["diferenca"] = it["qtd_recebida"].astype(int) - it["qtd_declarada"].astype(int)
-        it = it[it["diferenca"] != 0]
-        tab = it[["id_devolucao", "tipo", "qtd_declarada", "qtd_recebida", "diferenca"]].copy()
-        tab.columns = ["Devolução", "Tipo", "Declarado", "Recebido", "Diferença"]
-        st.dataframe(tab, width="stretch", hide_index=True)
-
-    # ---- Histórico ----
-    if not devs.empty:
-        st.markdown("#### Histórico completo")
-        hist = devs.copy()
-        hist["status"] = hist["status"].map(lambda s: dp.STATUS_LABEL.get(s, s))
-        cols = [
-            "id",
-            "data_criacao",
-            "usuario",
-            "destino",
-            "status",
-            "total_declarado",
-            "total_recebido",
-            "data_recebimento",
-            "recebido_por",
-        ]
-        hist = hist[cols].sort_values("data_criacao", ascending=False)
-        hist.columns = [
-            "Devolução",
-            "Emissão",
-            "Operação",
-            "Destino",
-            "Status",
-            "Declarado",
-            "Recebido",
-            "Data recebimento",
-            "Recebido por",
-        ]
-        st.dataframe(hist, width="stretch", hide_index=True)
+        meta = dev_f[["id", "data_criacao", "usuario", "destino", "status", "data_recebimento", "recebido_por", "placa", "local_devolucao", "obs"]].copy()
+        detalhe = it_f.merge(meta, left_on="id_devolucao", right_on="id", how="left")
+        detalhe["qtd_recebida_exibida"] = detalhe["qtd_recebida"].fillna(detalhe["qtd_declarada"])
+        detalhe["diferenca"] = detalhe["qtd_recebida_exibida"] - detalhe["qtd_declarada"]
+        detalhe["status_label"] = detalhe["status"].map(dp.STATUS_LABEL).fillna(detalhe["status"])
+        detalhe["data_criacao"] = pd.to_datetime(detalhe["data_criacao"], errors="coerce", dayfirst=True).dt.strftime("%d/%m/%Y %H:%M")
+        colunas = detalhe[[
+            "id_devolucao", "data_criacao", "destino", "tipo", "qtd_declarada",
+            "qtd_recebida_exibida", "diferenca", "status_label", "placa",
+        ]].copy()
+        colunas.columns = ["Devolução", "Data", "Operação", "Insumo", "Declarado", "Recebido", "Diferença", "Status", "Placa"]
+        st.dataframe(colunas, width="stretch", hide_index=True, height=360)
         st.download_button(
-            "Baixar CSV",
-            hist.to_csv(index=False).encode("utf-8-sig"),
-            file_name="devolucoes.csv",
+            "Baixar relatório detalhado (CSV)",
+            colunas.to_csv(index=False).encode("utf-8-sig"),
+            file_name="relatorio_detalhado_devolucoes.csv",
             mime="text/csv",
-            key="dl_devs",
+            key="rel5_csv",
         )
+
+        st.markdown("**Consultar uma devolução específica**")
+        opcoes_dev = sorted(detalhe["id_devolucao"].dropna().astype(str).unique(), reverse=True)
+        id_escolhido = st.selectbox("Registro de devolução", opcoes_dev, key="rel5_dev_escolhida")
+        registro = dev_f[dev_f["id"].astype(str) == str(id_escolhido)].iloc[0]
+        itens_registro = detalhe[detalhe["id_devolucao"].astype(str) == str(id_escolhido)].copy()
+        status_label = dp.STATUS_LABEL.get(registro["status"], registro["status"])
+        st.markdown(
+            f"**{id_escolhido}**  ·  {status_label}  ·  **Operação:** {registro['destino']}  ·  **Placa:** {registro.get('placa') or '—'}"
+        )
+        a, b, c = st.columns(3)
+        a.metric("Declarado", _fmt(itens_registro["qtd_declarada"].sum()))
+        b.metric("Recebido", _fmt(itens_registro["qtd_recebida_exibida"].sum()))
+        c.metric("Diferença", _fmt(itens_registro["diferenca"].sum()))
+        tab_itens = itens_registro[["tipo", "qtd_declarada", "qtd_recebida_exibida", "diferenca"]].copy()
+        tab_itens.columns = ["Insumo", "Declarado", "Recebido", "Diferença"]
+        st.dataframe(tab_itens, width="stretch", hide_index=True)
+        if str(registro.get("obs") or "").strip():
+            st.caption(f"Observação: {registro['obs']}")
