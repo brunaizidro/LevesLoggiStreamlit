@@ -285,9 +285,9 @@ def page_8():
                 legend=dict(orientation="h", y=-0.2, font=dict(size=9)),
                 xaxis=dict(showgrid=False),
                 yaxis=dict(title="Valor (R$)", gridcolor="#E6EEF8", tickformat="~s", rangemode="tozero"),
-                yaxis2=dict(title="Devolução (%)", overlaying="y", side="right",
+                yaxis2=dict(title=dict(text="Devolução (%)", font=dict(color="#078F61")), overlaying="y", side="right",
                             range=[0, 110], ticksuffix="%", showgrid=False,
-                            tickfont=dict(color="#078F61"), titlefont=dict(color="#078F61")),
+                            tickfont=dict(color="#078F61")),
             )
             st.plotly_chart(fig_ev, use_container_width=True, config={"displayModeBar": False})
         else:
