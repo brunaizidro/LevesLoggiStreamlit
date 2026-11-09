@@ -29,9 +29,9 @@ def _cabecalho():
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
     [data-testid="stAppViewContainer"],[data-testid="stAppViewContainer"] * {font-family:'Montserrat',sans-serif}
-    .rel-breadcrumb {color:#8290A5;font-size:11px;font-weight:700;letter-spacing:.6px;margin:0 0 7px}
-    .rel-title {color:#172B4D;font-size:35px;line-height:1.2;font-weight:800;letter-spacing:-.6px;margin:0}
-    .rel-subtitle {color:#627895;font-size:14px;font-weight:600;line-height:1.55;margin:5px 0 18px}
+    .rel-breadcrumb {color:#7B8798;font-size:11px;font-weight:600;letter-spacing:.55px;margin:0 0 7px}
+    .rel-title {color:#172B4D;font-size:clamp(28px,2.3vw,34px);line-height:1.18;font-weight:800;letter-spacing:-.8px;margin:0}
+    .rel-subtitle {color:#7A8493;font-size:14px;font-weight:600;line-height:1.55;margin:6px 0 18px}
     .rel-section {color:#172B4D;font-size:18px;font-weight:800;margin:8px 0 4px}
     .rel-caption {color:#71829A;font-size:12px;margin:0 0 12px}
     .insumo-card {background:linear-gradient(180deg,#F4F8FF 0%,#FFFFFF 45%);border:1px solid #CFE0FF;border-radius:16px;padding:0 15px 16px;height:100%;box-shadow:0 2px 8px rgba(30,80,150,.04);overflow:hidden}
