@@ -235,7 +235,7 @@ def _tabela_usuarios(eh_gdl: bool = False):
         })
     if not linhas:
         st.caption("Nenhum usuário para o filtro.")
-        df = pd.DataFrame(linhas)
+        return
     novos_status = {}
 
     # Tabela com checkbox integrado e larguras ajustadas para evitar
@@ -287,8 +287,6 @@ def _tabela_usuarios(eh_gdl: bool = False):
             value=bool(u["ativo"]),
             key=f"status_user_{u['usuario']}",
             label_visibility="collapsed",
-        )
-,
         )
 
     c1, c2 = st.columns([1, 2])
