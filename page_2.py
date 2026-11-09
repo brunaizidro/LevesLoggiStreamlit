@@ -240,7 +240,7 @@ def _tabela_usuarios(eh_gdl: bool = False):
 
     # Tabela com checkbox integrado, cabeçalho contínuo e grade azul-clara.
     widths = [3.5, 1.15, 1.1, 3.0, 1.4, 0.7]
-    with st.container(height=545, border=False):
+    with st.container(height=700, border=False):
         st.markdown("""
         <style>
         .usuarios-grid-header {
