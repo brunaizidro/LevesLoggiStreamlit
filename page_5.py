@@ -49,12 +49,12 @@ def _cabecalho():
     .insumo-label {font-size:11px;color:#71829A;font-weight:600;margin-bottom:3px}
     .insumo-value {font-size:14px;color:#17385F;font-weight:800;white-space:nowrap}
     .monthly-table-wrap {border:1px solid #D7E3F4;border-radius:10px;overflow:hidden;width:100%}
-    .monthly-table {border-collapse:collapse;width:100%;table-layout:fixed;font-size:10px;color:#17385F}
-    .monthly-table th {background:#0754C8;color:#FFFFFF;text-align:center;font-weight:800;padding:6px 3px;border:1px solid #D4E2F7;white-space:nowrap}
+    .monthly-table {border-collapse:collapse;width:100%;table-layout:fixed;font-size:11px;color:#17385F}
+    .monthly-table th {background:#0754C8;color:#FFFFFF;text-align:center;font-weight:800;padding:8px 4px;border:1px solid #D4E2F7;white-space:nowrap}
     .monthly-table th.month-head {background:#0647AC}
-    .monthly-table td {padding:7px 3px;text-align:center;border:1px solid #E1E8F1;white-space:nowrap}
-    .monthly-table td.month-cell {text-align:left;font-weight:700;background:#F6F9FE;padding-left:7px}
-    .monthly-table td.pct-cell {font-weight:800;color:#17385F}
+    .monthly-table td {padding:9px 4px;text-align:center;vertical-align:middle;border:1px solid #E1E8F1;white-space:nowrap;font-size:11px}
+    .monthly-table td.month-cell {text-align:center;font-weight:800;background:#F6F9FE;padding:9px 5px}
+    .monthly-table td.pct-cell {font-weight:800;color:#17385F;border-radius:5px;background-image:linear-gradient(115deg,rgba(255,255,255,.68),rgba(255,255,255,0))}
     [data-testid="stDataFrame"] {border:1px solid #DCE7F6;border-radius:10px}
     [data-testid="stMetric"] {background:#F5F8FE;border:1px solid #E0EAF8;border-radius:12px;padding:12px}
     </style>
@@ -224,6 +224,7 @@ def page_5():
         # Tabela compacta com cabeçalho agrupado por insumo.
         html = [
             '<div class="monthly-table-wrap"><table class="monthly-table">',
+            '<colgroup><col style="width:18%">' + '<col style="width:9.11%">' * 9 + '</colgroup>',
             '<thead><tr><th rowspan="2" class="month-head">Mês</th>',
             '<th colspan="3">Saca</th><th colspan="3">Gaylord</th><th colspan="3">Pallet</th></tr><tr>'
         ]
@@ -242,17 +243,17 @@ def page_5():
                 else:
                     pct = (devolvido / enviado * 100) if enviado else 0
                     qtd_env, qtd_dev, pct_txt = _qtd(enviado), _qtd(devolvido), f"{pct:.1f}%"
-                faixa = "#E7F8EC" if pct >= 65 else ("#FFF5D9" if pct >= 50 else "#FDECEC")
+                faixa = "linear-gradient(115deg,#D5F5DE 0%,#B9EBC8 100%)" if pct >= 65 else ("linear-gradient(115deg,#FFF4CC 0%,#FFE59A 100%)" if pct >= 50 else "linear-gradient(115deg,#FFE0E0 0%,#FFC2C2 100%)")
                 html.append(f'<td>{qtd_env}</td><td>{qtd_dev}</td><td class="pct-cell" style="background:{faixa}">{pct_txt}</td>')
             html.append('</tr>')
         html.append('</tbody></table></div>')
 
-        col_tabela, col_grafico = st.columns([1.25, 1], gap="small")
+        col_tabela, col_grafico = st.columns([1.35, 1], gap="medium")
         with col_tabela:
-            st.markdown("**Evolução mensal da devolução**")
+            st.markdown("<div style=\"text-align:center;font-weight:800;color:#17385F;font-size:16px;margin-bottom:8px\">Evolução mensal da devolução</div>", unsafe_allow_html=True)
             st.markdown("".join(html), unsafe_allow_html=True)
         with col_grafico:
-            st.markdown("**% de devolução por insumo**")
+            st.markdown("<div style=\"text-align:center;font-weight:800;color:#17385F;font-size:16px;margin-bottom:8px\">% de devolução por insumo</div>", unsafe_allow_html=True)
             graf = tabela.copy()
             graf["Percentual"] = graf["% devolução"].str.replace("%", "", regex=False).str.replace(",", ".", regex=False).astype(float)
             fig = px.line(
@@ -260,7 +261,7 @@ def page_5():
                 color_discrete_map={"Saca": CORES["SACA"], "Gaylord": CORES["GAYLORD"], "Pallet": CORES["PALLET"]},
                 category_orders={"Competência": [dp.rotulo_mes(m) for m in meses], "Insumo": ["Saca", "Gaylord", "Pallet"]},
             )
-            fig.update_layout(height=220, margin=dict(l=5, r=5, t=5, b=5), font_family="Montserrat",
+            fig.update_layout(height=260, margin=dict(l=8, r=8, t=8, b=8), font_family="Montserrat",
                 font=dict(size=9, color="#60738E"), paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
                 legend=dict(title_text="", orientation="v", x=1.01, y=0.98, font=dict(size=10)),
                 xaxis_title="", yaxis_title="", yaxis=dict(range=[0, 100], ticksuffix="%"))
