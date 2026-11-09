@@ -708,7 +708,8 @@ def _minhas_devolucoes(destino: str, eh_admin: bool = False, eh_gdl: bool = Fals
                 unsafe_allow_html=True,
             )
             c4.markdown(
-                f"<div class='dev-quantity-wrap'><div class='dev-quantity'>{_fmt(d['total_declarado'])}</div></div>",
+                f"<div class='dev-quantity-wrap' style='display:flex;justify-content:center;align-items:center;width:100%;text-align:center;'>"
+                f"<span class='dev-quantity' style='display:block;width:100%;text-align:center;margin:0 auto;'>{_fmt(d['total_declarado'])}</span></div>",
                 unsafe_allow_html=True,
             )
             with c5:
