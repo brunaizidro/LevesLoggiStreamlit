@@ -322,6 +322,14 @@ def page_8():
           padding-left: 10px !important;
           padding-right: 10px !important;
         }
+        /* Status com mais espaço para não cortar "Não devolveu" */
+        .pendencias-table thead th:nth-child(2),
+        .pendencias-table tbody td:nth-child(2) {
+          min-width: 112px !important;
+          width: 112px !important;
+          padding-left: 10px !important;
+          padding-right: 10px !important;
+        }
         /* Destaque visual para o saldo e o valor pendente */
         .pendencias-table thead th:nth-child(12),
         .pendencias-table thead th:nth-child(13) {
