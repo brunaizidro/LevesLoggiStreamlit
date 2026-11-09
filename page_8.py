@@ -234,39 +234,60 @@ def page_8():
                               textfont=dict(size=10, color="#17365F"))
         st.plotly_chart(fig_val, use_container_width=True, config={"displayModeBar": False})
     with c3:
-        # Evolução das competências mais recentes disponíveis.
+        # Evolução mensal: valores em R$ e taxa de devolução sobre o valor enviado.
         meses_evolucao = sorted(envios["mes"].dropna().astype(str).unique().tolist())[-6:]
         evolucao = []
         for competencia in meses_evolucao:
             hist = dp.conciliacao(competencia)
             if hist.empty:
                 continue
+            enviado_hist = sum(_valor(r["enviado"], r["tipo"], precos) for _, r in hist.iterrows())
             devolvido_hist = sum(_valor(r["devolvido"], r["tipo"], precos) for _, r in hist.iterrows())
             pendente_hist = sum(_valor(r["cobravel"], r["tipo"], precos) for _, r in hist.iterrows())
+            taxa_devolucao = (devolvido_hist / enviado_hist * 100) if enviado_hist > 0 else 0
             evolucao.append({
                 "Mês": dp.rotulo_mes(competencia)[:3],
                 "Valor devolvido": devolvido_hist,
                 "Valor pendente": pendente_hist,
-                "Valor total": devolvido_hist + pendente_hist,
+                "Valor total": enviado_hist,
+                "Taxa de devolução": taxa_devolucao,
             })
         if evolucao:
             ev = pd.DataFrame(evolucao)
+            variacoes = ev["Taxa de devolução"].diff()
+            rotulos_taxa = []
+            for idx, taxa in enumerate(ev["Taxa de devolução"]):
+                if idx == 0 or pd.isna(variacoes.iloc[idx]):
+                    rotulos_taxa.append(f"{taxa:.1f}%")
+                else:
+                    delta = variacoes.iloc[idx]
+                    seta = "↑" if delta > 0 else ("↓" if delta < 0 else "→")
+                    rotulos_taxa.append(f"{taxa:.1f}% {seta} {abs(delta):.1f} p.p.")
             fig_ev = go.Figure()
             fig_ev.add_bar(x=ev["Mês"], y=ev["Valor devolvido"], name="Valor devolvido",
-                           marker_color="#0756B8")
+                           marker_color="#0756B8", yaxis="y")
             fig_ev.add_bar(x=ev["Mês"], y=ev["Valor pendente"], name="Valor pendente",
-                           marker_color="#8BC8F5")
-            fig_ev.add_scatter(x=ev["Mês"], y=ev["Valor total"], name="Valor total",
-                               mode="lines+markers", line=dict(color="#0756B8", width=2),
-                               marker=dict(size=6, color="#fff", line=dict(color="#0756B8", width=2)))
+                           marker_color="#8BC8F5", yaxis="y")
+            fig_ev.add_scatter(
+                x=ev["Mês"], y=ev["Taxa de devolução"], name="% devolvido",
+                mode="lines+markers+text", text=rotulos_taxa, textposition="top center",
+                textfont=dict(size=9, color="#078F61"),
+                line=dict(color="#078F61", width=3),
+                marker=dict(size=8, color="#fff", line=dict(color="#078F61", width=2)),
+                yaxis="y2",
+            )
             fig_ev.update_layout(
-                title=dict(text="Evolução das devoluções", x=0.03, xanchor="left",
+                title=dict(text="Evolução dos valores e da taxa de devolução", x=0.03, xanchor="left",
                            font=dict(size=15, color="#123B78")),
-                barmode="stack", height=285, margin=dict(l=8,r=8,t=42,b=8),
+                barmode="stack", height=310, margin=dict(l=8,r=48,t=52,b=38),
                 font=dict(family="Montserrat", size=10, color="#17365F"),
                 paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                legend=dict(orientation="h", y=-0.22, font=dict(size=9)),
-                xaxis=dict(showgrid=False), yaxis=dict(gridcolor="#E6EEF8", tickformat="~s"),
+                legend=dict(orientation="h", y=-0.2, font=dict(size=9)),
+                xaxis=dict(showgrid=False),
+                yaxis=dict(title="Valor (R$)", gridcolor="#E6EEF8", tickformat="~s", rangemode="tozero"),
+                yaxis2=dict(title="Devolução (%)", overlaying="y", side="right",
+                            range=[0, 110], ticksuffix="%", showgrid=False,
+                            tickfont=dict(color="#078F61"), titlefont=dict(color="#078F61")),
             )
             st.plotly_chart(fig_ev, use_container_width=True, config={"displayModeBar": False})
         else:
