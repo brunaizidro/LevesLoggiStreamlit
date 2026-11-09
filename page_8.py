@@ -103,9 +103,9 @@ def page_8():
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
     .pendencias, .pendencias * {font-family:'Montserrat',sans-serif;}
     .pendencias .block-container {padding-top:1rem;}
-    .pendencias-header {background:linear-gradient(105deg,#064AA6 0%,#0877E8 100%);padding:17px 24px;border-radius:14px;color:#fff;margin:0 0 16px;}
-    .pendencias-title {font-size:27px;font-weight:800;color:#fff;margin:0;line-height:1.2;}
-    .pendencias-sub {font-size:13px;color:#EAF4FF;margin:4px 0 0;font-weight:600;}
+    .pendencias-breadcrumb {color:#7B8798!important;font-family:'Montserrat',sans-serif!important;font-size:11px!important;font-weight:600!important;letter-spacing:.55px!important;margin:0 0 7px!important;}
+    .pendencias-title {color:#172B4D!important;font-family:'Montserrat',sans-serif!important;font-size:38px!important;line-height:1.18!important;font-weight:800!important;letter-spacing:-.8px!important;margin:0!important;}
+    .pendencias-sub {color:#627895!important;font-family:'Montserrat',sans-serif!important;font-size:16px!important;font-weight:600!important;line-height:1.55!important;margin:2px 0 18px!important;}
     div[data-testid="stMetric"] {background:#F3F7FE;border:1px solid #D2E3FC;padding:8px 11px;border-radius:11px;min-height:64px;}
     div[data-testid="stMetricLabel"] p {font-size:11px;font-weight:700;color:#183B6B;margin-bottom:2px;}
     div[data-testid="stMetricValue"] {font-size:20px;font-weight:800;color:#064AA6;}
@@ -116,10 +116,9 @@ def page_8():
     .stPlotlyChart {border:1px solid #D6E5FA;border-radius:13px;padding:7px;background:#fff;}
     </style>
     <div class="pendencias">
-      <div class="pendencias-header">
-        <div class="pendencias-title">📦 Pendências de Devolução</div>
-        <div class="pendencias-sub">Análise gerencial das devoluções de insumos (Leves)</div>
-      </div>
+      <div class="pendencias-breadcrumb">PORTAL LEVES &nbsp;/&nbsp; PENDÊNCIAS</div>
+      <div class="pendencias-title">Pendências de devolução</div>
+      <p class="pendencias-sub">Acompanhe os saldos pendentes de devolução e os valores por competência.</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -344,7 +343,7 @@ def page_8():
         "Saldo pendente", "Valor pendente",
     ]
     # Ordena o detalhamento pelo valor pendente, do menor para o maior.
-    tabela = resumo.sort_values("_valor_num", ascending=True, kind="stable").rename(columns={
+    tabela = resumo.sort_values("_valor_num", ascending=False, kind="stable").rename(columns={
         "Sacas enviados": "Sacas enviados", "Sacas devolvidos": "Sacas devolvidos",
         "Sacas pendentes": "Sacas pendentes",
     })
