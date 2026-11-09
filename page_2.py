@@ -239,7 +239,7 @@ def _tabela_usuarios(eh_gdl: bool = False):
     novos_status = {}
 
     # Tabela com checkbox integrado, cabeçalho contínuo e grade azul-clara.
-    widths = [3.5, 1.15, 1.1, 3.0, 1.4, 0.7]
+    widths = [3.0, 1.0, 0.95, 4.15, 1.2, 0.55]
     with st.container(height=500, border=False, gap=0):
         st.markdown("""
         <style>
@@ -258,11 +258,28 @@ def _tabela_usuarios(eh_gdl: bool = False):
             background:#FFFFFF;
         }
         .usuarios-grid-cell.alt {background:#F4F8FE;}
-        .usuarios-grid-cell.nome,.usuarios-grid-cell.email {text-align:left;justify-content:flex-start;}
+        .usuarios-grid-cell.nome {text-align:left;justify-content:flex-start;}
+        .usuarios-grid-cell.email {
+            text-align:left;justify-content:flex-start;
+            white-space:nowrap;overflow:visible;overflow-wrap:normal;
+            word-break:keep-all;font-size:11px;
+        }
         .usuarios-grid-cell.centro {text-align:center;justify-content:center;white-space:nowrap;}
-        [data-testid="stCheckbox"] {display:flex;justify-content:center!important;align-items:center;min-height:44px;width:100%;}
+        /* Remove o espaçamento automático entre as linhas da grade. */
+        [data-testid="stVerticalBlock"]:has(.usuarios-grid-header) {
+            gap:0 !important;row-gap:0 !important;
+        }
+        [data-testid="stVerticalBlock"]:has(.usuarios-grid-header) > [data-testid="stElementContainer"] {
+            margin:0 !important;padding:0 !important;
+        }
+        [data-testid="stHorizontalBlock"] {gap:0 !important;}
+        [data-testid="stCheckbox"] {
+            display:flex;justify-content:center!important;align-items:center;
+            min-height:44px;width:100%;margin:0!important;padding:0!important;
+        }
         [data-testid="stCheckbox"] > label {justify-content:center!important;width:100%;}
         [data-testid="stCheckbox"] > label > div:first-child {margin:0 auto!important;}
+        [data-testid="stCheckbox"] p {display:none!important;}
         </style>
         """, unsafe_allow_html=True)
 
