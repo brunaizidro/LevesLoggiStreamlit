@@ -236,23 +236,61 @@ def _tabela_usuarios(eh_gdl: bool = False):
         return
 
     df = pd.DataFrame(linhas)
-    edited = st.data_editor(
-        df, hide_index=True, width="stretch",
-        height=min(430, 40 * (len(df) + 1) + 3),
-        disabled=["Nome", "Login", "Destino", "E-mail", "Perfil"],
-        column_config={
-            "Login": st.column_config.TextColumn(width="small"),
-            "Perfil": st.column_config.TextColumn(width="small"),
-            "Ativo": st.column_config.CheckboxColumn("Ativo", help="Desmarque para desativar", width="small"),
-        },
-        key="editor_users",
+    # Tabela HTML: ao contrário do st.data_editor (que desenha o texto em canvas),
+    # permite aplicar Montserrat e o mesmo padrão visual das demais tabelas.
+    tabela_html = df.to_html(index=False, escape=True, border=0, classes="usuarios-html-table")
+    st.markdown(
+        """
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+        .usuarios-html-wrap{
+            height:430px;overflow:auto;border:1px solid #DCE7F6;
+            border-radius:10px;background:#FFFFFF;
+        }
+        .usuarios-html-table{
+            width:100%;min-width:900px;border-collapse:separate;border-spacing:0;
+            font-family:'Montserrat',sans-serif!important;font-size:13px;
+        }
+        .usuarios-html-table thead th{
+            position:sticky;top:0;z-index:2;background:#0756B8;color:#FFFFFF;
+            font-family:'Montserrat',sans-serif!important;font-weight:700;
+            text-align:center;padding:12px 10px;border-right:1px solid #D6E5FA;
+            white-space:nowrap;
+        }
+        .usuarios-html-table tbody td{
+            font-family:'Montserrat',sans-serif!important;color:#183B6B;
+            font-weight:600;padding:10px;border-right:1px solid #E1EAF5;
+            border-bottom:1px solid #E1EAF5;white-space:nowrap;
+            background:#FFFFFF;
+        }
+        .usuarios-html-table tbody tr:nth-child(even) td{background:#F1F6FD;}
+        .usuarios-html-table th:first-child,.usuarios-html-table td:first-child{
+            text-align:left;min-width:260px;
+        }
+        .usuarios-html-table th:not(:first-child),.usuarios-html-table td:not(:first-child){
+            text-align:center;
+        }
+        </style>
+        <div class="usuarios-html-wrap">""" + tabela_html + """</div>
+        """,
+        unsafe_allow_html=True,
     )
+
+    st.markdown("**Gerenciar status dos usuários**")
+    st.caption("Marque/desmarque os usuários e clique em salvar. Os demais dados são somente leitura.")
+    novos_status = {}
+    for idx, u in enumerate(usuarios):
+        nome_exibicao = f"{u['nome']} ({u['usuario']})"
+        col = st.columns([3, 1])
+        novos_status[u["usuario"]] = col[0].checkbox(
+            nome_exibicao, value=bool(u["ativo"]), key=f"status_user_{u['usuario']}"
+        )
+        col[1].caption("Ativo" if novos_status[u["usuario"]] else "Inativo")
 
     c1, c2 = st.columns([1, 2])
     if c1.button("Salvar alterações", type="primary", width="stretch"):
         mudou, bloqueado = 0, False
-        for _, r in edited.iterrows():
-            login, novo = r["Login"], bool(r["Ativo"])
+        for login, novo in novos_status.items():
             if novo == orig_ativo.get(login):
                 continue
             if login == logado:
@@ -267,4 +305,3 @@ def _tabela_usuarios(eh_gdl: bool = False):
             st.rerun()
         elif not bloqueado:
             st.info("Nenhuma alteração para salvar.")
-    c2.caption("Marque/desmarque **Ativo** e clique em salvar. Demais campos são só leitura.")
