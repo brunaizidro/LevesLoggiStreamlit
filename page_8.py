@@ -321,7 +321,7 @@ def page_8():
             fig_ev.update_layout(
                 title=dict(text="Evolução da taxa de devolução", x=0.03, xanchor="left",
                            font=dict(size=15, color="#123B78")),
-                height=310, margin=dict(l=18,r=42,t=58,b=48),
+                height=285, margin=dict(l=18,r=42,t=58,b=48),
                 font=dict(family="Montserrat", size=10, color="#17365F"),
                 paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
                 legend=dict(orientation="h", y=-0.2, font=dict(size=9)),
