@@ -101,18 +101,18 @@ def page_3():
         .dev-page-kicker { color:#6383aa; font-size:12px; font-weight:700; letter-spacing:1.1px; text-transform:uppercase; margin:0 0 5px; }
         .dev-header { width:100% !important; display:flex !important; flex-direction:column !important; align-items:flex-start !important; gap:0 !important; margin:0 0 18px !important; padding:0 !important; }
         .dev-title-wrap { width:100% !important; display:block !important; text-align:left !important; margin:0 !important; padding:0 !important; line-height:1 !important; }
-        .dev-page-title { color:#172B4D !important; display:block !important; width:100% !important; font-size:38px !important; line-height:1.18 !important; font-weight:800 !important; letter-spacing:-.8px !important; margin:0 !important; padding:0 !important; text-align:left !important; }
-        .dev-page-subtitle { color:#627895 !important; display:block !important; font-family:'Montserrat',sans-serif !important; font-size:16px !important; line-height:1.55 !important; font-weight:600 !important; margin:2px 0 18px !important; padding:0 !important; position:static !important; top:auto !important; text-align:left !important; }
-        .dev-section-title { display:flex; align-items:center; gap:14px; color:#173F78; background:#EAF2FF; border:1px solid #CFE0FF; border-radius:13px; padding:13px 18px; font-family:'Montserrat',sans-serif; font-size:20px; font-weight:800; margin:16px 0 12px; }
-        .dev-new-title { position:relative; display:flex; align-items:center; gap:16px; color:#123f7c; background:linear-gradient(105deg,#eaf3ff 0%,#f5f9ff 58%,#e2efff 100%); border:2px solid #6da8ff; border-radius:17px; padding:13px 22px; min-height:86px; font-family:'Montserrat',sans-serif; font-size:25px; font-weight:800; margin:18px 0 10px; box-shadow:0 5px 15px rgba(7,93,229,.09); overflow:hidden; }
+        .dev-page-title { color:#172B4D !important; display:block !important; width:100% !important; font-size:clamp(28px,2.3vw,34px) !important; line-height:1.18 !important; font-weight:800 !important; letter-spacing:-.8px !important; margin:0 !important; padding:0 !important; text-align:left !important; }
+        .dev-page-subtitle { color:#627895 !important; display:block !important; font-family:'Montserrat',sans-serif !important; font-size:14px !important; line-height:1.55 !important; font-weight:600 !important; margin:2px 0 18px !important; padding:0 !important; position:static !important; top:auto !important; text-align:left !important; }
+        .dev-section-title { display:flex; align-items:center; gap:14px; color:#173F78; background:#EAF2FF; border:1px solid #CFE0FF; border-radius:13px; padding:13px 18px; font-family:'Montserrat',sans-serif; font-size:18px; font-weight:800; margin:16px 0 12px; }
+        .dev-new-title { position:relative; display:flex; align-items:center; gap:16px; color:#123f7c; background:linear-gradient(105deg,#eaf3ff 0%,#f5f9ff 58%,#e2efff 100%); border:2px solid #6da8ff; border-radius:17px; padding:13px 22px; min-height:86px; font-family:'Montserrat',sans-serif; font-size:23px; font-weight:800; margin:18px 0 10px; box-shadow:0 5px 15px rgba(7,93,229,.09); overflow:hidden; }
         .dev-new-title-copy { display:flex; flex-direction:column; gap:4px; position:relative; z-index:1; }
-        .dev-new-title-copy strong { color:#123f7c; font-size:24px; line-height:1.15; font-weight:850; }
+        .dev-new-title-copy strong { color:#123f7c; font-size:23px; line-height:1.15; font-weight:850; }
         .dev-new-title-copy small { color:#54749b; font-size:13px; line-height:1.3; font-weight:650; }
         .dev-new-truck { display:flex; align-items:center; justify-content:center; position:absolute; right:22px; bottom:0; width:205px; height:72px; color:#1680f5; opacity:.9; }
         .dev-new-truck:before { content:''; position:absolute; right:-20px; bottom:-28px; width:235px; height:90px; border-radius:60% 0 0 0; background:linear-gradient(110deg,rgba(191,220,255,.35),rgba(141,190,255,.55)); }
         .dev-new-truck svg { position:relative; z-index:1; width:100%; height:100%; }
         div[data-testid='stForm'] { border:2px solid #c7dcff !important; border-radius:17px !important; padding:16px 18px 16px !important; background:linear-gradient(180deg,#f8fbff 0%,#ffffff 100%) !important; box-shadow:0 5px 16px rgba(30,91,165,.07) !important; }
-        div[data-testid='stFormSubmitButton'] button { min-height:48px !important; padding:11px 25px !important; border-radius:12px !important; font-size:16px !important; box-shadow:0 4px 10px rgba(7,93,229,.2) !important; }
+        div[data-testid='stFormSubmitButton'] button { min-height:48px !important; padding:11px 25px !important; border-radius:12px !important; font-size:14px !important; box-shadow:0 4px 10px rgba(7,93,229,.2) !important; }
         @media (max-width:700px) { .dev-new-title { min-height:74px; padding:12px 14px; } .dev-new-title-copy strong { font-size:20px; } .dev-new-title-copy small { font-size:11px; max-width:240px; } .dev-new-truck { opacity:.2; right:4px; width:120px; } }
         .dev-section-icon { display:inline-flex; align-items:center; justify-content:center; width:40px; height:40px; flex:0 0 40px; border-radius:11px; background:#075DE5; color:#fff; font-size:27px; line-height:1; font-weight:500; }
         div[data-testid='stForm'] { border:1px solid #d5e6ff !important; border-radius:17px !important; padding:14px 18px 16px !important; background:linear-gradient(180deg,#fbfdff 0%,#ffffff 100%) !important; }
@@ -131,7 +131,7 @@ def page_3():
         div[data-testid='stNumberInput'] > div, div[data-testid='stTextInput'] > div, div[data-testid='stTextArea'] > div { border-radius:10px !important; }
         div[data-testid='stNumberInput'] input, div[data-testid='stTextInput'] input, div[data-testid='stTextArea'] textarea { border-radius:10px !important; border-color:#cbd8e8 !important; background:#fff !important; font-family:'Montserrat',sans-serif !important; }
         div[data-testid='stTextArea'] textarea { min-height:68px !important; }
-        .dev-field-label { color:#0E2C5A; font-family:'Montserrat',sans-serif; font-size:16px; font-weight:800; margin:12px 0 6px; }
+        .dev-field-label { color:#0E2C5A; font-family:'Montserrat',sans-serif; font-size:13px; font-weight:700; margin:12px 0 6px; }
         .dev-observation-label { margin-top:14px; }
         [class*="st-key-dev-plate-field"], [class*="st-key-dev-observation-field"] { width:100%; box-sizing:border-box; border:1px solid #C9D8F3; border-radius:13px; background:linear-gradient(180deg,#FBFDFF 0%,#F8FAFF 100%); padding:0 8px; overflow:hidden; }
         [class*="st-key-dev-plate-field"] [data-testid="stHorizontalBlock"], [class*="st-key-dev-observation-field"] [data-testid="stHorizontalBlock"] { display:flex !important; flex-wrap:nowrap !important; width:100% !important; align-items:stretch !important; gap:0 !important; }
@@ -144,12 +144,12 @@ def page_3():
         [class*="st-key-dev-plate-field"] div[data-testid="stTextInput"], [class*="st-key-dev-observation-field"] div[data-testid="stTextArea"] { display:block !important; width:100% !important; max-width:100% !important; min-width:0 !important; margin:0 !important; padding:0 !important; }
         [class*="st-key-dev-plate-field"] div[data-testid="stTextInput"] > div, [class*="st-key-dev-observation-field"] div[data-testid="stTextArea"] > div { display:block !important; width:100% !important; max-width:100% !important; min-width:0 !important; border:0 !important; box-shadow:none !important; background:transparent !important; padding:0 !important; }
         [class*="st-key-dev-plate-field"] input, [class*="st-key-dev-observation-field"] textarea { display:block; width:100% !important; max-width:100% !important; min-width:0 !important; box-sizing:border-box !important; border:0 !important; outline:0 !important; box-shadow:none !important; border-radius:0 !important; background:transparent !important; color:#17345f !important; font-family:'Montserrat',sans-serif !important; }
-        [class*="st-key-dev-plate-field"] input { height:44px !important; padding:0 12px !important; font-size:16px !important; }
-        [class*="st-key-dev-observation-field"] textarea { min-height:64px !important; height:64px !important; padding:10px 12px !important; font-size:15px !important; resize:none !important; }
+        [class*="st-key-dev-plate-field"] input { height:44px !important; padding:0 12px !important; font-size:14px !important; }
+        [class*="st-key-dev-observation-field"] textarea { min-height:64px !important; height:64px !important; padding:10px 12px !important; font-size:14px !important; resize:none !important; }
         [class*="st-key-dev-plate-field"] input:focus, [class*="st-key-dev-observation-field"] textarea:focus { border:0 !important; box-shadow:none !important; }
                 div[data-testid='stFormSubmitButton'] button { background:#075DE5 !important; color:#fff !important; border:0 !important; border-radius:10px !important; font-family:'Montserrat',sans-serif !important; font-weight:800 !important; padding:10px 22px !important; }
         div[data-testid='stFormSubmitButton'] button:hover { background:#064fc4 !important; box-shadow:0 4px 12px rgba(7,93,229,.18) !important; }
-        .dev-balance-section-title { display:flex; align-items:center; gap:15px; width:100%; box-sizing:border-box; color:#104783; background:linear-gradient(105deg,#eaf3ff 0%,#dceaff 100%); border:1px solid #c9ddff; border-radius:15px; padding:10px 18px; min-height:62px; margin:12px 0 10px; font-family:'Montserrat',sans-serif; font-size:20px; line-height:1.25; font-weight:800; letter-spacing:-.35px; }
+        .dev-balance-section-title { display:flex; align-items:center; gap:15px; width:100%; box-sizing:border-box; color:#104783; background:linear-gradient(105deg,#eaf3ff 0%,#dceaff 100%); border:1px solid #c9ddff; border-radius:15px; padding:10px 18px; min-height:62px; margin:12px 0 10px; font-family:'Montserrat',sans-serif; font-size:18px; line-height:1.25; font-weight:800; letter-spacing:-.35px; }
         .dev-balance-section-title svg { width:32px; height:32px; flex:0 0 32px; color:#075DE5; }
         .dev-balance-card { position:relative; overflow:hidden; box-sizing:border-box; background:#fff; border:1px solid #d6e4f7; border-radius:16px; padding:15px 18px 13px; min-height:178px; box-shadow:0 6px 16px rgba(28,89,160,.08); transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
         .dev-balance-card:before { content:""; position:absolute; left:0; top:0; bottom:0; width:5px; background:#1680f5; }
@@ -159,11 +159,11 @@ def page_3():
         .dev-balance-icon svg { width:100%; height:100%; display:block; }
         .dev-balance-divider { align-self:stretch; width:1px; min-height:68px; background:#d8e5f6; }
         .dev-balance-info { display:flex; flex-direction:column; align-items:flex-start; justify-content:center; min-width:0; }
-        .dev-balance-label { color:#123b6c; font-family:'Montserrat',sans-serif; font-size:16px; line-height:1.2; font-weight:800; letter-spacing:.15px; text-transform:uppercase; margin:0 0 7px; text-align:left; }
+        .dev-balance-label { color:#123b6c; font-family:'Montserrat',sans-serif; font-size:15px; line-height:1.2; font-weight:800; letter-spacing:.15px; text-transform:uppercase; margin:0 0 7px; text-align:left; }
         .dev-balance-qty { color:#123b6c; font-family:'Montserrat',sans-serif; font-size:40px; line-height:1; font-weight:800; letter-spacing:-2px; margin:0; text-align:left; }
-        .dev-balance-caption { color:#7188a5; font-family:'Montserrat',sans-serif; font-size:13px; font-weight:750; margin:11px 0 5px; padding-top:10px; border-top:1px solid #e5edf7; }
-        .dev-balance-value { color:#0755ad; font-family:'Montserrat',sans-serif; font-size:19px; line-height:1.2; font-weight:800; }
-        .dev-total-banner { display:flex; align-items:center; gap:15px; box-sizing:border-box; width:100%; background:linear-gradient(105deg,#0646a8 0%,#075de5 100%); border:1px solid #075de5; border-radius:15px; padding:10px 20px; min-height:72px; margin:12px 0 16px; color:#fff; font-family:'Montserrat',sans-serif; font-size:25px; font-weight:800; box-shadow:0 9px 20px rgba(7,93,229,.2); }
+        .dev-balance-caption { color:#7188a5; font-family:'Montserrat',sans-serif; font-size:12px; font-weight:750; margin:11px 0 5px; padding-top:10px; border-top:1px solid #e5edf7; }
+        .dev-balance-value { color:#0755ad; font-family:'Montserrat',sans-serif; font-size:18px; line-height:1.2; font-weight:800; }
+        .dev-total-banner { display:flex; align-items:center; gap:15px; box-sizing:border-box; width:100%; background:linear-gradient(105deg,#0646a8 0%,#075de5 100%); border:1px solid #075de5; border-radius:15px; padding:10px 20px; min-height:72px; margin:12px 0 16px; color:#fff; font-family:'Montserrat',sans-serif; font-size:20px; font-weight:800; box-shadow:0 9px 20px rgba(7,93,229,.2); }
         .dev-total-icon { display:flex; align-items:center; justify-content:center; flex:0 0 48px; width:48px; height:46px; color:#fff; border-right:2px solid rgba(255,255,255,.25); padding-right:18px; box-sizing:content-box; }
         .dev-total-icon svg { width:42px; height:42px; display:block; }
         .dev-total-label { color:#fff; white-space:nowrap; }
@@ -180,7 +180,7 @@ def page_3():
           .dev-total-banner strong { font-size:25px; min-height:48px; padding:0 16px; }
         }
         @media (max-width: 600px) {
-          .dev-balance-section-title { font-size:18px; padding:14px 16px; min-height:64px; }
+          .dev-balance-section-title { font-size:17px; padding:14px 16px; min-height:64px; }
           .dev-balance-section-title svg { width:32px; height:32px; flex-basis:32px; }
           .dev-total-banner { flex-wrap:wrap; gap:12px; }
           .dev-total-icon { flex-basis:42px; width:42px; padding-right:12px; }
@@ -195,7 +195,7 @@ def page_3():
         div[data-testid="stFormSubmitButton"] button { background:#075BEA !important; color:white !important; border:0 !important; border-radius:10px !important; font-weight:700 !important; padding:10px 22px !important; }
         div[data-testid="stAlert"][kind="success"] { background:#e8f8f2 !important; border:1px solid #c9efdf !important; color:#126b62 !important; border-radius:11px !important; }
         div[data-testid="stAlert"][kind="info"] { background:#eaf3ff !important; border:1px solid #d8e8ff !important; color:#1155cc !important; border-radius:12px !important; }
-        .dev-list-title { color:#172b4d !important; font-family:'Montserrat',sans-serif !important; font-size:24px !important; font-weight:800 !important; letter-spacing:-.4px !important; margin:22px 0 12px !important; }
+        .dev-list-title { color:#172b4d !important; font-family:'Montserrat',sans-serif !important; font-size:22px !important; font-weight:800 !important; letter-spacing:-.4px !important; margin:22px 0 12px !important; }
         .dev-table-header { display:grid; grid-template-columns:31% 18% 18% 15% 18%; align-items:center; background:#eaf3ff; color:#17345f; border-radius:10px 10px 0 0; margin:-1px -1px 12px; padding:12px 16px; font-family:'Montserrat',sans-serif; font-size:11px; font-weight:800; letter-spacing:.45px; }
         .dev-table-header > div:nth-child(2), .dev-table-header > div:nth-child(3), .dev-table-header > div:nth-child(4) { text-align:center !important; }
         .dev-record-cell { display:flex; align-items:center; gap:12px; min-height:46px; }
@@ -252,13 +252,13 @@ def page_3():
         }
         .st-key-dev-new-panel .dev-new-title-copy { gap:3px !important; }
         .st-key-dev-new-panel .dev-new-title-copy strong {
-            font-size:24px !important;
+            font-size:23px !important;
             line-height:1.2 !important;
             font-weight:800 !important;
             color:#103e79 !important;
         }
         .st-key-dev-new-panel .dev-new-title-copy small {
-            font-size:14px !important;
+            font-size:13px !important;
             line-height:1.3 !important;
             font-weight:800 !important;
             color:#52739b !important;
@@ -406,7 +406,7 @@ def page_3():
             .st-key-dev-new-panel { padding:12px !important; }
             .st-key-dev-new-panel .dev-new-title-copy strong { font-size:21px !important; }
             .st-key-dev-new-panel .dev-new-title-copy small { font-size:12px !important; }
-            .st-key-dev-new-panel .dev-field-label { font-size:16px !important; }
+            .st-key-dev-new-panel .dev-field-label { font-size:13px !important; }
         }
         </style>
         """,
