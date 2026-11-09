@@ -121,6 +121,33 @@ def page_2():
         .modulo-breadcrumb { color:#7B8798 !important; font-family:'Montserrat',sans-serif !important; font-size:11px !important; font-weight:600 !important; letter-spacing:.55px !important; margin:0 0 7px !important; }
         .modulo-title { color:#172B4D !important; font-family:'Montserrat',sans-serif !important; font-size:38px !important; line-height:1.18 !important; font-weight:800 !important; letter-spacing:-.8px !important; margin:0 !important; text-align:left !important; }
         .modulo-subtitle { color:#627895 !important; font-family:'Montserrat',sans-serif !important; font-size:16px !important; font-weight:600 !important; line-height:1.55 !important; margin:2px 0 18px !important; text-align:left !important; }
+        /* Padronização da tabela de usuários com as demais tabelas do portal */
+        [data-testid="stDataEditor"] {
+            font-family:'Montserrat',sans-serif !important;
+            --gdg-font-family: 'Montserrat', sans-serif;
+            --gdg-header-font-style: 700 12px 'Montserrat', sans-serif;
+            --gdg-header-background: #0756B8;
+            --gdg-header-text: #FFFFFF;
+            --gdg-header-border-color: #D6E5FA;
+            --gdg-border-color: #D6E5FA;
+            --gdg-cell-text: #183B6B;
+            --gdg-bg-cell: #FFFFFF;
+            --gdg-bg-cell-medium: #F1F6FD;
+            --gdg-accent-color: #0866F5;
+            border:1px solid #C8DDF8;
+            border-radius:12px;
+            overflow:hidden;
+        }
+        [data-testid="stDataEditor"] * {
+            font-family:'Montserrat',sans-serif !important;
+        }
+        [data-testid="stDataEditor"] canvas {
+            font-family:'Montserrat',sans-serif !important;
+        }
+        [data-testid="stTextInput"] label,
+        [data-testid="stTextInput"] input {
+            font-family:'Montserrat',sans-serif !important;
+        }
         </style>
         <div class="modulo-header">
             <div class="modulo-breadcrumb">PORTAL LEVES &nbsp;/&nbsp; USUÁRIOS</div>
