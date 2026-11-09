@@ -268,7 +268,7 @@ def page_5():
                 fig = px.line(
                     graf, x="Competência", y="Percentual", color="Legenda", markers=True,
                     color_discrete_map={nomes_legenda.get("Saca", "Saca"): CORES["SACA"], nomes_legenda.get("Gaylord", "Gaylord"): CORES["GAYLORD"], nomes_legenda.get("Pallet", "Pallet"): CORES["PALLET"]},
-                    category_orders={"Competência": ordem_meses, "Legenda": [nomes_legenda[t] for t in ["Saca", "Gaylord", "Pallet"] if t in nomes_legenda.values()]},
+                    category_orders={"Competência": ordem_meses, "Legenda": [nomes_legenda[t] for t in ["Saca", "Gaylord", "Pallet"] if t in nomes_legenda]},
                 )
                 fig.update_traces(
                     line=dict(width=3, shape="linear"), marker=dict(size=7, line=dict(width=1.5, color="#FFFFFF")),
