@@ -333,9 +333,10 @@ def page_8():
         /* Destaque visual para o saldo e o valor pendente */
         .pendencias-table thead th:nth-child(12),
         .pendencias-table thead th:nth-child(13) {
-          background: #064AA6 !important;
-          color: #FFFFFF !important;
-          border-left: 2px solid rgba(255,255,255,.55) !important;
+          background: #E7ECF2 !important;
+          color: #17365F !important;
+          border-left: 2px solid #FFFFFF !important;
+          border-bottom: 1px solid #D5DDE7 !important;
         }
         .pendencias-table tbody td:nth-child(12),
         .pendencias-table tbody td:nth-child(13) {
