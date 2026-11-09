@@ -83,18 +83,21 @@ def page_5():
     env["tipo"] = env["tipo"].astype(str).str.upper().str.strip()
     env = env[env["tipo"].isin(TIPOS)].copy()
     env["ano"] = env["dt"].dt.year.astype(str)
-    anos = sorted(env["ano"].dropna().unique().tolist(), reverse=True)
+    meses_disponiveis = sorted(env["mes"].dropna().astype(str).unique().tolist())
+    rotulos_meses = {dp.rotulo_mes(m): m for m in meses_disponiveis}
     destinos = sorted(d for d in env["destino"].dropna().astype(str).unique() if d.strip())
 
     with st.container(border=True):
         st.markdown("**Filtros da análise**")
         c1, c2 = st.columns([1, 1.6])
         with c1:
-            ano = st.selectbox("Ano", ["Todos"] + anos, key="rel5_ano_analitico")
+            mes_label = st.selectbox("Mês", ["Todos os meses"] + list(rotulos_meses.keys()), key="rel5_mes_analitico")
         with c2:
             destino = st.selectbox("Operação / destino", ["Todas"] + destinos, key="rel5_destino_analitico")
 
-    env_f = env[env["ano"] == ano].copy() if ano != "Todos" else env.copy()
+    env_f = env.copy()
+    if mes_label != "Todos os meses":
+        env_f = env_f[env_f["mes"].astype(str) == rotulos_meses[mes_label]].copy()
     env_f = _filtrar_destino(env_f, destino)
     if env_f.empty:
         st.info("Não há envios para os filtros selecionados.")
