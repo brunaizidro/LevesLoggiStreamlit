@@ -240,7 +240,7 @@ def _tabela_usuarios(eh_gdl: bool = False):
 
     # Tabela com checkbox integrado, cabeçalho contínuo e grade azul-clara.
     widths = [3.5, 1.15, 1.1, 3.0, 1.4, 0.7]
-    with st.container(height=500, border=False, gap=None):
+    with st.container(height=500, border=False, gap=0):
         st.markdown("""
         <style>
         .usuarios-grid-header {
@@ -252,7 +252,7 @@ def _tabela_usuarios(eh_gdl: bool = False):
         }
         .usuarios-grid-cell {
             color:#172B4D;font-family:'Montserrat',sans-serif;font-size:12px;
-            font-weight:600;padding:9px 8px;min-height:48px;
+            font-weight:600;padding:8px 8px;min-height:44px;
             border:1px solid #D6E5FA;display:flex;align-items:center;
             line-height:1.3;overflow-wrap:anywhere;word-break:normal;
             background:#FFFFFF;
@@ -260,7 +260,7 @@ def _tabela_usuarios(eh_gdl: bool = False):
         .usuarios-grid-cell.alt {background:#F4F8FE;}
         .usuarios-grid-cell.nome,.usuarios-grid-cell.email {text-align:left;justify-content:flex-start;}
         .usuarios-grid-cell.centro {text-align:center;justify-content:center;white-space:nowrap;}
-        [data-testid="stCheckbox"] {display:flex;justify-content:center!important;align-items:center;min-height:48px;width:100%;}
+        [data-testid="stCheckbox"] {display:flex;justify-content:center!important;align-items:center;min-height:44px;width:100%;}
         [data-testid="stCheckbox"] > label {justify-content:center!important;width:100%;}
         [data-testid="stCheckbox"] > label > div:first-child {margin:0 auto!important;}
         </style>
