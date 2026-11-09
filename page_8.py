@@ -283,31 +283,34 @@ def page_8():
     <html>
     <head>
       <meta charset="utf-8">
+      <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
       <style>
         * { box-sizing: border-box; }
-        body { margin: 0; padding: 0; background: transparent; font-family: Montserrat, Arial, sans-serif; }
+        body { margin: 0; padding: 0; background: transparent; font-family: 'Montserrat', Arial, sans-serif; }
         .pendencias-table-wrap {
           width: 100%; max-height: 700px; overflow: auto;
           border: 1px solid #C9DCF5; border-radius: 10px; background: #fff;
         }
         table.pendencias-table {
-          width: 100%; min-width: 1250px; border-collapse: separate;
-          border-spacing: 0; font-family: Montserrat, Arial, sans-serif;
-          color: #17365F; font-size: 12px;
+          width: 100%; min-width: 1120px; border-collapse: separate;
+          border-spacing: 0; font-family: 'Montserrat', Arial, sans-serif;
+          color: #17365F; font-size: 10px; font-weight: 600;
         }
         .pendencias-table thead th {
           position: sticky; top: 0; z-index: 2;
           background: #0866F5 !important; color: #fff !important;
           font-weight: 700 !important; text-align: center !important;
-          vertical-align: middle !important; padding: 11px 8px !important;
+          vertical-align: middle !important; padding: 8px 6px !important;
+          font-family: 'Montserrat', Arial, sans-serif !important; font-size: 10px !important;
           border-right: 1px solid rgba(255,255,255,.35);
           border-bottom: 1px solid #0757D8; white-space: normal;
         }
         .pendencias-table tbody td {
           text-align: center !important; vertical-align: middle !important;
-          padding: 9px 8px !important; border-right: 1px solid #E1EAF5;
+          padding: 6px 5px !important; border-right: 1px solid #E1EAF5;
           border-bottom: 1px solid #E1EAF5; white-space: nowrap;
-          background: #fff;
+          background: #fff; font-family: 'Montserrat', Arial, sans-serif !important;
+          font-size: 10px !important; font-weight: 600 !important;
         }
         .pendencias-table tbody tr:nth-child(even) td { background: #F1F6FD; }
         .pendencias-table tbody tr:last-child td { border-bottom: 0; }
