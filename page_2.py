@@ -240,7 +240,7 @@ def _tabela_usuarios(eh_gdl: bool = False):
 
     # Tabela com checkbox integrado, cabeçalho contínuo e grade azul-clara.
     widths = [3.5, 1.15, 1.1, 3.0, 1.4, 0.7]
-    with st.container(height=500, border=False):
+    with st.container(height=500, border=False, gap="none"):
         st.markdown("""
         <style>
         .usuarios-grid-header {
@@ -260,18 +260,20 @@ def _tabela_usuarios(eh_gdl: bool = False):
         .usuarios-grid-cell.alt {background:#F4F8FE;}
         .usuarios-grid-cell.nome,.usuarios-grid-cell.email {text-align:left;justify-content:flex-start;}
         .usuarios-grid-cell.centro {text-align:center;justify-content:center;white-space:nowrap;}
-        [data-testid="stCheckbox"] {display:flex;justify-content:center;align-items:center;min-height:48px;}
+        [data-testid="stCheckbox"] {display:flex;justify-content:center!important;align-items:center;min-height:48px;width:100%;}
+        [data-testid="stCheckbox"] > label {justify-content:center!important;width:100%;}
+        [data-testid="stCheckbox"] > label > div:first-child {margin:0 auto!important;}
         </style>
         """, unsafe_allow_html=True)
 
         headers = ["Nome", "Login", "Destino", "E-mail", "Perfil", "Ativo"]
-        hcols = st.columns(widths, gap=None)
+        hcols = st.columns(widths, gap="none")
         for col, label in zip(hcols, headers):
             col.markdown(f'<div class="usuarios-grid-header">{label}</div>', unsafe_allow_html=True)
 
         for idx, u in enumerate(usuarios):
             alt = " alt" if idx % 2 else ""
-            cells = st.columns(widths, gap=None)
+            cells = st.columns(widths, gap="none")
             values = [
                 (u["nome"], "nome"),
                 (u["usuario"], "centro"),
