@@ -248,12 +248,13 @@ def page_5():
             html.append('</tr>')
         html.append('</tbody></table></div>')
 
-        col_tabela, col_grafico = st.columns([1.35, 1], gap="medium")
+        col_tabela, col_grafico = st.columns([1, 1], gap="medium")
         with col_tabela:
-            st.markdown("<div style=\"text-align:left;font-weight:800;color:#17385F;font-size:17px;margin:0 0 8px 0\">Evolução mensal da devolução</div>", unsafe_allow_html=True)
-            st.markdown("".join(html), unsafe_allow_html=True)
+            with st.container(height=390, border=True):
+                st.markdown("<div style=\"text-align:left;font-weight:800;color:#17385F;font-size:17px;margin:2px 0 12px 2px\">Evolução mensal da devolução</div>", unsafe_allow_html=True)
+                st.markdown("".join(html), unsafe_allow_html=True)
         with col_grafico:
-            with st.container(border=True):
+            with st.container(height=390, border=True):
                 st.markdown("<div style=\"font-weight:800;color:#17385F;font-size:17px;margin:2px 0 8px 2px\">% de devolução por insumo</div>", unsafe_allow_html=True)
                 graf = tabela.copy()
                 graf["Percentual"] = graf["% devolução"].str.replace("%", "", regex=False).str.replace(",", ".", regex=False).astype(float)
