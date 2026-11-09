@@ -8,6 +8,7 @@ pela camada de extração; o login/hash é responsabilidade de auth.py.
 from __future__ import annotations
 
 import io
+import html
 
 import pandas as pd
 import streamlit as st
@@ -234,34 +235,33 @@ def _tabela_usuarios(eh_gdl: bool = False):
         })
     if not linhas:
         st.caption("Nenhum usuário para o filtro.")
-        return
-
-    df = pd.DataFrame(linhas)
+        df = pd.DataFrame(linhas)
     novos_status = {}
 
-    # Tabela montada com células Streamlit para manter o visual personalizado
-    # e permitir editar o checkbox diretamente na última coluna.
+    # Tabela com checkbox integrado e larguras ajustadas para evitar
+    # quebra dos títulos e corte desnecessário dos dados.
     st.markdown("""
     <style>
     .usuarios-grid-header {
         background:#0067FC;color:#FFFFFF;font-family:'Montserrat',sans-serif;
-        font-size:13px;font-weight:700;padding:11px 12px;text-align:center;
-        border-right:1px solid rgba(255,255,255,.35);min-height:42px;
+        font-size:12px;font-weight:700;padding:10px 6px;text-align:center;
+        min-height:40px;white-space:nowrap;display:flex;
+        align-items:center;justify-content:center;line-height:1.2;
     }
     .usuarios-grid-cell {
-        color:#172B4D;font-family:'Montserrat',sans-serif;font-size:13px;
-        font-weight:600;padding:10px 12px;min-height:42px;
+        color:#172B4D;font-family:'Montserrat',sans-serif;font-size:12px;
+        font-weight:600;padding:9px 8px;min-height:44px;
         border-bottom:1px solid #E8EEF7;display:flex;align-items:center;
-        white-space:nowrap;overflow:hidden;
+        line-height:1.35;overflow-wrap:anywhere;word-break:normal;
     }
     .usuarios-grid-cell.alt {background:#F7FAFF;}
-    .usuarios-grid-cell.nome {text-align:left;}
-    .usuarios-grid-cell.email {text-align:left;}
+    .usuarios-grid-cell.nome,.usuarios-grid-cell.email {text-align:left;justify-content:flex-start;}
+    .usuarios-grid-cell.centro {text-align:center;justify-content:center;white-space:nowrap;}
     </style>
     """, unsafe_allow_html=True)
 
     headers = ["Nome", "Login", "Destino", "E-mail", "Perfil", "Ativo"]
-    widths = [3.2, .8, .8, 2.7, 1.25, .65]
+    widths = [3.5, 1.15, 1.1, 3.0, 1.4, 0.7]
     hcols = st.columns(widths, gap="small")
     for col, label in zip(hcols, headers):
         col.markdown(f'<div class="usuarios-grid-header">{label}</div>', unsafe_allow_html=True)
@@ -271,14 +271,15 @@ def _tabela_usuarios(eh_gdl: bool = False):
         cells = st.columns(widths, gap="small")
         values = [
             (u["nome"], "nome"),
-            (u["usuario"], ""),
-            (u["destino"], ""),
-            (u.get("email") or "", "email"),
-            (PERFIL_LABEL.get(u["perfil"], "Operação"), ""),
+            (u["usuario"], "centro"),
+            (u["destino"], "centro"),
+            (u.get("email") or "—", "email"),
+            (PERFIL_LABEL.get(u["perfil"], "Operação"), "centro"),
         ]
         for col, (value, extra) in zip(cells[:5], values):
+            safe_value = html.escape(str(value))
             col.markdown(
-                f'<div class="usuarios-grid-cell{alt} {extra}">{value if value else "—"}</div>',
+                f'<div class="usuarios-grid-cell{alt} {extra}">{safe_value}</div>',
                 unsafe_allow_html=True,
             )
         novos_status[u["usuario"]] = cells[5].checkbox(
@@ -286,6 +287,8 @@ def _tabela_usuarios(eh_gdl: bool = False):
             value=bool(u["ativo"]),
             key=f"status_user_{u['usuario']}",
             label_visibility="collapsed",
+        )
+,
         )
 
     c1, c2 = st.columns([1, 2])
