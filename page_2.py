@@ -239,7 +239,7 @@ def _tabela_usuarios(eh_gdl: bool = False):
     novos_status = {}
 
     # Tabela com checkbox integrado, cabeçalho contínuo e grade azul-clara.
-    widths = [3.0, 1.0, 0.95, 4.15, 1.2, 0.55]
+    widths = [3.8, 1.0, 0.95, 3.6, 1.2, 0.55]
     with st.container(height=500, border=False, gap=0):
         st.markdown("""
         <style>
@@ -258,11 +258,15 @@ def _tabela_usuarios(eh_gdl: bool = False):
             background:#FFFFFF;
         }
         .usuarios-grid-cell.alt {background:#F4F8FE;}
-        .usuarios-grid-cell.nome {text-align:left;justify-content:flex-start;}
+        .usuarios-grid-cell.nome {
+            text-align:left;justify-content:flex-start;
+            white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+            overflow-wrap:normal;word-break:keep-all;font-size:11px;
+        }
         .usuarios-grid-cell.email {
             text-align:left;justify-content:flex-start;
-            white-space:nowrap;overflow:visible;overflow-wrap:normal;
-            word-break:keep-all;font-size:11px;
+            white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+            overflow-wrap:normal;word-break:keep-all;font-size:11px;
         }
         .usuarios-grid-cell.centro {text-align:center;justify-content:center;white-space:nowrap;}
         /* Remove o espaçamento automático entre as linhas da grade. */
