@@ -290,8 +290,20 @@ def page_3():
         }
         .st-key-dev-new-panel .dev-qty-head {
             min-height:42px !important;
-            gap:9px !important;
+            gap:10px !important;
             align-items:center !important;
+            justify-content:center !important;
+            transform:translateY(-3px) !important;
+            width:100% !important;
+        }
+        .st-key-dev-new-panel [class*="st-key-dev-qtd-"] [data-testid="stHorizontalBlock"] > div:first-child {
+            display:flex !important;
+            align-items:center !important;
+            justify-content:center !important;
+        }
+        .st-key-dev-new-panel .dev-qty-title {
+            align-items:flex-start !important;
+            text-align:left !important;
         }
         .st-key-dev-new-panel .dev-qty-icon {
             width:34px !important;
@@ -326,11 +338,14 @@ def page_3():
             text-align:center !important;
         }
         .st-key-dev-new-panel .dev-field-label {
+            display:block !important;
+            width:100% !important;
             font-size:18px !important;
             line-height:1.3 !important;
             font-weight:800 !important;
-            text-align:center !important;
-            margin:3px 0 7px !important;
+            text-align:left !important;
+            margin:5px 0 8px !important;
+            padding-left:2px !important;
             color:#123b6c !important;
         }
         .st-key-dev-new-panel [class*="st-key-dev-plate-field"],
