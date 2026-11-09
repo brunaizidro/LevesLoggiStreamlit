@@ -239,7 +239,7 @@ def _tabela_usuarios(eh_gdl: bool = False):
     novos_status = {}
 
     # Tabela com checkbox integrado, cabeçalho contínuo e grade azul-clara.
-    widths = [3.8, 1.0, 0.95, 3.6, 1.2, 0.55]
+    widths = [3.65, 0.95, 0.9, 3.45, 1.15, 0.9]
     with st.container(height=500, border=False, gap=0, key="usuarios_tabela_compacta"):
         st.markdown("""
         <style>
@@ -290,14 +290,26 @@ def _tabela_usuarios(eh_gdl: bool = False):
         }
         .st-key-usuarios_tabela_compacta .usuarios-grid-header {
             box-sizing:border-box !important;margin:0 !important;
+            position:sticky !important;top:0 !important;z-index:30 !important;
+            background:#0067FC !important;
         }
-        [data-testid="stCheckbox"] {
-            display:flex;justify-content:center!important;align-items:center;
-            min-height:44px;width:100%;margin:0!important;padding:0!important;
+        /* Mantém o cabeçalho visível durante a rolagem da lista. */
+        .st-key-usuarios_tabela_compacta [data-testid="stVerticalBlockBorderWrapper"] {
+            overflow:visible !important;
         }
-        [data-testid="stCheckbox"] > label {justify-content:center!important;width:100%;}
-        [data-testid="stCheckbox"] > label > div:first-child {margin:0 auto!important;}
-        [data-testid="stCheckbox"] p {display:none!important;}
+        .st-key-usuarios_tabela_compacta [data-testid="stCheckbox"] {
+            display:flex !important;justify-content:center !important;
+            align-items:center !important;min-height:44px !important;
+            width:100% !important;margin:0 !important;padding:0 !important;
+        }
+        .st-key-usuarios_tabela_compacta [data-testid="stCheckbox"] > label {
+            display:flex !important;justify-content:center !important;
+            align-items:center !important;width:100% !important;margin:0 auto !important;
+        }
+        .st-key-usuarios_tabela_compacta [data-testid="stCheckbox"] > label > div:first-child {
+            margin:0 auto !important;
+        }
+        .st-key-usuarios_tabela_compacta [data-testid="stCheckbox"] p {display:none !important;}
         </style>
         """, unsafe_allow_html=True)
 
