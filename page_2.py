@@ -237,27 +237,56 @@ def _tabela_usuarios(eh_gdl: bool = False):
         return
 
     df = pd.DataFrame(linhas)
-    # A coluna Ativo fica editável dentro da própria tabela.
-    edited = st.data_editor(
-        df,
-        hide_index=True,
-        use_container_width=True,
-        height=430,
-        disabled=["Nome", "Login", "Destino", "E-mail", "Perfil"],
-        column_config={
-            "Nome": st.column_config.TextColumn("Nome", width="large"),
-            "Login": st.column_config.TextColumn("Login", width="small"),
-            "Destino": st.column_config.TextColumn("Destino", width="small"),
-            "E-mail": st.column_config.TextColumn("E-mail", width="large"),
-            "Perfil": st.column_config.TextColumn("Perfil", width="medium"),
-            "Ativo": st.column_config.CheckboxColumn("Ativo", help="Marque para ativar ou desmarque para inativar."),
-        },
-        key="usuarios_tabela_status",
-    )
-    novos_status = {
-        row["Login"]: bool(row["Ativo"])
-        for _, row in edited.iterrows()
+    novos_status = {}
+
+    # Tabela montada com células Streamlit para manter o visual personalizado
+    # e permitir editar o checkbox diretamente na última coluna.
+    st.markdown("""
+    <style>
+    .usuarios-grid-header {
+        background:#0067FC;color:#FFFFFF;font-family:'Montserrat',sans-serif;
+        font-size:13px;font-weight:700;padding:11px 12px;text-align:center;
+        border-right:1px solid rgba(255,255,255,.35);min-height:42px;
     }
+    .usuarios-grid-cell {
+        color:#172B4D;font-family:'Montserrat',sans-serif;font-size:13px;
+        font-weight:600;padding:10px 12px;min-height:42px;
+        border-bottom:1px solid #E8EEF7;display:flex;align-items:center;
+        white-space:nowrap;overflow:hidden;
+    }
+    .usuarios-grid-cell.alt {background:#F7FAFF;}
+    .usuarios-grid-cell.nome {text-align:left;}
+    .usuarios-grid-cell.email {text-align:left;}
+    </style>
+    """, unsafe_allow_html=True)
+
+    headers = ["Nome", "Login", "Destino", "E-mail", "Perfil", "Ativo"]
+    widths = [3.2, .8, .8, 2.7, 1.25, .65]
+    hcols = st.columns(widths, gap="small")
+    for col, label in zip(hcols, headers):
+        col.markdown(f'<div class="usuarios-grid-header">{label}</div>', unsafe_allow_html=True)
+
+    for idx, u in enumerate(usuarios):
+        alt = " alt" if idx % 2 else ""
+        cells = st.columns(widths, gap="small")
+        values = [
+            (u["nome"], "nome"),
+            (u["usuario"], ""),
+            (u["destino"], ""),
+            (u.get("email") or "", "email"),
+            (PERFIL_LABEL.get(u["perfil"], "Operação"), ""),
+        ]
+        for col, (value, extra) in zip(cells[:5], values):
+            col.markdown(
+                f'<div class="usuarios-grid-cell{alt} {extra}">{value if value else "—"}</div>',
+                unsafe_allow_html=True,
+            )
+        novos_status[u["usuario"]] = cells[5].checkbox(
+            "Ativo",
+            value=bool(u["ativo"]),
+            key=f"status_user_{u['usuario']}",
+            label_visibility="collapsed",
+        )
 
     c1, c2 = st.columns([1, 2])
     if c1.button("Salvar alterações", type="primary", width="stretch"):
