@@ -200,7 +200,7 @@ def page_5():
             "Recebido": _fmt(recebido),
             "Diferença": _fmt(divergencia),
             "Cancelado": _fmt(cancelado),
-            "Envios sem devolução registrada": _fmt(max(enviado - declarado, 0)),
+            "Ainda sem devolução declarada": _fmt(max(enviado - declarado, 0)),
         })
     st.dataframe(pd.DataFrame(linhas_tipo), width="stretch", hide_index=True, height=190)
 
