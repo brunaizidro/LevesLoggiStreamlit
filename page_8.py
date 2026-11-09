@@ -269,14 +269,64 @@ def page_8():
         "Sacas pendentes": "Sacas pendentes",
     })
     tabela = tabela[colunas].copy()
-    st.dataframe(
-        tabela, use_container_width=True, hide_index=True,
-        column_config={
-            "Leve": st.column_config.TextColumn("Leve (Sigla)", width="medium"),
-            "Status": st.column_config.TextColumn("Status", width="small"),
-            "Saldo pendente": st.column_config.NumberColumn("Saldo pendente (qtd)", format="%d"),
-        },
+    # Cabeçalho azul integral e alinhamento central, seguindo o padrão visual
+    # da tabela de referência; linhas alternadas em branco e azul bem claro.
+    tabela_estilizada = (
+        tabela.style
+        .hide(axis="index")
+        .set_properties(**{
+            "text-align": "center",
+            "vertical-align": "middle",
+            "font-family": "Montserrat, sans-serif",
+            "font-size": "12px",
+            "color": "#17365F",
+            "border-color": "#DCE7F5",
+        })
+        .set_table_styles([
+            {
+                "selector": "thead th",
+                "props": [
+                    ("background-color", "#0866F5"),
+                    ("color", "#FFFFFF"),
+                    ("font-weight", "700"),
+                    ("text-align", "center"),
+                    ("vertical-align", "middle"),
+                    ("border", "1px solid #DCE7F5"),
+                    ("padding", "10px 8px"),
+                    ("white-space", "normal"),
+                ],
+            },
+            {
+                "selector": "tbody td",
+                "props": [
+                    ("text-align", "center"),
+                    ("vertical-align", "middle"),
+                    ("padding", "8px 7px"),
+                    ("border", "1px solid #E1EAF5"),
+                ],
+            },
+            {
+                "selector": "tbody tr:nth-child(even)",
+                "props": [("background-color", "#F1F6FD")],
+            },
+            {
+                "selector": "tbody tr:nth-child(odd)",
+                "props": [("background-color", "#FFFFFF")],
+            },
+            {
+                "selector": "table",
+                "props": [
+                    ("border-collapse", "separate"),
+                    ("border-spacing", "0"),
+                    ("border", "1px solid #C9DCF5"),
+                    ("border-radius", "9px"),
+                    ("overflow", "hidden"),
+                    ("width", "100%"),
+                ],
+            },
+        ])
     )
+    st.dataframe(tabela_estilizada, use_container_width=True, hide_index=True)
 
     st.markdown("---")
     st.markdown('<div class="section-title">✉️ Enviar e-mail de cobrança</div>', unsafe_allow_html=True)
