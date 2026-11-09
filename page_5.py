@@ -50,9 +50,9 @@ def _cabecalho():
     .insumo-value {font-size:14px;color:#17385F;font-weight:800;white-space:nowrap}
     .monthly-table-wrap {border:1px solid #D7E3F4;border-radius:10px;overflow:hidden;width:100%}
     .monthly-table {border-collapse:collapse;width:100%;table-layout:fixed;font-size:12px;color:#17385F}
-    .monthly-table th {background:#0754C8;color:#FFFFFF;text-align:center;font-weight:800;padding:9px 5px;border:1px solid #D4E2F7;white-space:nowrap;font-size:12px}
+    .monthly-table th {background:#0754C8;color:#FFFFFF;text-align:center;font-weight:800;padding:10px 6px;border:1px solid #D4E2F7;white-space:nowrap;font-size:12px}
     .monthly-table th.month-head {background:#0647AC}
-    .monthly-table td {padding:10px 5px;text-align:center;vertical-align:middle;border:1px solid #E1E8F1;white-space:nowrap;font-size:12px}
+    .monthly-table td {padding:11px 6px;text-align:center;vertical-align:middle;border:1px solid #E1E8F1;white-space:nowrap;font-size:12px}
     .monthly-table td.month-cell {text-align:center;font-weight:800;background:#F6F9FE;padding:10px 5px;font-size:12px}
     .monthly-table td.pct-cell {font-weight:800;color:#17385F;border-radius:5px;background-image:linear-gradient(115deg,rgba(255,255,255,.68),rgba(255,255,255,0))}
     [data-testid="stDataFrame"] {border:1px solid #DCE7F6;border-radius:10px}
@@ -224,12 +224,12 @@ def page_5():
         # Tabela compacta com cabeçalho agrupado por insumo.
         html = [
             '<div class="monthly-table-wrap"><table class="monthly-table">',
-            '<colgroup><col style="width:18%">' + '<col style="width:9.11%">' * 9 + '</colgroup>',
+            '<colgroup><col style="width:20%">' + '<col style="width:8.89%">' * 9 + '</colgroup>',
             '<thead><tr><th rowspan="2" class="month-head">Mês</th>',
             '<th colspan="3">Saca</th><th colspan="3">Gaylord</th><th colspan="3">Pallet</th></tr><tr>'
         ]
         for _ in TIPOS:
-            html.extend(['<th>Enviado</th><th>Devolvido</th><th>% Dev.</th>'])
+            html.extend(['<th>Env.</th><th>Dev.</th><th>% Dev.</th>'])
         html.append('</tr></thead><tbody>')
         for mes in meses:
             html.append(f'<tr><td class="month-cell">{dp.rotulo_mes(mes)}</td>')
