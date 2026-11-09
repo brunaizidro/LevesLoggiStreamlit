@@ -13,7 +13,7 @@ import data_processing as dp
 
 TIPOS = ["SACA", "GAYLORD", "PALLET"]
 NOMES = {"SACA": "Saca", "GAYLORD": "Gaylord", "PALLET": "Pallet"}
-CORES = {"SACA": "#89939F", "GAYLORD": "#0647AC", "PALLET": "#55B8F5"}
+CORES = {"SACA": "#0647AC", "GAYLORD": "#55B8F5", "PALLET": "#89939F"}
 
 
 def _qtd(v) -> str:
@@ -262,26 +262,26 @@ def page_5():
                 graf = tabela.copy()
                 graf["Percentual"] = graf["% devolução"].str.replace("%", "", regex=False).str.replace(",", ".", regex=False).astype(float)
                 ordem_meses = [dp.rotulo_mes(m) for m in meses]
-                fig = px.line(
-                    graf, x="Competência", y="Percentual", color="Insumo", markers=True,
+                fig = px.bar(
+                    graf, x="Competência", y="Percentual", color="Insumo", barmode="group", text="Percentual",
                     color_discrete_map={"Saca": CORES["SACA"], "Gaylord": CORES["GAYLORD"], "Pallet": CORES["PALLET"]},
                     category_orders={"Competência": ordem_meses, "Insumo": ["Saca", "Gaylord", "Pallet"]},
                 )
-                cores_gradiente = {"Saca": "rgba(137,147,159,0.25)", "Gaylord": "rgba(6,71,172,0.24)", "Pallet": "rgba(85,184,245,0.24)"}
-                for traco in fig.data:
-                    traco.fill = "tozeroy"
-                    traco.fillgradient = dict(type="vertical", colorscale=[[0, "rgba(255,255,255,0.00)"], [1, cores_gradiente.get(traco.name, "rgba(0,102,255,0.18)")]])
-                    traco.line.width = 3
-                    traco.marker.size = 7
-                    traco.marker.line = dict(width=1.5, color="#FFFFFF")
-                    traco.hovertemplate = "<b>%{fullData.name}</b><br>%{x}<br>Devolução: %{y:.1f}%<extra></extra>"
+                fig.update_traces(
+                    texttemplate="%{y:.1f}%", textposition="outside", cliponaxis=False,
+                    textfont=dict(family="Montserrat", size=10, color="#17385F"),
+                    marker_line=dict(width=1, color="rgba(255,255,255,0.8)"),
+                    hovertemplate="<b>%{fullData.name}</b><br>%{x}<br>Devolução: %{y:.1f}%<extra></extra>",
+                )
+                teto = max(80, float(graf["Percentual"].max()) + 12) if not graf.empty else 80
                 fig.update_layout(
-                    height=310, margin=dict(l=8, r=8, t=12, b=8), font_family="Montserrat",
+                    height=310, margin=dict(l=8, r=8, t=42, b=8), font_family="Montserrat",
                     font=dict(size=11, color="#647895"), paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(255,255,255,0)",
-                    legend=dict(title_text="", orientation="v", x=1.02, y=0.98, xanchor="left", yanchor="top", font=dict(size=10, color="#17385F"), bgcolor="rgba(255,255,255,0)"),
+                    bargap=0.22, bargroupgap=0.08,
+                    legend=dict(title_text="", orientation="h", x=0.5, y=1.16, xanchor="center", yanchor="top", font=dict(size=10, color="#17385F"), bgcolor="rgba(255,255,255,0)"),
                     xaxis=dict(title="", categoryorder="array", categoryarray=ordem_meses, tickfont=dict(size=10, color="#647895"), showgrid=False, showline=False, zeroline=False, automargin=True),
-                    yaxis=dict(title="", range=[0,100], visible=False, showgrid=False, showticklabels=False, zeroline=False),
-                    hovermode="x unified",
+                    yaxis=dict(title="", range=[0,teto], dtick=10, ticksuffix="%", tickfont=dict(size=10, color="#647895"), showgrid=True, gridcolor="#EAF0F8", gridwidth=1, zeroline=False),
+                    hovermode="x unified"
                 )
                 st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
     st.download_button(
