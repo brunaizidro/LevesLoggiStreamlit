@@ -258,28 +258,25 @@ def page_5():
                 graf = tabela.copy()
                 graf["Percentual"] = graf["% devolução"].str.replace("%", "", regex=False).str.replace(",", ".", regex=False).astype(float)
                 ordem_meses = [dp.rotulo_mes(m) for m in meses]
-                nomes_legenda = {}
-                for tipo in ["Saca", "Gaylord", "Pallet"]:
-                    serie = graf[graf["Insumo"] == tipo]
-                    if not serie.empty:
-                        ultimo = serie.iloc[-1]["Percentual"]
-                        nomes_legenda[tipo] = f"{tipo}  ·  {ultimo:.1f}%"
-                graf["Legenda"] = graf["Insumo"].map(nomes_legenda)
                 fig = px.line(
-                    graf, x="Competência", y="Percentual", color="Legenda", markers=True,
-                    color_discrete_map={nomes_legenda.get("Saca", "Saca"): CORES["SACA"], nomes_legenda.get("Gaylord", "Gaylord"): CORES["GAYLORD"], nomes_legenda.get("Pallet", "Pallet"): CORES["PALLET"]},
-                    category_orders={"Competência": ordem_meses, "Legenda": [nomes_legenda[t] for t in ["Saca", "Gaylord", "Pallet"] if t in nomes_legenda]},
+                    graf, x="Competência", y="Percentual", color="Insumo", markers=True,
+                    color_discrete_map={"Saca": CORES["SACA"], "Gaylord": CORES["GAYLORD"], "Pallet": CORES["PALLET"]},
+                    category_orders={"Competência": ordem_meses, "Insumo": ["Saca", "Gaylord", "Pallet"]},
                 )
-                fig.update_traces(
-                    line=dict(width=3, shape="linear"), marker=dict(size=7, line=dict(width=1.5, color="#FFFFFF")),
-                    hovertemplate="<b>%{fullData.name}</b><br>%{x}<br>Devolução: %{y:.1f}%<extra></extra>",
-                )
+                cores_gradiente = {"Saca": "rgba(0,102,255,0.24)", "Gaylord": "rgba(0,183,214,0.20)", "Pallet": "rgba(194,101,25,0.18)"}
+                for traco in fig.data:
+                    traco.fill = "tozeroy"
+                    traco.fillgradient = dict(type="vertical", colorscale=[[0, "rgba(255,255,255,0.00)"], [1, cores_gradiente.get(traco.name, "rgba(0,102,255,0.18)")]])
+                    traco.line.width = 3
+                    traco.marker.size = 7
+                    traco.marker.line = dict(width=1.5, color="#FFFFFF")
+                    traco.hovertemplate = "<b>%{fullData.name}</b><br>%{x}<br>Devolução: %{y:.1f}%<extra></extra>"
                 fig.update_layout(
                     height=310, margin=dict(l=8, r=8, t=12, b=8), font_family="Montserrat",
-                    font=dict(size=11, color="#647895"), paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="#FFFFFF",
+                    font=dict(size=11, color="#647895"), paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(255,255,255,0)",
                     legend=dict(title_text="", orientation="v", x=1.02, y=0.98, xanchor="left", yanchor="top", font=dict(size=10, color="#17385F"), bgcolor="rgba(255,255,255,0)"),
-                    xaxis=dict(title="", categoryorder="array", categoryarray=ordem_meses, tickfont=dict(size=10, color="#647895"), showgrid=False, zeroline=False, automargin=True),
-                    yaxis=dict(title="", range=[0,100], tickmode="linear", tick0=0, dtick=20, ticksuffix="%", tickfont=dict(size=10, color="#647895"), gridcolor="#E8EEF7", gridwidth=1, zeroline=False),
+                    xaxis=dict(title="", categoryorder="array", categoryarray=ordem_meses, tickfont=dict(size=10, color="#647895"), showgrid=False, showline=False, zeroline=False, automargin=True),
+                    yaxis=dict(title="", range=[0,100], visible=False, showgrid=False, showticklabels=False, zeroline=False),
                     hovermode="x unified",
                 )
                 st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
