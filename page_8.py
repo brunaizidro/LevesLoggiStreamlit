@@ -343,7 +343,8 @@ def page_8():
         "Pallets enviados", "Pallets devolvidos", "Pallets pendentes",
         "Saldo pendente", "Valor pendente",
     ]
-    tabela = resumo.rename(columns={
+    # Ordena o detalhamento pelo valor pendente, do menor para o maior.
+    tabela = resumo.sort_values("_valor_num", ascending=True, kind="stable").rename(columns={
         "Sacas enviados": "Sacas enviados", "Sacas devolvidos": "Sacas devolvidos",
         "Sacas pendentes": "Sacas pendentes",
     })
