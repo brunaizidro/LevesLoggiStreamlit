@@ -140,15 +140,45 @@ def page_3():
         [class*="st-key-dev-plate-field"] input:focus, [class*="st-key-dev-observation-field"] textarea:focus { border:0 !important; box-shadow:none !important; }
                 div[data-testid='stFormSubmitButton'] button { background:#075DE5 !important; color:#fff !important; border:0 !important; border-radius:10px !important; font-family:'Montserrat',sans-serif !important; font-weight:800 !important; padding:10px 22px !important; }
         div[data-testid='stFormSubmitButton'] button:hover { background:#064fc4 !important; box-shadow:0 4px 12px rgba(7,93,229,.18) !important; }
-        .dev-balance-card { position:relative; overflow:hidden; background:#ffffff; border:1px solid #d9e4f2; border-radius:14px; padding:18px 20px 17px; min-height:146px; box-shadow:0 3px 10px rgba(23,52,95,.045); transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
-        .dev-balance-card:before { content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:#2874df; }
-        .dev-balance-card:hover { transform:translateY(-2px); border-color:#b8d2f5; box-shadow:0 7px 18px rgba(23,75,136,.09); }
-        .dev-balance-label { color:#607895; font-family:'Montserrat',sans-serif; font-size:12px; font-weight:800; letter-spacing:.45px; text-transform:uppercase; margin-bottom:9px; text-align:center; }
-        .dev-balance-qty { color:#142f55; font-family:'Montserrat',sans-serif; font-size:34px; line-height:1.05; font-weight:800; letter-spacing:-1px; margin-bottom:15px; text-align:center; }
-        .dev-balance-caption { color:#8192a8; font-family:'Montserrat',sans-serif; font-size:11px; font-weight:700; margin-bottom:3px; padding-top:10px; border-top:1px solid #edf1f6; }
-        .dev-balance-value { color:#174b88; font-family:'Montserrat',sans-serif; font-size:17px; font-weight:800; }
-        .dev-total-banner { display:flex; align-items:center; gap:13px; background:#075DE5; border:1px solid #075DE5; border-radius:13px; padding:16px 20px; margin:14px 0 20px; color:#ffffff; font-family:'Montserrat',sans-serif; font-size:14px; font-weight:700; box-shadow:0 3px 10px rgba(7,93,229,.18); }
-        .dev-total-banner strong { color:#ffffff; font-size:19px; font-weight:800; margin-left:4px; }
+        .dev-balance-section-title { display:flex; align-items:center; gap:18px; width:100%; box-sizing:border-box; color:#104783; background:linear-gradient(105deg,#eaf3ff 0%,#dceaff 100%); border:1px solid #c9ddff; border-radius:17px; padding:17px 24px; min-height:78px; margin:16px 0 12px; font-family:'Montserrat',sans-serif; font-size:23px; line-height:1.25; font-weight:800; letter-spacing:-.35px; }
+        .dev-balance-section-title svg { width:42px; height:42px; flex:0 0 42px; color:#075DE5; }
+        .dev-balance-card { position:relative; overflow:hidden; box-sizing:border-box; background:#fff; border:1px solid #d6e4f7; border-radius:24px; padding:28px 28px 23px; min-height:252px; box-shadow:0 9px 22px rgba(28,89,160,.09); transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+        .dev-balance-card:before { content:""; position:absolute; left:0; top:0; bottom:0; width:8px; background:#1680f5; }
+        .dev-balance-card:hover { transform:translateY(-2px); border-color:#b8d2f5; box-shadow:0 12px 25px rgba(23,75,136,.13); }
+        .dev-balance-top { display:flex; align-items:center; gap:24px; min-height:116px; }
+        .dev-balance-icon { display:flex; align-items:center; justify-content:center; flex:0 0 130px; width:130px; height:112px; box-sizing:border-box; border-radius:28px; background:#e9f3ff; color:#1680f5; padding:25px; }
+        .dev-balance-icon svg { width:100%; height:100%; display:block; }
+        .dev-balance-divider { align-self:stretch; width:1px; min-height:108px; background:#d8e5f6; }
+        .dev-balance-info { display:flex; flex-direction:column; align-items:flex-start; justify-content:center; min-width:0; }
+        .dev-balance-label { color:#123b6c; font-family:'Montserrat',sans-serif; font-size:20px; line-height:1.2; font-weight:800; letter-spacing:.15px; text-transform:uppercase; margin:0 0 14px; text-align:left; }
+        .dev-balance-qty { color:#123b6c; font-family:'Montserrat',sans-serif; font-size:58px; line-height:1; font-weight:800; letter-spacing:-2px; margin:0; text-align:left; }
+        .dev-balance-caption { color:#7188a5; font-family:'Montserrat',sans-serif; font-size:15px; font-weight:750; margin:20px 0 8px; padding-top:19px; border-top:1px solid #e5edf7; }
+        .dev-balance-value { color:#0755ad; font-family:'Montserrat',sans-serif; font-size:24px; line-height:1.2; font-weight:800; }
+        .dev-total-banner { display:flex; align-items:center; gap:28px; box-sizing:border-box; width:100%; background:linear-gradient(105deg,#0646a8 0%,#075de5 100%); border:1px solid #075de5; border-radius:23px; padding:24px 38px; min-height:144px; margin:20px 0 24px; color:#fff; font-family:'Montserrat',sans-serif; font-size:20px; font-weight:800; box-shadow:0 9px 20px rgba(7,93,229,.2); }
+        .dev-total-icon { display:flex; align-items:center; justify-content:center; flex:0 0 78px; width:78px; height:66px; color:#fff; border-right:2px solid rgba(255,255,255,.25); padding-right:28px; box-sizing:content-box; }
+        .dev-total-icon svg { width:62px; height:62px; display:block; }
+        .dev-total-label { color:#fff; white-space:nowrap; }
+        .dev-total-banner strong { display:inline-flex; align-items:center; justify-content:center; min-height:92px; padding:0 36px; box-sizing:border-box; border-radius:27px; background:rgba(65,151,255,.28); color:#fff; font-size:48px; line-height:1; font-weight:800; letter-spacing:-1px; white-space:nowrap; margin-left:0; }
+        @media (max-width: 900px) {
+          .dev-balance-card { padding:20px 18px 18px; min-height:205px; }
+          .dev-balance-top { gap:14px; min-height:88px; }
+          .dev-balance-icon { flex-basis:84px; width:84px; height:84px; padding:17px; border-radius:20px; }
+          .dev-balance-divider { min-height:82px; }
+          .dev-balance-label { font-size:15px; margin-bottom:10px; }
+          .dev-balance-qty { font-size:43px; }
+          .dev-balance-value { font-size:19px; }
+          .dev-total-banner { gap:16px; padding:18px 20px; min-height:108px; }
+          .dev-total-banner strong { font-size:30px; min-height:66px; padding:0 20px; }
+        }
+        @media (max-width: 600px) {
+          .dev-balance-section-title { font-size:18px; padding:14px 16px; min-height:64px; }
+          .dev-balance-section-title svg { width:32px; height:32px; flex-basis:32px; }
+          .dev-total-banner { flex-wrap:wrap; gap:12px; }
+          .dev-total-icon { flex-basis:42px; width:42px; padding-right:12px; }
+          .dev-total-icon svg { width:42px; height:42px; }
+          .dev-total-label { white-space:normal; font-size:16px; }
+          .dev-total-banner strong { width:100%; font-size:28px; }
+        }
         div[data-testid="stSelectbox"] label, div[data-testid="stNumberInput"] label, div[data-testid="stTextInput"] label { color:#17385f !important; font-weight:650 !important; }
         div[data-testid="stSelectbox"] > div > div, div[data-testid="stNumberInput"] input, div[data-testid="stTextInput"] input { border-radius:10px !important; }
         div[data-testid="stExpander"] { border:1px solid #d5e6ff !important; border-radius:12px !important; background:#f7faff !important; }
@@ -276,11 +306,19 @@ def page_3():
             st.info("Nenhum ativo enviado para a sua operação até o momento.")
         return
 
-    st.markdown("<div class='dev-section-title'>Saldo a devolver" + ("" if eh_gdl else f" — {escolha_mes}") + "</div>", unsafe_allow_html=True)
+    titulo_saldo = "Saldo a devolver" + ("" if eh_gdl else f" — {escolha_mes}")
+    icone_caixa_titulo = "<svg viewBox='0 0 48 48' aria-hidden='true'><path d='m6 15 18-9 18 9v20L24 44 6 35Z' fill='none' stroke='currentColor' stroke-width='3' stroke-linejoin='round'/><path d='m6 15 18 10 18-10M24 25v19M16 10l18 10' fill='none' stroke='currentColor' stroke-width='3' stroke-linejoin='round'/></svg>"
+    st.markdown(f"<div class='dev-balance-section-title'>{icone_caixa_titulo}<span>{titulo_saldo}</span></div>", unsafe_allow_html=True)
     pr = dp.precos()
-    cols = st.columns(max(len(saldo), 1))
+    icones_saldo = {
+        "gaylord": "<svg viewBox='0 0 48 48' aria-hidden='true'><path d='M7 15 24 6l17 9v19L24 43 7 34Z' fill='none' stroke='currentColor' stroke-width='2.8' stroke-linejoin='round'/><path d='m7 15 17 10 17-10M24 25v18M16 10l17 10M32 10 15 20' fill='none' stroke='currentColor' stroke-width='2.6' stroke-linejoin='round'/></svg>",
+        "pallet": "<svg viewBox='0 0 48 48' aria-hidden='true'><path d='m5 17 19-10 19 10-19 10Z M5 25l19 10 19-10M5 33l19 10 19-10' fill='none' stroke='currentColor' stroke-width='2.8' stroke-linejoin='round'/><path d='M10 18v7m28-7v7' fill='none' stroke='currentColor' stroke-width='2.4' stroke-linecap='round'/></svg>",
+        "saca": "<svg viewBox='0 0 48 48' aria-hidden='true'><path d='M18 7c2 4 10 4 12 0M18 7l-2 7c-5 4-8 11-8 20 0 5 7 7 16 7s16-2 16-7c0-9-3-16-8-20l-2-7M16 14h16' fill='none' stroke='currentColor' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'/></svg>",
+    }
+    cols = st.columns(max(len(saldo), 1), gap="large")
     for i, (_, r) in enumerate(saldo.iterrows()):
         tipo = r["tipo"]
+        tipo_chave = str(tipo).strip().lower()
         qtd_saldo = int(r["saldo"])
         valor_unitario = pr.get(tipo, 0)
         valor_total_insumo = qtd_saldo * valor_unitario
@@ -295,11 +333,18 @@ def page_3():
                 f"<div class='dev-balance-value'>{dp.fmt_brl(valor_total_insumo)}</div>"
                 if valor_unitario > 0 else ""
             )
+            icone = icones_saldo.get(tipo_chave, icones_saldo["gaylord"])
             st.markdown(
                 f"""
                 <div class="dev-balance-card" title="{ajuda}">
-                    <div class="dev-balance-label">{tipo.title()}</div>
-                    <div class="dev-balance-qty">{_fmt(qtd_saldo)}</div>
+                    <div class="dev-balance-top">
+                        <div class="dev-balance-icon">{icone}</div>
+                        <div class="dev-balance-divider"></div>
+                        <div class="dev-balance-info">
+                            <div class="dev-balance-label">{str(tipo).upper()}</div>
+                            <div class="dev-balance-qty">{_fmt(qtd_saldo)}</div>
+                        </div>
+                    </div>
                     {valor_html}
                 </div>
                 """,
@@ -311,8 +356,9 @@ def page_3():
             int(r["saldo"]) * pr.get(r["tipo"], 0)
             for _, r in saldo.iterrows()
         )
+        icone_moedas = "<svg viewBox='0 0 64 64' aria-hidden='true'><ellipse cx='22' cy='18' rx='15' ry='7' fill='none' stroke='currentColor' stroke-width='4'/><path d='M7 18v9c0 4 7 7 15 7 3 0 6-.5 8-1.5M7 27c0 4 7 7 15 7 3 0 6-.5 8-1.5M7 36c0 4 7 7 15 7 5 0 9-1.5 12-4' fill='none' stroke='currentColor' stroke-width='4' stroke-linecap='round'/><ellipse cx='43' cy='9' rx='13' ry='6' fill='none' stroke='currentColor' stroke-width='4'/><path d='M30 9v8c0 3 6 6 13 6 7 0 13-3 13-6V9M30 17v8c0 3 6 6 13 6 7 0 13-3 13-6v-8M30 25v8c0 3 6 6 13 6 7 0 13-3 13-6v-8' fill='none' stroke='currentColor' stroke-width='4' stroke-linecap='round'/></svg>"
         st.markdown(
-            f"<div class='dev-total-banner'><span style='font-size:20px;'>R$</span><span>Valor total a devolver</span><strong>{dp.fmt_brl(total_val)}</strong></div>",
+            f"<div class='dev-total-banner'><span class='dev-total-icon'>{icone_moedas}</span><span class='dev-total-label'>Valor total a devolver</span><strong>{dp.fmt_brl(total_val)}</strong></div>",
             unsafe_allow_html=True,
         )
 
