@@ -355,8 +355,8 @@ def page_8():
         '<table class="pendencias-table"',
         1,
     )
-    # Exibe aproximadamente 15 Leves por vez; os demais ficam na rolagem vertical.
-    altura_tabela = 15 * 29 + 48
+    # Exibe aproximadamente 7 Leves por vez; os demais ficam na rolagem vertical.
+    altura_tabela = 7 * 29 + 48
     html_tabela = """
     <!DOCTYPE html>
     <html>
@@ -367,7 +367,7 @@ def page_8():
         * { box-sizing: border-box; }
         body { margin: 0; padding: 0; background: transparent; font-family: 'Montserrat', Arial, sans-serif; }
         .pendencias-table-wrap {
-          width: 100%; max-height: 483px; overflow: auto;
+          width: 100%; max-height: 251px; overflow: auto;
           border: 1px solid #C9DCF5; border-radius: 10px; background: #fff;
         }
         table.pendencias-table {
