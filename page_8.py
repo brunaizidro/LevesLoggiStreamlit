@@ -311,7 +311,7 @@ def page_8():
           padding: 6px 5px !important; border-right: 1px solid #E1EAF5;
           border-bottom: 1px solid #E1EAF5; white-space: nowrap;
           background: #fff; font-family: 'Montserrat', Arial, sans-serif !important;
-          font-size: 10px !important; font-weight: 600 !important;
+          font-size: 11px !important; font-weight: 600 !important;
         }
         .pendencias-table tbody tr:nth-child(even) td { background: #F1F6FD; }
         /* Coluna da sigla mais larga para facilitar a leitura */
