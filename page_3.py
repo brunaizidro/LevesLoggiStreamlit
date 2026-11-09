@@ -492,13 +492,25 @@ def page_3():
         st.success(f"Competência selecionada: **{escolha_mes}** · prazo: **{prazo_txt}**")
 
     # ---- Saldo a devolver ----
+    # Para a operação, o painel deve mostrar o mesmo saldo disponível no
+    # formulário: envios da competência menos devoluções já registradas
+    # (inclusive EM_TRANSITO) e cobranças da própria competência.
+    # A conciliação por recebimento continua sendo usada nos relatórios/cobranças.
     if eh_gdl:
         saldo = dp.saldo_por_tipo(destino)
     else:
+        pendencias_competencia = dp.pending_mes_tipo(destino, mes_ref)
         conc = dp.conciliacao(mes_ref)
         if not conc.empty:
             conc = conc[conc["destino"].map(dp._normalizar) == dp._normalizar(destino)].copy()
-            conc["saldo"] = conc["em_aberto"].astype(int)
+            saldos_por_tipo = {
+                str(tipo).upper().strip(): int(qtd)
+                for tipo, qtd in pendencias_competencia.items()
+            }
+            conc["saldo"] = conc["tipo"].astype(str).str.upper().str.strip().map(saldos_por_tipo).fillna(0).astype(int)
+            conc["devolvido"] = (
+                conc["enviado"].astype(int) - conc["saldo"] - conc["cobrado"].astype(int)
+            ).clip(lower=0)
             saldo = conc[conc["saldo"] > 0][["tipo", "enviado", "devolvido", "saldo"]].copy()
         else:
             saldo = pd.DataFrame(columns=["tipo", "enviado", "devolvido", "saldo"])
