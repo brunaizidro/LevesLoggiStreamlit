@@ -35,6 +35,7 @@ def _cabecalho():
     .rel-section {color:#172B4D;font-size:18px;font-weight:800;margin:8px 0 4px}
     .rel-caption {color:#71829A;font-size:12px;margin:0 0 12px}
     .insumo-card {background:linear-gradient(180deg,#F4F8FF 0%,#FFFFFF 45%);border:1px solid #CFE0FF;border-radius:16px;padding:0 15px 16px;height:100%;box-shadow:0 2px 8px rgba(30,80,150,.04);overflow:hidden}
+    .insumo-tag {font-size:10px;font-weight:800;color:#42618A;background:#E5EEFC;border-radius:20px;padding:5px 9px}
     .insumo-card-head {display:flex;align-items:center;justify-content:space-between;margin:0 -15px 14px;padding:13px 15px;background:#F1F6FF;border-bottom:1px solid #E1EBFA}
     .insumo-ring {width:76px;height:76px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
     .insumo-ring-inner {width:58px;height:58px;border-radius:50%;background:white;display:flex;align-items:center;justify-content:center;color:#17385F;font-size:16px;font-weight:800}
@@ -191,26 +192,48 @@ def page_5():
             })
 
     tabela = pd.DataFrame(linhas)
-    st.dataframe(tabela, width="stretch", hide_index=True, height=min(560, max(150, 38 + 38 * len(tabela))))
-
     if not tabela.empty:
-        st.markdown('<div class="rel-section">Evolução mensal do percentual de devolução</div>', unsafe_allow_html=True)
-        graf = pd.DataFrame(linhas).copy()
-        graf["Percentual"] = graf["% devolução"].str.replace("%", "", regex=False).str.replace(",", ".", regex=False).astype(float)
-        fig = px.line(
-            graf, x="Competência", y="Percentual", color="Insumo", markers=True,
-            color_discrete_map={"Saca": CORES["SACA"], "Gaylord": CORES["GAYLORD"], "Pallet": CORES["PALLET"]},
-            category_orders={"Insumo": ["Saca", "Gaylord", "Pallet"]},
-        )
-        fig.update_layout(
-            height=340, margin=dict(l=8, r=8, t=15, b=8), font_family="Montserrat",
-            paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-            legend_title_text="", xaxis_title="", yaxis_title="Devolução (%)",
-            yaxis=dict(range=[0, 100], ticksuffix="%"),
-        )
-        fig.update_traces(line=dict(width=3), marker=dict(size=7))
-        st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
+        # Matriz mensal compacta: uma linha por competência e um bloco por insumo.
+        matriz = []
+        for mes in meses:
+            registro = {"Mês": dp.rotulo_mes(mes)}
+            for tipo in TIPOS:
+                parte = base[(base["mes"].astype(str) == str(mes)) & (base["tipo"] == tipo)]
+                enviado = float(parte["enviado"].sum())
+                devolvido = float(parte["devolvido"].sum())
+                pendente = float(parte["em_aberto"].sum())
+                if enviado == 0 and devolvido == 0 and pendente == 0:
+                    valores = ("—", "—", "—")
+                else:
+                    pct = devolvido / enviado * 100 if enviado else 0
+                    valores = (_qtd(enviado), _qtd(devolvido), f"{pct:.1f}%")
+                registro[f"{NOMES[tipo]} · Enviado"] = valores[0]
+                registro[f"{NOMES[tipo]} · Devolvido"] = valores[1]
+                registro[f"{NOMES[tipo]} · % Dev."] = valores[2]
+            matriz.append(registro)
 
+        tabela_mensal = pd.DataFrame(matriz)
+        col_tabela, col_grafico = st.columns([1.2, 1])
+        with col_tabela:
+            st.markdown("**Detalhamento mês a mês**")
+            st.dataframe(tabela_mensal, width="stretch", hide_index=True, height=min(480, max(170, 42 + 42 * len(tabela_mensal))))
+        with col_grafico:
+            st.markdown("**% de devolução por insumo**")
+            graf = tabela.copy()
+            graf["Percentual"] = graf["% devolução"].str.replace("%", "", regex=False).str.replace(",", ".", regex=False).astype(float)
+            fig = px.line(
+                graf, x="Competência", y="Percentual", color="Insumo", markers=True,
+                color_discrete_map={"Saca": CORES["SACA"], "Gaylord": CORES["GAYLORD"], "Pallet": CORES["PALLET"]},
+                category_orders={"Competência": [dp.rotulo_mes(m) for m in meses], "Insumo": ["Saca", "Gaylord", "Pallet"]},
+            )
+            fig.update_layout(
+                height=355, margin=dict(l=8, r=8, t=15, b=8), font_family="Montserrat",
+                paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+                legend_title_text="", xaxis_title="", yaxis_title="Devolução (%)",
+                yaxis=dict(range=[0, 100], ticksuffix="%"),
+            )
+            fig.update_traces(line=dict(width=3), marker=dict(size=7))
+            st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
     st.download_button(
         "Baixar análise mensal (CSV)",
         tabela.to_csv(index=False).encode("utf-8-sig"),
