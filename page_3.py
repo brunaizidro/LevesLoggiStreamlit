@@ -197,11 +197,14 @@ def page_3():
         div[data-testid="stAlert"][kind="info"] { background:#eaf3ff !important; border:1px solid #d8e8ff !important; color:#1155cc !important; border-radius:12px !important; }
         .dev-list-title { color:#172b4d !important; font-family:'Montserrat',sans-serif !important; font-size:24px !important; font-weight:800 !important; letter-spacing:-.4px !important; margin:22px 0 12px !important; }
         .dev-table-header { display:grid; grid-template-columns:31% 18% 18% 15% 18%; align-items:center; background:#eaf3ff; color:#17345f; border-radius:10px 10px 0 0; margin:-1px -1px 12px; padding:12px 16px; font-family:'Montserrat',sans-serif; font-size:11px; font-weight:800; letter-spacing:.45px; }
+        .dev-table-header > div:nth-child(2), .dev-table-header > div:nth-child(3), .dev-table-header > div:nth-child(4) { text-align:center !important; }
         .dev-record-cell { display:flex; align-items:center; gap:12px; min-height:46px; }
         .dev-record-icon { display:flex; align-items:center; justify-content:center; flex:0 0 36px; width:36px; height:36px; border-radius:11px; background:#e5f0ff; color:#075bea; font-size:20px; font-weight:800; }
         .dev-record-id { display:block; color:#172b4d !important; font-family:'Montserrat',sans-serif !important; font-size:14px !important; font-weight:800 !important; line-height:1.35; }
         .dev-record-meta { display:block; color:#526985 !important; font-family:'Montserrat',sans-serif !important; font-size:12px !important; font-weight:500 !important; line-height:1.45; margin-top:2px !important; }
         .dev-status { display:inline-flex; align-items:center; gap:6px; border-radius:8px; padding:6px 10px; font-family:'Montserrat',sans-serif; font-size:12px; font-weight:700; white-space:nowrap; background:#eaf3ff; color:#1155cc; }
+        .dev-status-wrap { display:flex !important; align-items:center !important; justify-content:center !important; width:100% !important; }
+        .dev-operation { justify-content:center !important; width:100% !important; text-align:center !important; }
         .dev-status-check { font-size:14px; font-weight:900; }
         .dev-status-ok { background:#d9f9d4; color:#087b55; }
         .dev-status-cancel { background:#fff0f0; color:#bd3e45; }
@@ -695,8 +698,8 @@ def _minhas_devolucoes(destino: str, eh_admin: bool = False, eh_gdl: bool = Fals
                 else ""
             )
             c2.markdown(
-                f"<span class='dev-status {status_class}'>"
-                f"<span class='dev-status-check'>✓</span>{status_txt}</span>",
+                f"<div class='dev-status-wrap'><span class='dev-status {status_class}'>"
+                f"<span class='dev-status-check'>✓</span>{status_txt}</span></div>",
                 unsafe_allow_html=True,
             )
             operacao = str(d.get("placa") or "").strip()
