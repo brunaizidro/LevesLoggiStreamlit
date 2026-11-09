@@ -314,6 +314,32 @@ def page_8():
           font-size: 10px !important; font-weight: 600 !important;
         }
         .pendencias-table tbody tr:nth-child(even) td { background: #F1F6FD; }
+        /* Coluna da sigla mais larga para facilitar a leitura */
+        .pendencias-table thead th:first-child,
+        .pendencias-table tbody td:first-child {
+          min-width: 88px !important;
+          width: 88px !important;
+          padding-left: 10px !important;
+          padding-right: 10px !important;
+        }
+        /* Destaque visual para o saldo e o valor pendente */
+        .pendencias-table thead th:nth-child(12),
+        .pendencias-table thead th:nth-child(13) {
+          background: #064AA6 !important;
+          color: #FFFFFF !important;
+          border-left: 2px solid rgba(255,255,255,.55) !important;
+        }
+        .pendencias-table tbody td:nth-child(12),
+        .pendencias-table tbody td:nth-child(13) {
+          background: #E2EEFF !important;
+          color: #064AA6 !important;
+          font-weight: 800 !important;
+          border-left: 1px solid #B7D1F5 !important;
+        }
+        .pendencias-table tbody tr:nth-child(even) td:nth-child(12),
+        .pendencias-table tbody tr:nth-child(even) td:nth-child(13) {
+          background: #D5E6FF !important;
+        }
         .pendencias-table tbody tr:last-child td { border-bottom: 0; }
         .pendencias-table th:last-child, .pendencias-table td:last-child { border-right: 0; }
       </style>
