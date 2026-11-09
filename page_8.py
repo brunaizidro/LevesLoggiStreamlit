@@ -86,7 +86,7 @@ def _grafico_donut(resumo):
     )
     fig = go.Figure(go.Pie(
         labels=contagem.index, values=contagem.values, hole=.64,
-        marker=dict(colors=["#22C55E", "#F4B740", "#F87171"]),
+        marker=dict(colors=["#0756B8", "#8BC8F5", "#D7E0EA"]),
         textinfo="value+percent", textposition="inside",
     ))
     fig.update_layout(
@@ -216,7 +216,7 @@ def page_8():
         ])
         fig_val = px.bar(valores, x="Valor", y="Situação", orientation="h",
                          color="Situação",
-                         color_discrete_map={"Devolvido": "#0756B8", "Pendente": "#8BC8F5"},
+                         color_discrete_map={"Devolvido": "#66758A", "Pendente": "#D5DCE5"},
                          text=valores["Valor"].map(dp.fmt_brl),
                          title="Valores (R$)")
         fig_val.update_layout(
@@ -265,15 +265,15 @@ def page_8():
                     rotulos_taxa.append(f"{taxa:.1f}% {seta} {abs(delta):.1f} p.p.")
             fig_ev = go.Figure()
             fig_ev.add_bar(x=ev["Mês"], y=ev["Valor devolvido"], name="Valor devolvido",
-                           marker_color="#0756B8", yaxis="y")
+                           marker_color="#64748B", yaxis="y")
             fig_ev.add_bar(x=ev["Mês"], y=ev["Valor pendente"], name="Valor pendente",
-                           marker_color="#8BC8F5", yaxis="y")
+                           marker_color="#D5DCE5", yaxis="y")
             fig_ev.add_scatter(
                 x=ev["Mês"], y=ev["Taxa de devolução"], name="% devolvido",
                 mode="lines+markers+text", text=rotulos_taxa, textposition="top center",
-                textfont=dict(size=9, color="#078F61"),
-                line=dict(color="#078F61", width=3),
-                marker=dict(size=8, color="#fff", line=dict(color="#078F61", width=2)),
+                textfont=dict(size=9, color="#0756B8"),
+                line=dict(color="#0756B8", width=3),
+                marker=dict(size=8, color="#fff", line=dict(color="#0756B8", width=2)),
                 yaxis="y2",
             )
             fig_ev.update_layout(
@@ -285,9 +285,9 @@ def page_8():
                 legend=dict(orientation="h", y=-0.2, font=dict(size=9)),
                 xaxis=dict(showgrid=False),
                 yaxis=dict(title="Valor (R$)", gridcolor="#E6EEF8", tickformat="~s", rangemode="tozero"),
-                yaxis2=dict(title=dict(text="Devolução (%)", font=dict(color="#078F61")), overlaying="y", side="right",
+                yaxis2=dict(title=dict(text="Devolução (%)", font=dict(color="#0756B8")), overlaying="y", side="right",
                             range=[0, 110], ticksuffix="%", showgrid=False,
-                            tickfont=dict(color="#078F61")),
+                            tickfont=dict(color="#0756B8")),
             )
             st.plotly_chart(fig_ev, use_container_width=True, config={"displayModeBar": False})
         else:
