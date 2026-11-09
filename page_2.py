@@ -238,56 +238,59 @@ def _tabela_usuarios(eh_gdl: bool = False):
         return
     novos_status = {}
 
-    # Tabela com checkbox integrado e larguras ajustadas para evitar
-    # quebra dos títulos e corte desnecessário dos dados.
-    st.markdown("""
-    <style>
-    .usuarios-grid-header {
-        background:#0067FC;color:#FFFFFF;font-family:'Montserrat',sans-serif;
-        font-size:12px;font-weight:700;padding:10px 6px;text-align:center;
-        min-height:40px;white-space:nowrap;display:flex;
-        align-items:center;justify-content:center;line-height:1.2;
-    }
-    .usuarios-grid-cell {
-        color:#172B4D;font-family:'Montserrat',sans-serif;font-size:12px;
-        font-weight:600;padding:9px 8px;min-height:44px;
-        border-bottom:1px solid #E8EEF7;display:flex;align-items:center;
-        line-height:1.35;overflow-wrap:anywhere;word-break:normal;
-    }
-    .usuarios-grid-cell.alt {background:#F7FAFF;}
-    .usuarios-grid-cell.nome,.usuarios-grid-cell.email {text-align:left;justify-content:flex-start;}
-    .usuarios-grid-cell.centro {text-align:center;justify-content:center;white-space:nowrap;}
-    </style>
-    """, unsafe_allow_html=True)
-
-    headers = ["Nome", "Login", "Destino", "E-mail", "Perfil", "Ativo"]
+    # Tabela com checkbox integrado, cabeçalho contínuo e grade azul-clara.
     widths = [3.5, 1.15, 1.1, 3.0, 1.4, 0.7]
-    hcols = st.columns(widths, gap="small")
-    for col, label in zip(hcols, headers):
-        col.markdown(f'<div class="usuarios-grid-header">{label}</div>', unsafe_allow_html=True)
+    with st.container(height=545, border=False):
+        st.markdown("""
+        <style>
+        .usuarios-grid-header {
+            background:#0067FC;color:#FFFFFF;font-family:'Montserrat',sans-serif;
+            font-size:12px;font-weight:700;padding:11px 6px;text-align:center;
+            min-height:42px;white-space:nowrap;display:flex;
+            align-items:center;justify-content:center;line-height:1.2;
+            border:1px solid #BFD7F5;
+        }
+        .usuarios-grid-cell {
+            color:#172B4D;font-family:'Montserrat',sans-serif;font-size:12px;
+            font-weight:600;padding:9px 8px;min-height:48px;
+            border:1px solid #D6E5FA;display:flex;align-items:center;
+            line-height:1.3;overflow-wrap:anywhere;word-break:normal;
+            background:#FFFFFF;
+        }
+        .usuarios-grid-cell.alt {background:#F4F8FE;}
+        .usuarios-grid-cell.nome,.usuarios-grid-cell.email {text-align:left;justify-content:flex-start;}
+        .usuarios-grid-cell.centro {text-align:center;justify-content:center;white-space:nowrap;}
+        [data-testid="stCheckbox"] {display:flex;justify-content:center;align-items:center;min-height:48px;}
+        </style>
+        """, unsafe_allow_html=True)
 
-    for idx, u in enumerate(usuarios):
-        alt = " alt" if idx % 2 else ""
-        cells = st.columns(widths, gap="small")
-        values = [
-            (u["nome"], "nome"),
-            (u["usuario"], "centro"),
-            (u["destino"], "centro"),
-            (u.get("email") or "—", "email"),
-            (PERFIL_LABEL.get(u["perfil"], "Operação"), "centro"),
-        ]
-        for col, (value, extra) in zip(cells[:5], values):
-            safe_value = html.escape(str(value))
-            col.markdown(
-                f'<div class="usuarios-grid-cell{alt} {extra}">{safe_value}</div>',
-                unsafe_allow_html=True,
+        headers = ["Nome", "Login", "Destino", "E-mail", "Perfil", "Ativo"]
+        hcols = st.columns(widths, gap=None)
+        for col, label in zip(hcols, headers):
+            col.markdown(f'<div class="usuarios-grid-header">{label}</div>', unsafe_allow_html=True)
+
+        for idx, u in enumerate(usuarios):
+            alt = " alt" if idx % 2 else ""
+            cells = st.columns(widths, gap=None)
+            values = [
+                (u["nome"], "nome"),
+                (u["usuario"], "centro"),
+                (u["destino"], "centro"),
+                (u.get("email") or "—", "email"),
+                (PERFIL_LABEL.get(u["perfil"], "Operação"), "centro"),
+            ]
+            for col, (value, extra) in zip(cells[:5], values):
+                safe_value = html.escape(str(value))
+                col.markdown(
+                    f'<div class="usuarios-grid-cell{alt} {extra}">{safe_value}</div>',
+                    unsafe_allow_html=True,
+                )
+            novos_status[u["usuario"]] = cells[5].checkbox(
+                "Ativo",
+                value=bool(u["ativo"]),
+                key=f"status_user_{u['usuario']}",
+                label_visibility="collapsed",
             )
-        novos_status[u["usuario"]] = cells[5].checkbox(
-            "Ativo",
-            value=bool(u["ativo"]),
-            key=f"status_user_{u['usuario']}",
-            label_visibility="collapsed",
-        )
 
     c1, c2 = st.columns([1, 2])
     if c1.button("Salvar alterações", type="primary", width="stretch"):
