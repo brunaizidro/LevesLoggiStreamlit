@@ -221,130 +221,84 @@ def _tabela_usuarios(eh_gdl: bool = False):
     linha_por_login = {u["usuario"]: u["linha"] for u in usuarios}
     orig_ativo = {u["usuario"]: bool(u["ativo"]) for u in usuarios}
 
-    filtro = st.text_input("Buscar (nome, login, destino ou e-mail)", key="busca_users",
-                           placeholder="digite para filtrar...")
-    linhas = []
+    filtro = st.text_input(
+        "Buscar (nome, login, destino ou e-mail)",
+        key="busca_users",
+        placeholder="digite para filtrar...",
+    )
+    usuarios_visiveis = []
     for u in usuarios:
-        alvo = f"{u['nome']} {u['usuario']} {u['destino']} {u.get('email','')}".lower()
+        alvo = f"{u['nome']} {u['usuario']} {u['destino']} {u.get('email', '')}".lower()
         if filtro and filtro.strip().lower() not in alvo:
             continue
-        linhas.append({
-            "Nome": u["nome"], "Login": u["usuario"], "Destino": u["destino"],
-            "E-mail": u.get("email") or "", "Perfil": PERFIL_LABEL.get(u["perfil"], "Operação"),
-            "Ativo": bool(u["ativo"]),
-        })
-    if not linhas:
+        usuarios_visiveis.append(u)
+
+    if not usuarios_visiveis:
         st.caption("Nenhum usuário para o filtro.")
         return
-    novos_status = {}
 
-    # Tabela com checkbox integrado, cabeçalho contínuo e grade azul-clara.
-    widths = [3.65, 0.95, 0.9, 3.45, 1.15, 0.9]
-    with st.container(height=500, border=False, gap=0, key="usuarios_tabela_compacta"):
-        st.markdown("""
-        <style>
-        .usuarios-grid-header {
-            background:#0067FC;color:#FFFFFF;font-family:'Montserrat',sans-serif;
-            font-size:12px;font-weight:700;padding:11px 6px;text-align:center;
-            min-height:42px;white-space:nowrap;display:flex;
-            align-items:center;justify-content:center;line-height:1.2;
-            border:1px solid #BFD7F5;
+    # Editor nativo do Streamlit: cabeçalho fixo durante a rolagem,
+    # checkbox editável e alinhamento consistente das colunas.
+    df_usuarios = pd.DataFrame([
+        {
+            "Nome": u["nome"],
+            "Login": u["usuario"],
+            "Destino": u["destino"],
+            "E-mail": u.get("email") or "",
+            "Perfil": PERFIL_LABEL.get(u["perfil"], "Operação"),
+            "Ativo": bool(u["ativo"]),
         }
-        .usuarios-grid-cell {
-            color:#172B4D;font-family:'Montserrat',sans-serif;font-size:12px;
-            font-weight:600;padding:8px 8px;min-height:44px;
-            border:1px solid #D6E5FA;display:flex;align-items:center;
-            line-height:1.3;overflow-wrap:anywhere;word-break:normal;
-            background:#FFFFFF;
-        }
-        .usuarios-grid-cell.alt {background:#F4F8FE;}
-        .usuarios-grid-cell.nome {
-            text-align:left;justify-content:flex-start;
-            white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-            overflow-wrap:normal;word-break:keep-all;font-size:11px;
-        }
-        .usuarios-grid-cell.email {
-            text-align:left;justify-content:flex-start;
-            white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-            overflow-wrap:normal;word-break:keep-all;font-size:11px;
-        }
-        .usuarios-grid-cell.centro {text-align:center;justify-content:center;white-space:nowrap;}
-        /* Remove o espaçamento automático entre as linhas da grade. */
-        /* Zera o espaçamento real entre cabeçalho e linhas dentro da tabela. */
-        .st-key-usuarios_tabela_compacta [data-testid="stVerticalBlock"] {
-            gap:0 !important;row-gap:0 !important;
-        }
-        .st-key-usuarios_tabela_compacta [data-testid="stElementContainer"] {
-            margin:0 !important;padding:0 !important;
-        }
-        .st-key-usuarios_tabela_compacta [data-testid="stHorizontalBlock"] {
-            gap:0 !important;margin:0 !important;padding:0 !important;
-            align-items:stretch !important;
-        }
-        .st-key-usuarios_tabela_compacta [data-testid="stColumn"] {
-            padding:0 !important;margin:0 !important;
-        }
-        .st-key-usuarios_tabela_compacta .usuarios-grid-cell {
-            box-sizing:border-box !important;min-height:44px !important;
-            height:44px !important;margin:0 !important;
-        }
-        .st-key-usuarios_tabela_compacta .usuarios-grid-header {
-            box-sizing:border-box !important;margin:0 !important;
-            position:sticky !important;top:0 !important;z-index:30 !important;
-            background:#0067FC !important;
-        }
-        /* Mantém o cabeçalho visível durante a rolagem da lista. */
-        .st-key-usuarios_tabela_compacta [data-testid="stVerticalBlockBorderWrapper"] {
-            overflow:visible !important;
-        }
-        .st-key-usuarios_tabela_compacta [data-testid="stCheckbox"] {
-            display:flex !important;justify-content:center !important;
-            align-items:center !important;min-height:44px !important;
-            width:100% !important;margin:0 !important;padding:0 !important;
-        }
-        .st-key-usuarios_tabela_compacta [data-testid="stCheckbox"] > label {
-            display:flex !important;justify-content:center !important;
-            align-items:center !important;width:100% !important;margin:0 auto !important;
-        }
-        .st-key-usuarios_tabela_compacta [data-testid="stCheckbox"] > label > div:first-child {
-            margin:0 auto !important;
-        }
-        .st-key-usuarios_tabela_compacta [data-testid="stCheckbox"] p {display:none !important;}
-        </style>
-        """, unsafe_allow_html=True)
+        for u in usuarios_visiveis
+    ])
 
-        headers = ["Nome", "Login", "Destino", "E-mail", "Perfil", "Ativo"]
-        hcols = st.columns(widths, gap=None)
-        for col, label in zip(hcols, headers):
-            col.markdown(f'<div class="usuarios-grid-header">{label}</div>', unsafe_allow_html=True)
+    st.markdown("""
+    <style>
+    [data-testid="stDataEditor"] {
+        font-family:'Montserrat',sans-serif !important;
+        --gdg-font-family:'Montserrat',sans-serif;
+        --gdg-header-font-style:700 12px 'Montserrat',sans-serif;
+        --gdg-header-background:#0067FC;
+        --gdg-header-text:#FFFFFF;
+        --gdg-header-border-color:#D6E5FA;
+        --gdg-border-color:#D6E5FA;
+        --gdg-cell-text:#172B4D;
+        --gdg-bg-cell:#FFFFFF;
+        --gdg-bg-cell-medium:#F4F8FE;
+        --gdg-accent-color:#0866F5;
+        border:1px solid #D6E5FA;
+        border-radius:8px;
+        overflow:hidden;
+    }
+    [data-testid="stDataEditor"] * {
+        font-family:'Montserrat',sans-serif !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
-        for idx, u in enumerate(usuarios):
-            alt = " alt" if idx % 2 else ""
-            cells = st.columns(widths, gap=None)
-            values = [
-                (u["nome"], "nome"),
-                (u["usuario"], "centro"),
-                (u["destino"], "centro"),
-                (u.get("email") or "—", "email"),
-                (PERFIL_LABEL.get(u["perfil"], "Operação"), "centro"),
-            ]
-            for col, (value, extra) in zip(cells[:5], values):
-                safe_value = html.escape(str(value))
-                col.markdown(
-                    f'<div class="usuarios-grid-cell{alt} {extra}">{safe_value}</div>',
-                    unsafe_allow_html=True,
-                )
-            novos_status[u["usuario"]] = cells[5].checkbox(
-                "Ativo",
-                value=bool(u["ativo"]),
-                key=f"status_user_{u['usuario']}",
-                label_visibility="collapsed",
-            )
+    editado = st.data_editor(
+        df_usuarios,
+        key="editor_usuarios_ativo",
+        hide_index=True,
+        width="stretch",
+        height=500,
+        row_height=44,
+        disabled=["Nome", "Login", "Destino", "E-mail", "Perfil"],
+        column_config={
+            "Nome": st.column_config.TextColumn("Nome", width="large"),
+            "Login": st.column_config.TextColumn("Login", width="small"),
+            "Destino": st.column_config.TextColumn("Destino", width="small"),
+            "E-mail": st.column_config.TextColumn("E-mail", width="large"),
+            "Perfil": st.column_config.TextColumn("Perfil", width="medium"),
+            "Ativo": st.column_config.CheckboxColumn("Ativo", width="small"),
+        },
+    )
 
     c1, c2 = st.columns([1, 2])
     if c1.button("Salvar alterações", type="primary", width="stretch"):
         mudou, bloqueado = 0, False
-        for login, novo in novos_status.items():
+        for _, row in editado.iterrows():
+            login = str(row["Login"])
+            novo = bool(row["Ativo"])
             if novo == orig_ativo.get(login):
                 continue
             if login == logado:
@@ -352,6 +306,7 @@ def _tabela_usuarios(eh_gdl: bool = False):
                 continue
             dados.definir_ativo(linha_por_login[login], novo)
             mudou += 1
+
         if bloqueado:
             st.warning("Você não pode alterar o próprio status — ignorado.")
         if mudou:
