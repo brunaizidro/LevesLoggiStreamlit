@@ -464,8 +464,10 @@ def page_8():
     col_a, col_b = st.columns([2, 1])
     escolha = col_a.selectbox("Destinatários", ["Todas as operações com e-mail"] + list(rot.keys()),
                               key="pendencias_destino_email")
-    modelo = col_b.selectbox("Modelo de e-mail", ["Cobrança de devolução"], key="pendencias_modelo_email")
-    if st.button("➤ Enviar e-mail", type="primary", use_container_width=True):
+    with col_b:
+        st.markdown("<div style='height:27px'></div>", unsafe_allow_html=True)
+        enviar = st.button("➤ Enviar e-mail", type="primary", use_container_width=True)
+    if enviar:
         alvos = grupos_com_email if escolha == "Todas as operações com e-mail" else [rot[escolha]]
         enviados, falhas = 0, []
         for x in alvos:
@@ -477,7 +479,13 @@ def page_8():
         for erro in falhas:
             st.error(erro)
     if sem_email:
-        st.caption("Sem e-mail cadastrado (não serão notificadas): " + ", ".join(sem_email))
+        st.markdown(
+            "<div style='background:#EAF3FF;border:1px solid #CFE2FF;border-radius:12px;"
+            "padding:17px 20px;margin-top:10px;color:#F02D2D;font-family:Montserrat,sans-serif;"
+            "font-size:15px;font-weight:700;'>"
+            "Não há e-mail cadastrado para: " + ", ".join(sem_email) + "</div>",
+            unsafe_allow_html=True,
+        )
 
 
 def _enviar_grupo(x, silencioso=False):
