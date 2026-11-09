@@ -340,14 +340,14 @@ def page_8():
         }
         .pendencias-table tbody td:nth-child(12),
         .pendencias-table tbody td:nth-child(13) {
-          background: #EEF1F4 !important;
+          background: #F7F8FA !important;
           color: #064AA6 !important;
           font-weight: 800 !important;
-          border-left: 1px solid #B7D1F5 !important;
+          border-left: 1px solid #E3E7EC !important;
         }
         .pendencias-table tbody tr:nth-child(even) td:nth-child(12),
         .pendencias-table tbody tr:nth-child(even) td:nth-child(13) {
-          background: #E4E8ED !important;
+          background: #F1F3F5 !important;
         }
         .pendencias-table tbody tr:last-child td { border-bottom: 0; }
         .pendencias-table th:last-child, .pendencias-table td:last-child { border-right: 0; }
