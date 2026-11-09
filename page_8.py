@@ -173,15 +173,31 @@ def page_8():
     valor_pendente = float(resumo["_valor_num"].sum())
     valor_total = valor_devolvido + valor_pendente
 
-    st.caption(f"Indicadores e detalhamento da competência {competencia_label}.")
-    k1, k2, k3 = st.columns(3)
-    k1.metric("Total de Leves", _fmt(total_leves))
-    k2.metric("Leves que devolveram", f"{_fmt(devolvidos)} ({devolvidos/total_leves:.1%})")
-    k3.metric("Leves que não devolveram", f"{_fmt(nao_devolveram)} ({nao_devolveram/total_leves:.1%})")
-    v1, v2, v3 = st.columns(3)
-    v1.metric("Valor total enviado", dp.fmt_brl(valor_total))
-    v2.metric("Valor devolvido", dp.fmt_brl(valor_devolvido))
-    v3.metric("Valor pendente", dp.fmt_brl(valor_pendente))
+    st.markdown(f"""
+    <style>
+      .kpi-grid {{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:10px 0 16px;}}
+      .kpi-card {{display:flex;align-items:center;gap:14px;min-height:104px;padding:17px 20px;border:1px solid #D2E3FC;border-radius:18px;background:linear-gradient(135deg,#FFFFFF 0%,#F3F8FF 100%);box-shadow:0 3px 10px rgba(6,74,166,.06);}}
+      .kpi-icon {{width:54px;height:54px;flex:0 0 54px;display:flex;align-items:center;justify-content:center;border-radius:14px;background:#E4F0FF;color:#0756B8;font-size:27px;font-weight:700;}}
+      .kpi-label {{font-size:14px;font-weight:700;color:#34445F;margin-bottom:5px;}}
+      .kpi-value {{font-size:27px;line-height:1.15;font-weight:800;color:#0756B8;white-space:nowrap;}}
+      .kpi-sub {{display:inline-block;margin-left:8px;padding:5px 10px;border-radius:20px;background:#DDF5E9;color:#078354;font-size:15px;font-weight:800;vertical-align:middle;}}
+      .kpi-sub-red {{background:#FDE3E3;color:#D92323;}}
+      .kpi-green .kpi-icon {{background:#DDF5E9;color:#078354;}}
+      .kpi-green .kpi-value {{color:#078F61;}}
+      .kpi-red .kpi-icon {{background:#FDE3E3;color:#D92323;}}
+      .kpi-red .kpi-value {{color:#D92323;}}
+      @media(max-width:850px) {{.kpi-grid {{grid-template-columns:repeat(2,minmax(0,1fr));}} .kpi-value {{font-size:22px;}}}}
+      @media(max-width:560px) {{.kpi-grid {{grid-template-columns:1fr;}}}}
+    </style>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-icon">▦</div><div><div class="kpi-label">Total de Leves</div><div class="kpi-value">{_fmt(total_leves)}</div></div></div>
+      <div class="kpi-card kpi-green"><div class="kpi-icon">✓</div><div><div class="kpi-label">Leves que devolveram</div><div class="kpi-value">{_fmt(devolvidos)} <span class="kpi-sub">{devolvidos/total_leves:.1%}</span></div></div></div>
+      <div class="kpi-card kpi-red"><div class="kpi-icon">!</div><div><div class="kpi-label">Leves que não devolveram</div><div class="kpi-value" style="color:#0756B8">{_fmt(nao_devolveram)} <span class="kpi-sub kpi-sub-red">{nao_devolveram/total_leves:.1%}</span></div></div></div>
+      <div class="kpi-card"><div class="kpi-icon">▰</div><div><div class="kpi-label">Valor total enviado</div><div class="kpi-value">{dp.fmt_brl(valor_total)}</div></div></div>
+      <div class="kpi-card kpi-green"><div class="kpi-icon">✓</div><div><div class="kpi-label">Valor devolvido</div><div class="kpi-value">{dp.fmt_brl(valor_devolvido)}</div></div></div>
+      <div class="kpi-card kpi-red"><div class="kpi-icon">▤</div><div><div class="kpi-label">Valor pendente</div><div class="kpi-value">{dp.fmt_brl(valor_pendente)}</div></div></div>
+    </div>
+    """, unsafe_allow_html=True)
 
     c1, c2, c3 = st.columns([1, 1.08, 1.25])
     with c1:
