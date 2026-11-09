@@ -293,7 +293,7 @@ def page_3():
             gap:10px !important;
             align-items:center !important;
             justify-content:center !important;
-            transform:translateY(-3px) !important;
+            transform:translateY(-7px) !important;
             width:100% !important;
         }
         .st-key-dev-new-panel [class*="st-key-dev-qtd-"] [data-testid="stHorizontalBlock"] > div:first-child {
