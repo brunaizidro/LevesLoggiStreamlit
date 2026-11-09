@@ -13,7 +13,7 @@ import data_processing as dp
 
 TIPOS = ["SACA", "GAYLORD", "PALLET"]
 NOMES = {"SACA": "Saca", "GAYLORD": "Gaylord", "PALLET": "Pallet"}
-CORES = {"SACA": "#0866F5", "GAYLORD": "#00A9D8", "PALLET": "#B5651D"}
+CORES = {"SACA": "#89939F", "GAYLORD": "#0647AC", "PALLET": "#55B8F5"}
 
 
 def _qtd(v) -> str:
@@ -267,7 +267,7 @@ def page_5():
                     color_discrete_map={"Saca": CORES["SACA"], "Gaylord": CORES["GAYLORD"], "Pallet": CORES["PALLET"]},
                     category_orders={"Competência": ordem_meses, "Insumo": ["Saca", "Gaylord", "Pallet"]},
                 )
-                cores_gradiente = {"Saca": "rgba(0,102,255,0.24)", "Gaylord": "rgba(0,183,214,0.20)", "Pallet": "rgba(194,101,25,0.18)"}
+                cores_gradiente = {"Saca": "rgba(137,147,159,0.25)", "Gaylord": "rgba(6,71,172,0.24)", "Pallet": "rgba(85,184,245,0.24)"}
                 for traco in fig.data:
                     traco.fill = "tozeroy"
                     traco.fillgradient = dict(type="vertical", colorscale=[[0, "rgba(255,255,255,0.00)"], [1, cores_gradiente.get(traco.name, "rgba(0,102,255,0.18)")]])
