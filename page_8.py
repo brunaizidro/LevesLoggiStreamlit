@@ -101,18 +101,24 @@ def page_8():
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
     .pendencias, .pendencias * {font-family:'Montserrat',sans-serif;}
-    .pendencias-title {font-size:30px;font-weight:800;color:#123B78;margin:0;line-height:1.2;}
-    .pendencias-sub {font-size:13px;color:#58708F;margin:4px 0 18px;font-weight:500;}
-    .pendencias .block-container {padding-top:1.2rem;}
-    div[data-testid="stMetric"] {background:#F4F8FF;border:1px solid #D6E5FA;padding:12px 14px;border-radius:13px;}
-    div[data-testid="stMetricLabel"] p {font-size:12px;font-weight:700;color:#29476F;}
-    div[data-testid="stMetricValue"] {font-size:23px;font-weight:800;color:#123B78;}
-    .section-title {font-size:17px;font-weight:800;color:#123B78;margin:8px 0 10px;}
-    div[data-testid="stDataFrame"] {border:1px solid #D6E5FA;border-radius:12px;overflow:hidden;}
+    .pendencias .block-container {padding-top:1rem;}
+    .pendencias-header {background:linear-gradient(105deg,#064AA6 0%,#0877E8 100%);padding:17px 24px;border-radius:14px;color:#fff;margin:0 0 16px;}
+    .pendencias-title {font-size:27px;font-weight:800;color:#fff;margin:0;line-height:1.2;}
+    .pendencias-sub {font-size:13px;color:#EAF4FF;margin:4px 0 0;font-weight:600;}
+    div[data-testid="stMetric"] {background:#F3F7FE;border:1px solid #D2E3FC;padding:13px 14px;border-radius:13px;min-height:78px;}
+    div[data-testid="stMetricLabel"] p {font-size:12px;font-weight:700;color:#183B6B;}
+    div[data-testid="stMetricValue"] {font-size:23px;font-weight:800;color:#064AA6;}
+    .section-title {font-size:17px;font-weight:800;color:#064AA6;margin:12px 0 10px;}
+    div[data-testid="stDataFrame"] {border:1px solid #C8DDF8;border-radius:12px;overflow:hidden;}
+    div[data-testid="stSelectbox"] label {font-weight:700;color:#183B6B;}
+    div[data-testid="stButton"] button {border:1px solid #BBD4F5;border-radius:9px;font-weight:700;color:#064AA6;}
+    .stPlotlyChart {border:1px solid #D6E5FA;border-radius:13px;padding:7px;background:#fff;}
     </style>
     <div class="pendencias">
-      <div class="pendencias-title">📦 Pendências de Devolução</div>
-      <div class="pendencias-sub">Análise gerencial das devoluções de insumos (Leves)</div>
+      <div class="pendencias-header">
+        <div class="pendencias-title">📦 Pendências de Devolução</div>
+        <div class="pendencias-sub">Análise gerencial das devoluções de insumos (Leves)</div>
+      </div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -177,9 +183,16 @@ def page_8():
     v2.metric("Valor pendente", dp.fmt_brl(valor_pendente))
     v3.metric("Valor total enviado", dp.fmt_brl(valor_total))
 
-    c1, c2 = st.columns([1, 1.1])
+    c1, c2, c3 = st.columns([1, 1.08, 1.25])
     with c1:
-        st.plotly_chart(_grafico_donut(resumo), use_container_width=True)
+        fig_status = _grafico_donut(resumo)
+        fig_status.update_layout(
+            title=dict(text="Situação das devoluções (Leves)", x=0.03, xanchor="left",
+                       font=dict(size=15, color="#123B78")),
+            height=285, margin=dict(l=8, r=8, t=42, b=8),
+            legend=dict(orientation="h", y=-0.12, x=0.02, font=dict(size=10)),
+        )
+        st.plotly_chart(fig_status, use_container_width=True, config={"displayModeBar": False})
     with c2:
         valores = pd.DataFrame([
             {"Situação": "Devolvido", "Valor": valor_devolvido},
@@ -190,10 +203,58 @@ def page_8():
                          color_discrete_map={"Devolvido": "#0756B8", "Pendente": "#8BC8F5"},
                          text=valores["Valor"].map(dp.fmt_brl),
                          title="Valores (R$)")
-        fig_val.update_layout(showlegend=False, height=310, margin=dict(l=10,r=20,t=48,b=10),
-                              font_family="Montserrat", paper_bgcolor="rgba(0,0,0,0)")
-        fig_val.update_traces(textposition="outside", cliponaxis=False)
-        st.plotly_chart(fig_val, use_container_width=True)
+        fig_val.update_layout(
+            showlegend=False, height=285,
+            margin=dict(l=8, r=16, t=42, b=8),
+            font=dict(family="Montserrat", size=10, color="#17365F"),
+            paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+            title=dict(x=0.03, xanchor="left", font=dict(size=15, color="#123B78")),
+            xaxis=dict(title="Valor", gridcolor="#E6EEF8", zeroline=False,
+                       tickfont=dict(color="#73839A")),
+            yaxis=dict(title="Situação", autorange="reversed",
+                       tickfont=dict(color="#73839A")),
+        )
+        fig_val.update_traces(textposition="outside", cliponaxis=False,
+                              textfont=dict(size=10, color="#17365F"))
+        st.plotly_chart(fig_val, use_container_width=True, config={"displayModeBar": False})
+    with c3:
+        # Evolução das competências mais recentes disponíveis.
+        meses_evolucao = sorted(envios["mes"].dropna().astype(str).unique().tolist())[-6:]
+        evolucao = []
+        for competencia in meses_evolucao:
+            hist = dp.conciliacao(competencia)
+            if hist.empty:
+                continue
+            devolvido_hist = sum(_valor(r["devolvido"], r["tipo"], precos) for _, r in hist.iterrows())
+            pendente_hist = sum(_valor(r["cobravel"], r["tipo"], precos) for _, r in hist.iterrows())
+            evolucao.append({
+                "Mês": dp.rotulo_mes(competencia)[:3],
+                "Valor devolvido": devolvido_hist,
+                "Valor pendente": pendente_hist,
+                "Valor total": devolvido_hist + pendente_hist,
+            })
+        if evolucao:
+            ev = pd.DataFrame(evolucao)
+            fig_ev = go.Figure()
+            fig_ev.add_bar(x=ev["Mês"], y=ev["Valor devolvido"], name="Valor devolvido",
+                           marker_color="#0756B8")
+            fig_ev.add_bar(x=ev["Mês"], y=ev["Valor pendente"], name="Valor pendente",
+                           marker_color="#8BC8F5")
+            fig_ev.add_scatter(x=ev["Mês"], y=ev["Valor total"], name="Valor total",
+                               mode="lines+markers", line=dict(color="#0756B8", width=2),
+                               marker=dict(size=6, color="#fff", line=dict(color="#0756B8", width=2)))
+            fig_ev.update_layout(
+                title=dict(text="Evolução das devoluções", x=0.03, xanchor="left",
+                           font=dict(size=15, color="#123B78")),
+                barmode="stack", height=285, margin=dict(l=8,r=8,t=42,b=8),
+                font=dict(family="Montserrat", size=10, color="#17365F"),
+                paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+                legend=dict(orientation="h", y=-0.22, font=dict(size=9)),
+                xaxis=dict(showgrid=False), yaxis=dict(gridcolor="#E6EEF8", tickformat="~s"),
+            )
+            st.plotly_chart(fig_ev, use_container_width=True, config={"displayModeBar": False})
+        else:
+            st.info("Sem histórico suficiente para exibir a evolução.")
 
     st.markdown('<div class="section-title">Detalhamento por Leve</div>', unsafe_allow_html=True)
     colunas = [
