@@ -8,6 +8,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
+import streamlit.components.v1 as components
 
 import data_processing as dp
 import emailer
@@ -269,62 +270,56 @@ def page_8():
         "Sacas pendentes": "Sacas pendentes",
     })
     tabela = tabela[colunas].copy()
-    # HTML nativo para garantir que o Streamlit aplique o cabeçalho azul
-    # (o componente st.dataframe pode ignorar estilos de cabeçalho do Styler).
+    # Renderização em iframe HTML: garante CSS próprio sem o Markdown escapar as tags.
     tabela_html = tabela.to_html(index=False, border=0, escape=True)
-    st.markdown(
-        """
-        <style>
+    tabela_html = tabela_html.replace(
+        '<table',
+        '<table class="pendencias-table"',
+        1,
+    )
+    altura_tabela = min(720, max(190, 43 + len(tabela) * 34))
+    html_tabela = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 0; background: transparent; font-family: Montserrat, Arial, sans-serif; }
         .pendencias-table-wrap {
-            width: 100%;
-            overflow-x: auto;
-            border: 1px solid #C9DCF5;
-            border-radius: 10px;
-            background: #FFFFFF;
+          width: 100%; max-height: 700px; overflow: auto;
+          border: 1px solid #C9DCF5; border-radius: 10px; background: #fff;
         }
         table.pendencias-table {
-            width: 100%;
-            min-width: 1250px;
-            border-collapse: separate;
-            border-spacing: 0;
-            font-family: 'Montserrat', sans-serif;
-            color: #17365F;
-            font-size: 12px;
+          width: 100%; min-width: 1250px; border-collapse: separate;
+          border-spacing: 0; font-family: Montserrat, Arial, sans-serif;
+          color: #17365F; font-size: 12px;
         }
         .pendencias-table thead th {
-            background: #0866F5 !important;
-            color: #FFFFFF !important;
-            font-weight: 700 !important;
-            text-align: center !important;
-            vertical-align: middle !important;
-            padding: 11px 8px !important;
-            border-right: 1px solid rgba(255,255,255,.35) !important;
-            border-bottom: 1px solid #0757D8 !important;
-            white-space: normal !important;
+          position: sticky; top: 0; z-index: 2;
+          background: #0866F5 !important; color: #fff !important;
+          font-weight: 700 !important; text-align: center !important;
+          vertical-align: middle !important; padding: 11px 8px !important;
+          border-right: 1px solid rgba(255,255,255,.35);
+          border-bottom: 1px solid #0757D8; white-space: normal;
         }
         .pendencias-table tbody td {
-            text-align: center !important;
-            vertical-align: middle !important;
-            padding: 9px 8px !important;
-            border-right: 1px solid #E1EAF5 !important;
-            border-bottom: 1px solid #E1EAF5 !important;
-            white-space: nowrap;
+          text-align: center !important; vertical-align: middle !important;
+          padding: 9px 8px !important; border-right: 1px solid #E1EAF5;
+          border-bottom: 1px solid #E1EAF5; white-space: nowrap;
+          background: #fff;
         }
-        .pendencias-table tbody tr:nth-child(odd) td {
-            background: #FFFFFF !important;
-        }
-        .pendencias-table tbody tr:nth-child(even) td {
-            background: #F1F6FD !important;
-        }
-        .pendencias-table tbody tr:last-child td { border-bottom: 0 !important; }
-        .pendencias-table th:last-child, .pendencias-table td:last-child { border-right: 0 !important; }
-        </style>
-        <div class="pendencias-table-wrap">
-        """ + tabela_html.replace("<table", '<table class="pendencias-table"', 1) + """
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+        .pendencias-table tbody tr:nth-child(even) td { background: #F1F6FD; }
+        .pendencias-table tbody tr:last-child td { border-bottom: 0; }
+        .pendencias-table th:last-child, .pendencias-table td:last-child { border-right: 0; }
+      </style>
+    </head>
+    <body>
+      <div class="pendencias-table-wrap">""" + tabela_html + """</div>
+    </body>
+    </html>
+    """
+    components.html(html_tabela, height=altura_tabela, scrolling=True)
 
     st.markdown("---")
     st.markdown('<div class="section-title">✉️ Enviar e-mail de cobrança</div>', unsafe_allow_html=True)
