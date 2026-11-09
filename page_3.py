@@ -214,6 +214,171 @@ def page_3():
         div[data-testid="stDownloadButton"] button { border:1px solid #075bea !important; border-radius:10px !important; font-family:'Montserrat',sans-serif !important; font-weight:700 !important; color:#17345f !important; background:#fff !important; white-space:nowrap !important; padding:7px 12px !important; }
         div[data-testid="stDownloadButton"] button:hover { border-color:#1155cc !important; color:#1155cc !important; background:#f5f9ff !important; }
         hr.sb-sep { border-color:#d8e7f8 !important; margin:22px 0 !important; }
+        
+        /* Painel Nova devolução — composição compacta conforme referência */
+        .st-key-dev-new-panel {
+            box-sizing:border-box !important;
+            width:100% !important;
+            border:2px solid #4b8cff !important;
+            border-radius:14px !important;
+            padding:9px 12px 8px !important;
+            margin:12px 0 16px !important;
+            background:#ffffff !important;
+            box-shadow:0 3px 10px rgba(7,93,229,.07) !important;
+        }
+        .st-key-dev-new-panel, .st-key-dev-new-panel * {
+            font-weight:700 !important;
+        }
+        .st-key-dev-new-panel .dev-new-title {
+            min-height:52px !important;
+            box-sizing:border-box !important;
+            padding:6px 12px !important;
+            margin:0 0 6px !important;
+            border:1px solid #c6dcff !important;
+            border-radius:10px !important;
+            background:linear-gradient(100deg,#eaf3ff 0%,#f5f9ff 65%,#e1edff 100%) !important;
+            box-shadow:none !important;
+            gap:10px !important;
+        }
+        .st-key-dev-new-panel .dev-section-icon {
+            width:34px !important;
+            height:34px !important;
+            flex-basis:34px !important;
+            border-radius:9px !important;
+            font-size:23px !important;
+        }
+        .st-key-dev-new-panel .dev-new-title-copy { gap:2px !important; }
+        .st-key-dev-new-panel .dev-new-title-copy strong {
+            font-size:18px !important;
+            line-height:1.1 !important;
+            font-weight:800 !important;
+            color:#103e79 !important;
+        }
+        .st-key-dev-new-panel .dev-new-title-copy small {
+            font-size:10px !important;
+            line-height:1.15 !important;
+            font-weight:800 !important;
+            color:#52739b !important;
+        }
+        .st-key-dev-new-panel .dev-new-truck {
+            width:158px !important;
+            height:48px !important;
+            right:8px !important;
+            bottom:0 !important;
+            opacity:1 !important;
+        }
+        .st-key-dev-new-panel .dev-new-truck:before {
+            width:172px !important;
+            height:55px !important;
+            right:-8px !important;
+            bottom:-17px !important;
+            border-radius:60% 0 0 0 !important;
+            background:linear-gradient(100deg,rgba(191,220,255,.28),rgba(141,190,255,.48)) !important;
+        }
+        .st-key-dev-new-panel div[data-testid="stForm"] {
+            border:0 !important;
+            border-radius:0 !important;
+            padding:2px 3px 1px !important;
+            margin:0 !important;
+            background:transparent !important;
+            box-shadow:none !important;
+        }
+        .st-key-dev-new-panel [class*="st-key-dev-qtd-"] {
+            box-sizing:border-box !important;
+            min-height:38px !important;
+            padding:4px 7px !important;
+            border:1px solid #cfe0ff !important;
+            border-radius:9px !important;
+            background:linear-gradient(100deg,#f3f7ff,#fbfdff) !important;
+            box-shadow:0 1px 4px rgba(23,75,136,.05) !important;
+        }
+        .st-key-dev-new-panel [class*="st-key-dev-qtd-"] [data-testid="stHorizontalBlock"] {
+            gap:6px !important;
+            align-items:center !important;
+        }
+        .st-key-dev-new-panel .dev-qty-head {
+            min-height:30px !important;
+            gap:7px !important;
+        }
+        .st-key-dev-new-panel .dev-qty-icon {
+            width:28px !important;
+            height:28px !important;
+            flex-basis:28px !important;
+            padding:5px !important;
+            border-radius:8px !important;
+        }
+        .st-key-dev-new-panel .dev-qty-title strong {
+            font-size:11px !important;
+            font-weight:800 !important;
+        }
+        .st-key-dev-new-panel .dev-qty-title small {
+            font-size:9px !important;
+            font-weight:800 !important;
+        }
+        .st-key-dev-new-panel [class*="st-key-dev-qtd-"] div[data-testid="stNumberInput"] input {
+            height:28px !important;
+            min-height:28px !important;
+            font-size:19px !important;
+            font-weight:800 !important;
+        }
+        .st-key-dev-new-panel .dev-field-label {
+            font-size:12px !important;
+            line-height:1.2 !important;
+            font-weight:800 !important;
+            margin:7px 0 3px !important;
+            color:#123b6c !important;
+        }
+        .st-key-dev-new-panel [class*="st-key-dev-plate-field"],
+        .st-key-dev-new-panel [class*="st-key-dev-observation-field"] {
+            border:1px solid #c9dcff !important;
+            border-radius:9px !important;
+            background:#fff !important;
+            overflow:hidden !important;
+        }
+        .st-key-dev-new-panel .dev-input-icon {
+            min-height:29px !important;
+            height:29px !important;
+            display:flex !important;
+            align-items:center !important;
+            justify-content:center !important;
+        }
+        .st-key-dev-new-panel .dev-input-icon svg {
+            width:19px !important;
+            height:19px !important;
+        }
+        .st-key-dev-new-panel div[data-testid="stTextInput"] input,
+        .st-key-dev-new-panel div[data-testid="stTextArea"] textarea {
+            font-size:11px !important;
+            font-weight:800 !important;
+            border-radius:7px !important;
+        }
+        .st-key-dev-new-panel div[data-testid="stTextInput"] input {
+            min-height:28px !important;
+            height:28px !important;
+        }
+        .st-key-dev-new-panel div[data-testid="stTextArea"] textarea {
+            min-height:36px !important;
+            height:36px !important;
+            padding-top:7px !important;
+        }
+        .st-key-dev-new-panel div[data-testid="stFormSubmitButton"] button {
+            min-height:29px !important;
+            height:29px !important;
+            padding:4px 13px !important;
+            border-radius:8px !important;
+            font-size:11px !important;
+            font-weight:800 !important;
+            box-shadow:0 2px 5px rgba(7,93,229,.16) !important;
+        }
+        .st-key-dev-new-panel div[data-testid="stFormSubmitButton"] {
+            margin-top:5px !important;
+        }
+        @media (max-width:700px) {
+            .st-key-dev-new-panel { padding:7px !important; }
+            .st-key-dev-new-panel .dev-new-truck { width:105px !important; opacity:.35 !important; }
+            .st-key-dev-new-panel .dev-new-title-copy strong { font-size:16px !important; }
+            .st-key-dev-new-panel .dev-new-title-copy small { font-size:9px !important; }
+        }
         </style>
         """,
         unsafe_allow_html=True,
@@ -378,83 +543,84 @@ def page_3():
         _minhas_devolucoes(destino, eh_admin=False, eh_gdl=True)
         return
 
-    st.markdown("""<div class="dev-new-title"><span class="dev-section-icon">＋</span><span class="dev-new-title-copy"><strong>Nova devolução</strong><small>Registre uma nova devolução de insumos</small></span><span class="dev-new-truck" aria-hidden="true"><svg viewBox="0 0 240 90" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 57V34h116v40H18V57Z" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/><path d="M134 47h42l26 25v2h-68V47Z" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/><path d="M151 49v24m-127 0a13 13 0 1 0 26 0 13 13 0 0 0-26 0Zm133 0a13 13 0 1 0 26 0 13 13 0 0 0-26 0Z" stroke="currentColor" stroke-width="5"/><path d="M18 44h116M176 48v23" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path d="M205 45h18v28h-18zM209 34h10v11h-10zM199 57h30" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/></svg></span></div>""", unsafe_allow_html=True)
-    pend = {t: q for t, q in dp.pending_mes_tipo(destino, mes_ref).items() if q > 0}
-    if not pend:
-        st.success(f"Sem pendência de devolução para {escolha_mes}. 🎉")
-    else:
-        with st.form("nova_devolucao", clear_on_submit=True):
-            qtds = {}
-            itens_pend = sorted(pend.items())
-            fcols = st.columns(len(itens_pend), gap="medium")
-            icones_insumo = {
-                "gaylord": "<svg viewBox='0 0 48 48' aria-hidden='true'><path d='M7 15 24 6l17 9v19L24 43 7 34Z' fill='none' stroke='currentColor' stroke-width='2.6' stroke-linejoin='round'/><path d='m7 15 17 10 17-10M24 25v18M16 10l17 10M32 10 15 20' fill='none' stroke='currentColor' stroke-width='2.4' stroke-linejoin='round'/></svg>",
-                "pallet": "<svg viewBox='0 0 48 48' aria-hidden='true'><path d='m5 17 19-10 19 10-19 10Z M5 25l19 10 19-10M5 33l19 10 19-10' fill='none' stroke='currentColor' stroke-width='2.6' stroke-linejoin='round'/></svg>",
-                "saca": "<svg viewBox='0 0 48 48' aria-hidden='true'><path d='M18 7c2 4 10 4 12 0M18 7l-2 7c-5 4-8 11-8 20 0 5 7 7 16 7s16-2 16-7c0-9-3-16-8-20l-2-7M16 14h16M17 22c4 2 10 2 14 0' fill='none' stroke='currentColor' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/></svg>",
-            }
-            for i, (t, q) in enumerate(itens_pend):
-                with fcols[i].container(key=f"dev-qtd-{i}"):
-                    qty_cols = st.columns([1.45, 1.0], gap="small", vertical_alignment="center")
-                    with qty_cols[0]:
-                        st.markdown(
-                            f"<div class='dev-qty-head'>"
-                            f"<span class='dev-qty-icon'>{icones_insumo.get(str(t).lower(), '＋')}</span>"
-                            f"<span class='dev-qty-title'><strong>{t.upper()}</strong>"
-                            f"<small>Máx. {_fmt(q)}</small></span></div>",
-                            unsafe_allow_html=True,
-                        )
-                    with qty_cols[1]:
-                        qtds[t] = st.number_input(
-                            f"Quantidade de {t.title()}",
-                            min_value=0, max_value=int(q), step=1, value=0,
-                            label_visibility="collapsed", key=f"dev-quantidade-{i}",
-                        )
-            st.markdown("<div class='dev-field-label'>Placa do veículo</div>", unsafe_allow_html=True)
-            with st.container(key="dev-plate-field"):
-                plate_icon, plate_input = st.columns([0.065, 0.935], gap=0, vertical_alignment="center")
-                with plate_icon:
-                    st.markdown("<div class='dev-input-icon'><svg viewBox='0 0 24 24' aria-hidden='true'><path d='M3 7h12v11H3zM15 11h4l3 3v4h-7zM7 18a2 2 0 1 0 4 0m7 0a2 2 0 1 0 4 0' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/></svg></div>", unsafe_allow_html=True)
-                with plate_input:
-                    placa = st.text_input("Placa do veículo", placeholder="Ex.: ABC1D23", label_visibility="collapsed")
-            st.markdown("<div class='dev-field-label dev-observation-label'>Observação (opcional)</div>", unsafe_allow_html=True)
-            with st.container(key="dev-observation-field"):
-                obs_icon, obs_input = st.columns([0.065, 0.935], gap=0, vertical_alignment="center")
-                with obs_icon:
-                    st.markdown("<div class='dev-input-icon dev-textarea-icon'><svg viewBox='0 0 24 24' aria-hidden='true'><rect x='5' y='3' width='14' height='18' rx='1.5' fill='none' stroke='currentColor' stroke-width='1.8'/><path d='M8 8h8M8 12h8M8 16h5' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round'/></svg></div>", unsafe_allow_html=True)
-                with obs_input:
-                    obs = st.text_area("Observação", placeholder="Informe alguma particularidade desta devolução...", height=64, label_visibility="collapsed")
-            enviar = st.form_submit_button("▤  Gerar devolução", type="primary")
-
-        if enviar:
-            itens = [{"tipo": t, "qtd_declarada": int(q)} for t, q in qtds.items() if q > 0]
-            placa_norm = "".join(str(placa or "").upper().split()).replace("-", "")
-            if not itens:
-                st.error("Informe ao menos uma quantidade.")
-            elif not placa_norm:
-                st.error("Informe a placa do veículo.")
-            else:
-                total = sum(it["qtd_declarada"] for it in itens)
-                id_dev = dados.proximo_codigo_devolucao()
-                token = uuid.uuid4().hex
-                agora = datetime.now(dp.TZ).strftime("%Y-%m-%d %H:%M:%S")
-                dev = {
-                    "id": id_dev, "token": token, "data_criacao": agora,
-                    "usuario": user.get("nome", user.get("usuario", "")),
-                    "destino": destino, "status": dp.STATUS_TRANSITO,
-                    "total_declarado": total, "total_recebido": "",
-                    "data_recebimento": "", "recebido_por": "", "obs": obs,
-                    "placa": placa_norm,
-                    "competencia": mes_ref,
+    with st.container(key="dev-new-panel"):
+        st.markdown("""<div class="dev-new-title"><span class="dev-section-icon">＋</span><span class="dev-new-title-copy"><strong>Nova devolução</strong><small>Registre uma nova devolução de insumos</small></span><span class="dev-new-truck" aria-hidden="true"><svg viewBox="0 0 240 90" fill="none" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor" stroke-width="4.2" stroke-linejoin="round" stroke-linecap="round"><path d="M18 36h119v37H18z"/><path d="M137 48h39l27 25h-66z"/><path d="M151 49v24"/><path d="M28 36V17h34v19M64 36V9h36v27M102 36V20h30v16"/><path d="m28 17 17-9 17 9M64 9l18-8 18 8M102 20l15-8 15 8"/><path d="M28 17v19M62 17v19M64 9v27M100 9v27M102 20v16M132 20v16"/><circle cx="48" cy="74" r="11"/><circle cx="178" cy="74" r="11"/><path d="M137 48h29v25h-29M176 48v25"/></g></svg></span></div>""", unsafe_allow_html=True)
+        pend = {t: q for t, q in dp.pending_mes_tipo(destino, mes_ref).items() if q > 0}
+        if not pend:
+            st.success(f"Sem pendência de devolução para {escolha_mes}. 🎉")
+        else:
+            with st.form("nova_devolucao", clear_on_submit=True):
+                qtds = {}
+                itens_pend = sorted(pend.items())
+                fcols = st.columns(len(itens_pend), gap="medium")
+                icones_insumo = {
+                    "gaylord": "<svg viewBox='0 0 48 48' aria-hidden='true'><path d='M7 15 24 6l17 9v19L24 43 7 34Z' fill='none' stroke='currentColor' stroke-width='2.6' stroke-linejoin='round'/><path d='m7 15 17 10 17-10M24 25v18M16 10l17 10M32 10 15 20' fill='none' stroke='currentColor' stroke-width='2.4' stroke-linejoin='round'/></svg>",
+                    "pallet": "<svg viewBox='0 0 48 48' aria-hidden='true'><path d='m5 17 19-10 19 10-19 10Z M5 25l19 10 19-10M5 33l19 10 19-10' fill='none' stroke='currentColor' stroke-width='2.6' stroke-linejoin='round'/></svg>",
+                    "saca": "<svg viewBox='0 0 48 48' aria-hidden='true'><path d='M18 7c2 4 10 4 12 0M18 7l-2 7c-5 4-8 11-8 20 0 5 7 7 16 7s16-2 16-7c0-9-3-16-8-20l-2-7M16 14h16M17 22c4 2 10 2 14 0' fill='none' stroke='currentColor' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/></svg>",
                 }
-                dados.criar_devolucao(dev, itens)
-                st.success(f"Devolução **{id_dev}** criada. Baixe o romaneio abaixo e envie com os itens.")
-                pdf = romaneio.gerar_romaneio_pdf(dev, itens, dp.base_url())
-                st.download_button(
-                    "📄 Baixar romaneio (PDF)", pdf, file_name=f"{id_dev}.pdf",
-                    mime="application/pdf", key=f"dl_{id_dev}", type="primary",
-                )
-
-    _minhas_devolucoes(destino, eh_admin=eh_admin)
+                for i, (t, q) in enumerate(itens_pend):
+                    with fcols[i].container(key=f"dev-qtd-{i}"):
+                        qty_cols = st.columns([1.45, 1.0], gap="small", vertical_alignment="center")
+                        with qty_cols[0]:
+                            st.markdown(
+                                f"<div class='dev-qty-head'>"
+                                f"<span class='dev-qty-icon'>{icones_insumo.get(str(t).lower(), '＋')}</span>"
+                                f"<span class='dev-qty-title'><strong>{t.upper()}</strong>"
+                                f"<small>Máx. {_fmt(q)}</small></span></div>",
+                                unsafe_allow_html=True,
+                            )
+                        with qty_cols[1]:
+                            qtds[t] = st.number_input(
+                                f"Quantidade de {t.title()}",
+                                min_value=0, max_value=int(q), step=1, value=0,
+                                label_visibility="collapsed", key=f"dev-quantidade-{i}",
+                            )
+                st.markdown("<div class='dev-field-label'>Placa do veículo</div>", unsafe_allow_html=True)
+                with st.container(key="dev-plate-field"):
+                    plate_icon, plate_input = st.columns([0.065, 0.935], gap=0, vertical_alignment="center")
+                    with plate_icon:
+                        st.markdown("<div class='dev-input-icon'><svg viewBox='0 0 24 24' aria-hidden='true'><path d='M3 7h12v11H3zM15 11h4l3 3v4h-7zM7 18a2 2 0 1 0 4 0m7 0a2 2 0 1 0 4 0' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/></svg></div>", unsafe_allow_html=True)
+                    with plate_input:
+                        placa = st.text_input("Placa do veículo", placeholder="Ex.: ABC1D23", label_visibility="collapsed")
+                st.markdown("<div class='dev-field-label dev-observation-label'>Observação (opcional)</div>", unsafe_allow_html=True)
+                with st.container(key="dev-observation-field"):
+                    obs_icon, obs_input = st.columns([0.065, 0.935], gap=0, vertical_alignment="center")
+                    with obs_icon:
+                        st.markdown("<div class='dev-input-icon dev-textarea-icon'><svg viewBox='0 0 24 24' aria-hidden='true'><rect x='5' y='3' width='14' height='18' rx='1.5' fill='none' stroke='currentColor' stroke-width='1.8'/><path d='M8 8h8M8 12h8M8 16h5' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round'/></svg></div>", unsafe_allow_html=True)
+                    with obs_input:
+                        obs = st.text_area("Observação", placeholder="Informe alguma particularidade desta devolução...", height=38, label_visibility="collapsed")
+                enviar = st.form_submit_button("▤  Gerar devolução", type="primary")
+    
+            if enviar:
+                itens = [{"tipo": t, "qtd_declarada": int(q)} for t, q in qtds.items() if q > 0]
+                placa_norm = "".join(str(placa or "").upper().split()).replace("-", "")
+                if not itens:
+                    st.error("Informe ao menos uma quantidade.")
+                elif not placa_norm:
+                    st.error("Informe a placa do veículo.")
+                else:
+                    total = sum(it["qtd_declarada"] for it in itens)
+                    id_dev = dados.proximo_codigo_devolucao()
+                    token = uuid.uuid4().hex
+                    agora = datetime.now(dp.TZ).strftime("%Y-%m-%d %H:%M:%S")
+                    dev = {
+                        "id": id_dev, "token": token, "data_criacao": agora,
+                        "usuario": user.get("nome", user.get("usuario", "")),
+                        "destino": destino, "status": dp.STATUS_TRANSITO,
+                        "total_declarado": total, "total_recebido": "",
+                        "data_recebimento": "", "recebido_por": "", "obs": obs,
+                        "placa": placa_norm,
+                        "competencia": mes_ref,
+                    }
+                    dados.criar_devolucao(dev, itens)
+                    st.success(f"Devolução **{id_dev}** criada. Baixe o romaneio abaixo e envie com os itens.")
+                    pdf = romaneio.gerar_romaneio_pdf(dev, itens, dp.base_url())
+                    st.download_button(
+                        "📄 Baixar romaneio (PDF)", pdf, file_name=f"{id_dev}.pdf",
+                        mime="application/pdf", key=f"dl_{id_dev}", type="primary",
+                    )
+    
+        _minhas_devolucoes(destino, eh_admin=eh_admin)
 
 
 def _minhas_devolucoes(destino: str, eh_admin: bool = False, eh_gdl: bool = False):
