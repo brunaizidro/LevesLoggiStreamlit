@@ -304,11 +304,11 @@ def page_3():
         .st-key-dev-new-panel [class*="st-key-dev-qtd-"] div[data-testid="stNumberInput"] input {
             height:28px !important;
             min-height:28px !important;
-            font-size:22px !important;
+            font-size:27px !important;
             font-weight:800 !important;
         }
         .st-key-dev-new-panel .dev-field-label {
-            font-size:15px !important;
+            font-size:16px !important;
             line-height:1.25 !important;
             font-weight:800 !important;
             margin:7px 0 3px !important;
@@ -334,7 +334,7 @@ def page_3():
         }
         .st-key-dev-new-panel div[data-testid="stTextInput"] input,
         .st-key-dev-new-panel div[data-testid="stTextArea"] textarea {
-            font-size:14px !important;
+            font-size:16px !important;
             font-weight:700 !important;
             border-radius:7px !important;
         }
@@ -352,7 +352,7 @@ def page_3():
             height:29px !important;
             padding:4px 13px !important;
             border-radius:8px !important;
-            font-size:14px !important;
+            font-size:16px !important;
             font-weight:800 !important;
             box-shadow:0 2px 5px rgba(7,93,229,.16) !important;
         }
