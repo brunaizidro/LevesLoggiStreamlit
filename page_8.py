@@ -97,6 +97,11 @@ def _grafico_donut(resumo):
     return fig
 
 
+def _limpar_filtro_pendencias():
+    # O callback roda antes da criação dos widgets no rerun.
+    st.session_state["pendencias_destino_filtro"] = "Todas"
+
+
 def page_8():
     st.markdown("""
     <style>
@@ -148,9 +153,11 @@ def page_8():
                                       key="pendencias_destino_filtro")
     with f3:
         st.markdown("<div style='height:27px'></div>", unsafe_allow_html=True)
-        if st.button("↻ Limpar filtros", use_container_width=True):
-            st.session_state["pendencias_destino_filtro"] = "Todas"
-            st.rerun()
+        st.button(
+            "↻ Limpar filtros",
+            use_container_width=True,
+            on_click=_limpar_filtro_pendencias,
+        )
 
     if destino_filtro != "Todas":
         pend = pend[pend["destino"] == destino_filtro].copy()
