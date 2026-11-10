@@ -450,47 +450,51 @@ def page_8():
     """
     components.html(html_tabela, height=altura_tabela, scrolling=True)
 
-    st.markdown("---")
-    st.markdown('<div class="section-title">✉️ Enviar e-mail de cobrança</div>', unsafe_allow_html=True)
-    st.caption("Selecione as operações com saldo pendente e envie um lembrete de devolução.")
-    pend_email = pend[pd.to_numeric(pend["cobravel"], errors="coerce").fillna(0) > 0].copy()
-    grupos = _grupos_email(pend_email, competencia_label)
-    sem_email = [x["destino"] for x in grupos if not x["emails"]]
-    grupos_com_email = [x for x in grupos if x["emails"]]
+    # O envio de cobranças por e-mail é uma função exclusiva do administrador.
+    usuario_atual = st.session_state.get("usuario") or {}
+    perfil_atual = str(usuario_atual.get("perfil", "")).strip().lower()
+    if perfil_atual not in ("gdl", "gestor", "gestor_de_leves"):
+        st.markdown("---")
+        st.markdown('<div class="section-title">✉️ Enviar e-mail de cobrança</div>', unsafe_allow_html=True)
+        st.caption("Selecione as operações com saldo pendente e envie um lembrete de devolução.")
+        pend_email = pend[pd.to_numeric(pend["cobravel"], errors="coerce").fillna(0) > 0].copy()
+        grupos = _grupos_email(pend_email, competencia_label)
+        sem_email = [x["destino"] for x in grupos if not x["emails"]]
+        grupos_com_email = [x for x in grupos if x["emails"]]
 
-    if not emailer.smtp_configurado():
-        st.warning("Configure o servidor de e-mail (SMTP) em Configurações para enviar cobranças.")
-        return
-    if not grupos_com_email:
-        st.info("Não há operações com pendências e e-mail cadastrado para esta competência.")
-        return
+        if not emailer.smtp_configurado():
+            st.warning("Configure o servidor de e-mail (SMTP) em Configurações para enviar cobranças.")
+            return
+        if not grupos_com_email:
+            st.info("Não há operações com pendências e e-mail cadastrado para esta competência.")
+            return
 
-    rot = {f"{x['destino']} · {_fmt(x['total'])} pendentes": x for x in grupos_com_email}
-    col_a, col_b = st.columns([2, 1])
-    escolha = col_a.selectbox("Destinatários", ["Todas as operações com e-mail"] + list(rot.keys()),
-                              key="pendencias_destino_email")
-    with col_b:
-        st.markdown("<div style='height:27px'></div>", unsafe_allow_html=True)
-        enviar = st.button("➤ Enviar e-mail", type="primary", use_container_width=True)
-    if enviar:
-        alvos = grupos_com_email if escolha == "Todas as operações com e-mail" else [rot[escolha]]
-        enviados, falhas = 0, []
-        for x in alvos:
-            ok, erros = _enviar_grupo(x, silencioso=True)
-            enviados += ok
-            falhas.extend(erros)
-        if enviados:
-            st.success(f"{enviados} e-mail(s) enviado(s) para {competencia_label}.")
-        for erro in falhas:
-            st.error(erro)
-    if sem_email:
-        st.markdown(
-            "<div style='background:#EAF3FF;border:1px solid #CFE2FF;border-radius:12px;"
-            "padding:17px 20px;margin-top:10px;color:#F02D2D;font-family:Montserrat,sans-serif;"
-            "font-size:15px;font-weight:700;'>"
-            "Não há e-mail cadastrado para: " + ", ".join(sem_email) + "</div>",
-            unsafe_allow_html=True,
-        )
+        rot = {f"{x['destino']} · {_fmt(x['total'])} pendentes": x for x in grupos_com_email}
+        col_a, col_b = st.columns([2, 1])
+        escolha = col_a.selectbox("Destinatários", ["Todas as operações com e-mail"] + list(rot.keys()),
+                                  key="pendencias_destino_email")
+        with col_b:
+            st.markdown("<div style='height:27px'></div>", unsafe_allow_html=True)
+            enviar = st.button("➤ Enviar e-mail", type="primary", use_container_width=True)
+        if enviar:
+            alvos = grupos_com_email if escolha == "Todas as operações com e-mail" else [rot[escolha]]
+            enviados, falhas = 0, []
+            for x in alvos:
+                ok, erros = _enviar_grupo(x, silencioso=True)
+                enviados += ok
+                falhas.extend(erros)
+            if enviados:
+                st.success(f"{enviados} e-mail(s) enviado(s) para {competencia_label}.")
+            for erro in falhas:
+                st.error(erro)
+        if sem_email:
+            st.markdown(
+                "<div style='background:#EAF3FF;border:1px solid #CFE2FF;border-radius:12px;"
+                "padding:17px 20px;margin-top:10px;color:#F02D2D;font-family:Montserrat,sans-serif;"
+                "font-size:15px;font-weight:700;'>"
+                "Não há e-mail cadastrado para: " + ", ".join(sem_email) + "</div>",
+                unsafe_allow_html=True,
+            )
 
 
 def _enviar_grupo(x, silencioso=False):
