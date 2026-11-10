@@ -530,9 +530,24 @@ def page_3():
         "pallet": "<svg viewBox='0 0 48 48' aria-hidden='true'><path d='m5 17 19-10 19 10-19 10Z M5 25l19 10 19-10M5 33l19 10 19-10' fill='none' stroke='currentColor' stroke-width='2.8' stroke-linejoin='round'/><path d='M10 18v7m28-7v7' fill='none' stroke='currentColor' stroke-width='2.4' stroke-linecap='round'/></svg>",
         "saca": "<svg viewBox='0 0 48 48' aria-hidden='true'><path d='M18 7c2 4 10 4 12 0M18 7l-2 7c-5 4-8 11-8 20 0 5 7 7 16 7s16-2 16-7c0-9-3-16-8-20l-2-7M16 14h16' fill='none' stroke='currentColor' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'/></svg>",
     }
-    cols = st.columns(max(len(saldo), 1), gap="large")
-    for i, (_, r) in enumerate(saldo.iterrows()):
-        tipo = r["tipo"]
+    # Exibe somente os três tipos utilizados no controle de devoluções.
+    # A ordenação fixa mantém os cards distribuídos igualmente em três colunas.
+    ordem_tipos = ["GAYLORD", "PALLET", "SACA"]
+    saldo = saldo.copy()
+    saldo["tipo_normalizado"] = saldo["tipo"].astype(str).str.upper().str.strip()
+    saldo = saldo[saldo["tipo_normalizado"].isin(ordem_tipos)].copy()
+    saldo["ordem_exibicao"] = saldo["tipo_normalizado"].map(
+        {tipo: i for i, tipo in enumerate(ordem_tipos)}
+    )
+    saldo = saldo.sort_values("ordem_exibicao")
+
+    cols = st.columns(3, gap="large")
+    for i, tipo_fixo in enumerate(ordem_tipos):
+        linhas_tipo = saldo[saldo["tipo_normalizado"] == tipo_fixo]
+        r = linhas_tipo.iloc[0] if not linhas_tipo.empty else {
+            "tipo": tipo_fixo, "saldo": 0, "enviado": 0, "devolvido": 0
+        }
+        tipo = tipo_fixo
         tipo_chave = str(tipo).strip().lower()
         qtd_saldo = int(r["saldo"])
         valor_unitario = pr.get(tipo, 0)
