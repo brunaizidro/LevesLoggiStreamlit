@@ -207,7 +207,21 @@ def devolucoes_df() -> pd.DataFrame:
         return df
     for c in ("total_declarado", "total_recebido"):
         df[c] = pd.to_numeric(df[c], errors="coerce").fillna(0)
-    df["dt_criacao"] = pd.to_datetime(df["data_criacao"], errors="coerce")
+    # Padroniza status e datas para que históricos antigos também entrem
+    # na conciliação, mesmo quando a planilha contém caixa/ espaços ou datas BR.
+    df["status"] = (
+        df["status"].astype(str).str.strip().str.upper()
+        .str.normalize("NFKD").str.encode("ascii", errors="ignore").str.decode("ascii")
+        .str.replace(" ", "_", regex=False)
+    )
+    df["dt_criacao"] = pd.to_datetime(
+        df["data_criacao"].astype(str).str.strip(),
+        dayfirst=True, errors="coerce"
+    )
+    df["dt_recebimento"] = pd.to_datetime(
+        df["data_recebimento"].astype(str).str.strip(),
+        dayfirst=True, errors="coerce"
+    )
     return df
 
 
@@ -386,7 +400,9 @@ def _recebido_por_chave(cutoff: pd.Timestamp) -> dict:
     d = devs[devs["status"].isin(STATUS_RECEBIDOS)].copy()
     if d.empty:
         return {}
-    d["dt_receb"] = pd.to_datetime(d["data_recebimento"], errors="coerce")
+    # Usa a data de recebimento; em registros históricos sem essa coluna
+    # preenchida, considera a data de criação da devolução já marcada como recebida.
+    d["dt_receb"] = d["dt_recebimento"].fillna(d["dt_criacao"])
     d = d[d["dt_receb"].notna() & (d["dt_receb"] <= cutoff)]
     if d.empty:
         return {}
@@ -500,7 +516,9 @@ def _recebido_por_competencia(mes: str, cutoff: pd.Timestamp) -> dict:
     d = devs[devs["status"].isin(STATUS_RECEBIDOS)].copy()
     if d.empty:
         return {}
-    d["dt_receb"] = pd.to_datetime(d["data_recebimento"], errors="coerce")
+    # Usa a data de recebimento; em registros históricos sem essa coluna
+    # preenchida, considera a data de criação da devolução já marcada como recebida.
+    d["dt_receb"] = d["dt_recebimento"].fillna(d["dt_criacao"])
     d = d[d["dt_receb"].notna() & (d["dt_receb"] <= cutoff)]
     if d.empty:
         return {}
