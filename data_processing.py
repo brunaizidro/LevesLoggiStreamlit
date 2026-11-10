@@ -299,8 +299,11 @@ def competencia_fechavel(mes: str) -> bool:
 
 
 def _cutoff_competencia(mes: str) -> pd.Timestamp:
-    """Corte para contar devoluções da competência: dia 5 do mês seguinte (ou hoje, se antes)."""
-    return min(prazo_devolucao(mes), pd.Timestamp.now())
+    """Corte para contar devoluções: outubro/2026 considera recebimentos até hoje; demais meses seguem o prazo normal."""
+    agora = pd.Timestamp.now()
+    if mes == "2026-10":
+        return agora
+    return min(prazo_devolucao(mes), agora)
 
 
 def _competencia_do_dev(row) -> str:
