@@ -183,7 +183,8 @@ def _aguardando_recebimento(dev: dict) -> bool:
     status = str(dev.get("status", "")).strip().upper()
     if status == dp.STATUS_TRANSITO:
         return True
-    data_receb = str(dev.get("data_recebimento", "") or "").strip()
+    valor_data = dev.get("data_recebimento", "")
+    data_receb = "" if pd.isna(valor_data) else str(valor_data).strip()
     total_receb = pd.to_numeric(dev.get("total_recebido", 0), errors="coerce")
     total_receb = 0 if pd.isna(total_receb) else float(total_receb)
     return status in dp.STATUS_RECEBIDOS and not data_receb and total_receb <= 0
