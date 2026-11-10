@@ -1166,7 +1166,7 @@ def main():
                 "Configurações",
             ]
         elif user.get("perfil") == "gdl":
-            opcoes = ["Envios", "Conciliação", "Devoluções", "Usuários"]
+            opcoes = ["Envios", "Conciliação", "Devoluções", "Pendências", "Usuários"]
         else:
             opcoes = ["Envios", "Devoluções", "Cobranças"]
 
