@@ -325,8 +325,9 @@ def competencias_elegiveis(destino: str) -> list[str]:
     # configurado no servidor Streamlit.
     now = pd.Timestamp.now(tz=TZ).tz_localize(None)
     meses = sorted(set(e["mes"]), reverse=True)
-    # Retorna somente competências dentro do prazo normal de devolução.
-    return [m for m in meses if now <= prazo_devolucao(m)]
+    # Outubro/2026 permanece disponivel para registro excepcional de devolucoes.
+    # Nao altera os prazos de fechamento/cobranca das demais competencias.
+    return [m for m in meses if now <= prazo_devolucao(m) or m == "2026-10"]
 
 
 def pending_mes_tipo(destino: str, mes: str) -> dict:
