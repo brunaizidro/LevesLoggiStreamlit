@@ -494,7 +494,7 @@ def _cobrado_por_competencia(mes: str, ate: bool = True) -> dict:
 
 
 def _recebido_por_competencia(mes: str, cutoff: pd.Timestamp) -> dict:
-    """Qtd recebida por (destino_norm, tipo) das devoluções da competência `mes`, até o corte."""
+    """Qtd efetivamente recebida por competência, até o corte."""
     devs = devolucoes_df()
     its = itens_df()
     if devs.empty or its.empty:
@@ -517,6 +517,28 @@ def _recebido_por_competencia(mes: str, cutoff: pd.Timestamp) -> dict:
     it["destino_norm"] = it["id_devolucao"].map(mapa)
     it = it.dropna(subset=["destino_norm"])
     g = it.groupby(["destino_norm", "tipo"])["q"].sum()
+    return {k: int(v) for k, v in g.items()}
+
+
+def _comprometido_por_competencia(mes: str) -> dict:
+    """Qtd declarada em devoluções não canceladas da competência, inclusive em trânsito."""
+    devs = devolucoes_df()
+    its = itens_df()
+    if devs.empty or its.empty:
+        return {}
+    d = devs[devs["status"].isin(STATUS_COMPROMETIDOS)].copy()
+    if d.empty:
+        return {}
+    d["comp"] = d.apply(_competencia_do_dev, axis=1)
+    d = d[d["comp"] == mes]
+    if d.empty:
+        return {}
+    d["destino_norm"] = d["destino"].map(_normalizar)
+    mapa = d.set_index("id")["destino_norm"].to_dict()
+    it = its[its["id_devolucao"].isin(set(d["id"]))].copy()
+    it["destino_norm"] = it["id_devolucao"].map(mapa)
+    it = it.dropna(subset=["destino_norm"])
+    g = it.groupby(["destino_norm", "tipo"])["qtd_declarada"].sum()
     return {k: int(v) for k, v in g.items()}
 
 
@@ -546,14 +568,18 @@ def conciliacao(mes: str) -> pd.DataFrame:
     disp = envc.groupby("destino_norm")["destino"].first().to_dict()
 
     recebido = _recebido_por_competencia(mes, cutoff)
+    comprometido = _comprometido_por_competencia(mes)
     cobrado_mes = _cobrado_por_competencia(mes, ate=False)
 
     linhas = []
     for (dn, tipo), env_v in enviado.items():
         env_i = int(env_v)
         r = int(recebido.get((dn, tipo), 0))
+        declarado = int(comprometido.get((dn, tipo), 0))
         cb = int(cobrado_mes.get((dn, tipo), 0))
-        em_aberto = max(env_i - r - cb, 0)
+        # O declarado em devoluções ativas (incluindo EM_TRANSITO) já saiu
+        # do saldo cobrável. O recebido é exibido separadamente como efetivado.
+        em_aberto = max(env_i - declarado - cb, 0)
         linhas.append({
             "destino": disp.get(dn, dn), "tipo": tipo, "enviado": env_i,
             "devolvido": min(r, env_i), "cobrado": min(cb, env_i),
