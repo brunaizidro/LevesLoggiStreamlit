@@ -174,9 +174,11 @@ def page_8():
         return
 
     total_leves = len(resumo)
-    devolvidos = int((resumo["Status"] == "Devolvido").sum())
+    # O KPI "Leves que devolveram" inclui devoluções totais e parciais.
+    # "Não devolveram" permanece restrito a operações sem qualquer retorno.
+    devolvidos = int((resumo["_total_devolvido"] > 0).sum())
     parciais = int((resumo["Status"] == "Parcial").sum())
-    nao_devolveram = int((resumo["Status"] == "Não devolveu").sum())
+    nao_devolveram = int((resumo["_total_devolvido"] == 0).sum())
     qtd_devolvida = sum(int(pend.loc[pend["tipo"].astype(str).str.upper() == tipo, "devolvido"].sum())
                         for tipo in ["SACA", "GAYLORD", "PALLET"])
     qtd_pendente = int(resumo["Saldo pendente"].sum())
