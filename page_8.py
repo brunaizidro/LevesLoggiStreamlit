@@ -128,26 +128,10 @@ def page_8():
     </div>
     """, unsafe_allow_html=True)
 
-    user = st.session_state.get("usuario") or {}
-    eh_gdl = user.get("perfil") == "gdl"
-    destino_gdl = str(user.get("destino", "")).strip()
-
     envios = dp.envios_df()
     if envios.empty or "mes" not in envios.columns:
         st.info("Ainda não há envios registrados para consultar.")
         return
-
-    # No perfil GDL, o módulo apresenta exclusivamente os dados da própria operação.
-    if eh_gdl:
-        if not destino_gdl or "destino" not in envios.columns:
-            st.info("Não foi possível identificar a operação vinculada ao seu perfil GDL.")
-            return
-        envios = envios[
-            envios["destino"].map(dp._normalizar) == dp._normalizar(destino_gdl)
-        ].copy()
-        if envios.empty:
-            st.info("Ainda não há envios registrados para a sua operação.")
-            return
 
     meses = sorted(envios["mes"].dropna().astype(str).unique().tolist(), reverse=True)
     if not meses:
@@ -165,31 +149,22 @@ def page_8():
         return
 
     destinos = sorted(pend["destino"].dropna().astype(str).unique().tolist())
-    if eh_gdl:
-        pend = pend[
-            pend["destino"].map(dp._normalizar) == dp._normalizar(destino_gdl)
-        ].copy()
-        with f2:
-            st.text_input("Operação (Leve)", value=destino_gdl, disabled=True)
-        with f3:
-            st.markdown("<div style='height:27px'></div>", unsafe_allow_html=True)
-    else:
-        with f2:
-            destino_filtro = st.selectbox("Operação (Leve)", ["Todas"] + destinos,
-                                          key="pendencias_destino_filtro")
-        with f3:
-            st.markdown("<div style='height:27px'></div>", unsafe_allow_html=True)
-            st.button(
-                "↻ Limpar filtros",
-                use_container_width=True,
-                on_click=_limpar_filtro_pendencias,
-            )
+    with f2:
+        destino_filtro = st.selectbox("Operação (Leve)", ["Todas"] + destinos,
+                                      key="pendencias_destino_filtro")
+    with f3:
+        st.markdown("<div style='height:27px'></div>", unsafe_allow_html=True)
+        st.button(
+            "↻ Limpar filtros",
+            use_container_width=True,
+            on_click=_limpar_filtro_pendencias,
+        )
 
-        if destino_filtro != "Todas":
-            pend = pend[pend["destino"] == destino_filtro].copy()
+    if destino_filtro != "Todas":
+        pend = pend[pend["destino"] == destino_filtro].copy()
 
     if pend.empty:
-        st.info("Não há pendências para a sua operação nesta competência." if eh_gdl else "Não há dados para os filtros selecionados.")
+        st.info("Não há dados para os filtros selecionados.")
         return
 
     precos = dp.precos()
