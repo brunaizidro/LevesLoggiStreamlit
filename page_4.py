@@ -13,6 +13,7 @@ from __future__ import annotations
 from datetime import datetime
 
 import streamlit as st
+import pandas as pd
 
 import data_extraction as dados
 import data_processing as dp
@@ -177,6 +178,17 @@ hr { border-color:#DCE7F6 !important; margin:22px 0 !important; }
     )
 
 
+def _aguardando_recebimento(dev: dict) -> bool:
+    """Inclui registros com status recebido, mas sem dados de recebimento gravados."""
+    status = str(dev.get("status", "")).strip().upper()
+    if status == dp.STATUS_TRANSITO:
+        return True
+    data_receb = str(dev.get("data_recebimento", "") or "").strip()
+    total_receb = pd.to_numeric(dev.get("total_recebido", 0), errors="coerce")
+    total_receb = 0 if pd.isna(total_receb) else float(total_receb)
+    return status in dp.STATUS_RECEBIDOS and not data_receb and total_receb <= 0
+
+
 def _confirmar(dev: dict, itens: list[dict], recebidos: dict | None, quem: str):
     """Grava o recebimento.
 
@@ -254,7 +266,7 @@ def _card_devolucao(dev: dict, quem: str):
     if dev.get("local_devolucao"):
         st.caption(f"Local de devolução: {dev.get('local_devolucao')}")
 
-    if dev.get("status") != dp.STATUS_TRANSITO:
+    if not _aguardando_recebimento(dev):
         st.warning(
             f"Esta devolução já está **{dp.STATUS_LABEL.get(dev['status'], dev['status'])}**"
             + (f" — recebida em {dev.get('data_recebimento','')} por {dev.get('recebido_por','')}."
@@ -361,7 +373,7 @@ def page_4(scan_id: str | None = None, scan_token: str | None = None):
     if devs.empty:
         st.info("Nenhuma devolução registrada.")
         return
-    pendentes = devs[devs["status"] == dp.STATUS_TRANSITO].sort_values("dt_criacao")
+    pendentes = devs[devs.apply(lambda r: _aguardando_recebimento(r.to_dict()), axis=1)].sort_values("dt_criacao")
     if pendentes.empty:
         st.success("Nenhuma devolução em trânsito no momento.")
         return
