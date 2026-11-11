@@ -120,6 +120,31 @@ def diagnosticar_autenticacao() -> dict:
         "detalhe": resultados
     }
 
+def diagnosticar_tcp() -> list[dict]:
+    """Testa apenas a abertura TCP até o Gmail, sem autenticar ou enviar mensagens."""
+    import socket
+
+    host = str(config_smtp().get("smtp_host", "")).strip() or "smtp.gmail.com"
+    resultados = []
+    for porta in (587, 465):
+        try:
+            with socket.create_connection((host, porta), timeout=10):
+                resultados.append({
+                    "porta": porta,
+                    "ok": True,
+                    "etapa": "TCP",
+                    "detalhe": "Conexão TCP estabelecida."
+                })
+        except Exception as e:
+            resultados.append({
+                "porta": porta,
+                "ok": False,
+                "etapa": "TCP",
+                "detalhe": f"{type(e).__name__}: {e}"
+            })
+    return resultados
+
+
 def diagnosticar_conexao() -> list[dict]:
     """Testa conectividade e negociação TLS nas portas 587 e 465, sem autenticar ou enviar."""
     c = config_smtp()
