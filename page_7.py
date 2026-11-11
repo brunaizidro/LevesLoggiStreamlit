@@ -117,10 +117,12 @@ def page_7():
     if st.button("Testar autenticação SMTP", key="testar_auth_smtp", width="stretch"):
         with st.spinner("Validando autenticação SMTP..."):
             resultado_auth = emailer.diagnosticar_autenticacao()
-        if resultado_auth["ok"]:
-            st.success(resultado_auth["detalhe"])
-        else:
-            st.error(f"{resultado_auth['etapa']}: {resultado_auth['detalhe']}")
+        for teste in resultado_auth["detalhe"]:
+            titulo = f"Porta {teste['porta']} — {teste['modo']}"
+            if teste["ok"]:
+                st.success(f"{titulo}: {teste['detalhe']}")
+            else:
+                st.error(f"{titulo}: {teste['detalhe']}")
 
     st.divider()
     st.markdown("#### Testar envio")
