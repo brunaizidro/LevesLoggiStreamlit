@@ -15,6 +15,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 import auth
+import emailer
 import data_extraction as dados
 import data_processing as dp
 
