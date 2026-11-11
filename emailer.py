@@ -70,6 +70,65 @@ def _abrir_conexao(c: dict):
                 pass
         raise
 
+def diagnosticar_conexao() -> list[dict]:
+    """Testa conectividade e negociação TLS nas portas 587 e 465, sem autenticar ou enviar."""
+    c = config_smtp()
+    host = str(c.get("smtp_host", "")).strip()
+    if not host:
+        return [{"porta": "-", "ok": False, "etapa": "configuração", "detalhe": "Host SMTP não informado."}]
+
+    resultados = []
+    contexto = ssl.create_default_context()
+
+    # Porta 587: SMTP simples seguido de STARTTLS.
+    server = None
+    try:
+        server = smtplib.SMTP(host, 587, timeout=12)
+        server.ehlo()
+        code, resposta = server.starttls(context=contexto)
+        server.ehlo()
+        resultados.append({
+            "porta": 587, "ok": code == 220, "etapa": "STARTTLS",
+            "detalhe": f"TLS negociado (resposta {code})."
+        })
+    except Exception as e:
+        resultados.append({
+            "porta": 587, "ok": False, "etapa": "conexão/STARTTLS",
+            "detalhe": f"{type(e).__name__}: {e}"
+        })
+    finally:
+        if server is not None:
+            try:
+                server.quit()
+            except Exception:
+                pass
+
+    # Porta 465: SSL desde o início.
+    server_ssl = None
+    try:
+        server_ssl = smtplib.SMTP_SSL(
+            host, 465, timeout=12, context=contexto
+        )
+        code, resposta = server_ssl.noop()
+        resultados.append({
+            "porta": 465, "ok": code == 250, "etapa": "SSL",
+            "detalhe": f"Conexão SSL estabelecida (resposta {code})."
+        })
+    except Exception as e:
+        resultados.append({
+            "porta": 465, "ok": False, "etapa": "conexão SSL",
+            "detalhe": f"{type(e).__name__}: {e}"
+        })
+    finally:
+        if server_ssl is not None:
+            try:
+                server_ssl.quit()
+            except Exception:
+                pass
+
+    return resultados
+
+
 def enviar_email(
     destinatario: str,
     assunto: str,
