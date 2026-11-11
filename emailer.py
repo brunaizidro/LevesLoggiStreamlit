@@ -176,6 +176,78 @@ def diagnosticar_autenticacao() -> dict:
         "detalhe": resultados
     }
 
+
+def diagnosticar_mecanismos_auth() -> dict:
+    """Testa LOGIN e PLAIN em sessões independentes, sem registrar credenciais."""
+    c = config_smtp()
+    host = str(c.get("smtp_host", "")).strip() or "smtp.gmail.com"
+    user = str(c.get("smtp_user", "")).strip()
+    pwd = str(c.get("smtp_password", ""))
+    port = int(str(c.get("smtp_port", "587")).strip() or 587)
+    usar_tls = str(c.get("smtp_tls", "true")).strip().lower() in ("true", "1", "sim", "yes", "on")
+
+    if not user or not pwd:
+        return {"ok": False, "erro": "Usuário ou senha SMTP não configurados."}
+
+    resultados = []
+    for mecanismo in ("LOGIN", "PLAIN"):
+        server = None
+        try:
+            contexto = ssl.create_default_context()
+            if port == 465:
+                server = smtplib.SMTP_SSL(host, port, timeout=20, context=contexto)
+            else:
+                server = smtplib.SMTP(host, port, timeout=20)
+                server.ehlo()
+                if usar_tls:
+                    server.starttls(context=contexto)
+            code, _ = server.ehlo()
+            anunciado = server.esmtp_features.get("auth", "").upper().split()
+            if mecanismo not in anunciado:
+                resultados.append({
+                    "mecanismo": mecanismo, "ok": False,
+                    "etapa": "verificação",
+                    "detalhe": "Mecanismo não anunciado pelo servidor."
+                })
+                continue
+            # Cada mecanismo usa uma conexão nova. Não ativar debug SMTP:
+            # isso poderia expor material de autenticação nos logs.
+            code, resposta = server.auth(
+                mecanismo,
+                getattr(server, "auth_" + mecanismo.lower()),
+                initial_response_ok=(mecanismo == "PLAIN"),
+            )
+            resultados.append({
+                "mecanismo": mecanismo,
+                "ok": code == 235,
+                "codigo_smtp": code,
+                "etapa": "autenticação",
+                "detalhe": "Autenticação aceita." if code == 235 else "Servidor não aceitou a autenticação.",
+            })
+        except Exception as e:
+            resultados.append({
+                "mecanismo": mecanismo, "ok": False,
+                "etapa": "conexão/autenticação",
+                "erro": f"{type(e).__name__}: {e}",
+            })
+        finally:
+            if server is not None:
+                try:
+                    server.quit()
+                except Exception:
+                    try:
+                        server.close()
+                    except Exception:
+                        pass
+
+    return {
+        "ok": any(item.get("ok") for item in resultados),
+        "host": host,
+        "porta": port,
+        "usuario_configurado": bool(user),
+        "testes": resultados,
+    }
+
 def diagnosticar_tcp() -> list[dict]:
     """Testa apenas a abertura TCP até o Gmail, sem autenticar ou enviar mensagens."""
     import socket
