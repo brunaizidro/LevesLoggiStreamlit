@@ -163,6 +163,29 @@ def page_2():
     if eh_gdl:
         st.info("Perfil GDL: você pode cadastrar e ativar/desativar apenas usuários com perfil Operação.")
 
+    if eh_admin:
+        with st.expander("🛠️ Diagnóstico de e-mail (SMTP)", expanded=False):
+            st.caption(
+                "Testes seguros: não enviam mensagens e não exibem a senha SMTP. "
+                "Execute primeiro o teste TCP; depois, se necessário, o teste de TLS."
+            )
+            col_tcp, col_tls, col_auth = st.columns(3)
+            if col_tcp.button("Testar TCP", key="diag_smtp_tcp"):
+                st.session_state["diag_smtp_tcp_result"] = emailer.diagnosticar_tcp()
+            if col_tls.button("Testar TLS", key="diag_smtp_tls"):
+                st.session_state["diag_smtp_tls_result"] = emailer.diagnosticar_conexao()
+            if col_auth.button("Testar autenticação", key="diag_smtp_auth"):
+                st.session_state["diag_smtp_auth_result"] = emailer.diagnosticar_autenticacao()
+
+            for chave, titulo in (
+                ("diag_smtp_tcp_result", "Resultado TCP"),
+                ("diag_smtp_tls_result", "Resultado TLS"),
+                ("diag_smtp_auth_result", "Resultado de autenticação"),
+            ):
+                if chave in st.session_state:
+                    st.markdown(f"**{titulo}**")
+                    st.json(st.session_state[chave])
+
     with st.expander("📥 Importar usuários em massa (CSV)"):
         _importar_massa(eh_gdl=eh_gdl)
 
