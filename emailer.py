@@ -210,8 +210,11 @@ def diagnosticar_mecanismos_auth() -> dict:
                     "detalhe": "Mecanismo não anunciado pelo servidor."
                 })
                 continue
-            # Cada mecanismo usa uma conexão nova. Não ativar debug SMTP:
+            # smtplib.auth_LOGIN/auth_PLAIN leem estas credenciais
+            # dos atributos da própria conexão. Não ativar debug SMTP:
             # isso poderia expor material de autenticação nos logs.
+            server.user = user
+            server.password = pwd
             code, resposta = server.auth(
                 mecanismo,
                 getattr(server, "auth_" + mecanismo.lower()),
