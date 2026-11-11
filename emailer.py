@@ -72,31 +72,53 @@ def _abrir_conexao(c: dict):
 
 
 def diagnosticar_autenticacao() -> dict:
-    """Valida login SMTP sem enviar mensagem."""
-    server = None
-    try:
-        server = _abrir_conexao(config_smtp())
-        code, resposta = server.noop()
-        return {
-            "ok": code == 250,
-            "etapa": "autenticação",
-            "detalhe": f"Login SMTP aceito; NOOP respondeu {code}."
-        }
-    except Exception as e:
-        return {
-            "ok": False,
-            "etapa": "autenticação",
-            "detalhe": f"{type(e).__name__}: {e}"
-        }
-    finally:
-        if server is not None:
-            try:
-                server.quit()
-            except Exception:
+    """Testa autenticação SMTP nas duas combinações Gmail, sem enviar mensagem."""
+    c = config_smtp()
+    host = str(c.get("smtp_host", "")).strip()
+    user = str(c.get("smtp_user", "")).strip()
+    pwd = str(c.get("smtp_password", ""))
+    if not host or not user or not pwd:
+        return {"ok": False, "etapa": "configuração", "detalhe": "Host, usuário ou senha SMTP não preenchido."}
+
+    resultados = []
+    contexto = ssl.create_default_context()
+    for porta in (587, 465):
+        server = None
+        modo = "STARTTLS" if porta == 587 else "SSL"
+        try:
+            if porta == 465:
+                server = smtplib.SMTP_SSL(host, 465, timeout=20, context=contexto)
+            else:
+                server = smtplib.SMTP(host, 587, timeout=20)
+                server.ehlo()
+                server.starttls(context=contexto)
+                server.ehlo()
+            server.login(user, pwd)
+            code, resposta = server.noop()
+            resultados.append({
+                "porta": porta, "modo": modo, "ok": code == 250,
+                "detalhe": f"Autenticação aceita; NOOP respondeu {code}."
+            })
+        except Exception as e:
+            resultados.append({
+                "porta": porta, "modo": modo, "ok": False,
+                "detalhe": f"{type(e).__name__}: {e}"
+            })
+        finally:
+            if server is not None:
                 try:
-                    server.close()
+                    server.quit()
                 except Exception:
-                    pass
+                    try:
+                        server.close()
+                    except Exception:
+                        pass
+
+    return {
+        "ok": any(item["ok"] for item in resultados),
+        "etapa": "autenticação SMTP",
+        "detalhe": resultados
+    }
 
 def diagnosticar_conexao() -> list[dict]:
     """Testa conectividade e negociação TLS nas portas 587 e 465, sem autenticar ou enviar."""
