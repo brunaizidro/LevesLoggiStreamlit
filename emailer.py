@@ -71,6 +71,62 @@ def _abrir_conexao(c: dict):
         raise
 
 
+def diagnosticar_auth_detalhado() -> dict:
+    """Inspeciona EHLO e mecanismos AUTH sem registrar senha ou tráfego SMTP."""
+    c = config_smtp()
+    host = str(c.get("smtp_host", "")).strip() or "smtp.gmail.com"
+    user = str(c.get("smtp_user", "")).strip()
+    pwd = str(c.get("smtp_password", ""))
+    port = int(str(c.get("smtp_port", "587")).strip() or 587)
+    usar_ssl = port == 465
+    server = None
+    resultado = {
+        "host_configurado": bool(host),
+        "usuario_configurado": bool(user),
+        "senha_app_configurada": bool(pwd),
+        "usuario_igual_remetente": bool(user) and user.lower() == str(c.get("smtp_from", "")).strip().lower(),
+        "porta_configurada": port,
+    }
+    try:
+        contexto = ssl.create_default_context()
+        if usar_ssl:
+            server = smtplib.SMTP_SSL(host, port, timeout=20, context=contexto)
+        else:
+            server = smtplib.SMTP(host, port, timeout=20)
+            server.ehlo()
+            if str(c.get("smtp_tls", "true")).strip().lower() in ("true", "1", "sim", "yes", "on"):
+                server.starttls(context=contexto)
+        code, _ = server.ehlo()
+        auth = server.esmtp_features.get("auth", "")
+        resultado.update({
+            "ehlo_ok": code == 250,
+            "auth_anunciado_pelo_servidor": bool(auth),
+            "mecanismos_auth_anunciados": auth.split() if auth else [],
+            "etapa": "EHLO/TLS concluídos; iniciando autenticação",
+        })
+        if not user or not pwd:
+            resultado.update({"autenticacao_ok": False, "erro": "Usuário ou senha SMTP não configurados."})
+            return resultado
+        server.login(user, pwd)
+        resultado.update({"autenticacao_ok": True, "etapa": "Autenticação concluída"})
+    except Exception as e:
+        resultado.update({
+            "autenticacao_ok": False,
+            "etapa": resultado.get("etapa", "abertura/TLS/EHLO"),
+            "erro": f"{type(e).__name__}: {e}",
+        })
+    finally:
+        if server is not None:
+            try:
+                server.quit()
+            except Exception:
+                try:
+                    server.close()
+                except Exception:
+                    pass
+    return resultado
+
+
 def diagnosticar_autenticacao() -> dict:
     """Testa autenticação SMTP nas duas combinações Gmail, sem enviar mensagem."""
     c = config_smtp()
