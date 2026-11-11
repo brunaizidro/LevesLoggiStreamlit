@@ -177,6 +177,8 @@ def page_2():
                 st.session_state["diag_smtp_tls_result"] = emailer.diagnosticar_conexao()
             if col_auth.button("Testar autenticação", key="diag_smtp_auth"):
                 st.session_state["diag_smtp_auth_result"] = emailer.diagnosticar_autenticacao()
+            if st.button("Testar LOGIN e PLAIN", key="diag_smtp_auth_methods"):
+                st.session_state["diag_smtp_auth_methods_result"] = emailer.diagnosticar_mecanismos_auth()
             if st.button("Inspecionar AUTH (sem exibir senha)", key="diag_smtp_auth_detail"):
                 st.session_state["diag_smtp_auth_detail_result"] = emailer.diagnosticar_auth_detalhado()
 
@@ -184,6 +186,7 @@ def page_2():
                 ("diag_smtp_tcp_result", "Resultado TCP"),
                 ("diag_smtp_tls_result", "Resultado TLS"),
                 ("diag_smtp_auth_result", "Resultado de autenticação"),
+                ("diag_smtp_auth_methods_result", "Teste dos mecanismos LOGIN e PLAIN"),
                 ("diag_smtp_auth_detail_result", "Inspeção dos mecanismos AUTH"),
             ):
                 if chave in st.session_state:
