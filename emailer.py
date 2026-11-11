@@ -26,21 +26,49 @@ def smtp_configurado() -> bool:
 
 
 def _abrir_conexao(c: dict):
+    """Abre conexão SMTP respeitando o modo de segurança da porta configurada.
+
+    Porta 465 usa SSL desde o início. Outras portas usam SMTP e STARTTLS
+    quando smtp_tls estiver habilitado (padrão para a porta 587).
+    """
     host = str(c.get("smtp_host", "")).strip()
     port = int(str(c.get("smtp_port", "587")).strip() or 587)
-    usar_tls = str(c.get("smtp_tls", "true")).strip().lower() in ("true", "1", "sim")
-    if port == 465:
-        server = smtplib.SMTP_SSL(host, port, timeout=20, context=ssl.create_default_context())
-    else:
-        server = smtplib.SMTP(host, port, timeout=20)
-        if usar_tls:
-            server.starttls(context=ssl.create_default_context())
-    user = str(c.get("smtp_user", "")).strip()
-    pwd = str(c.get("smtp_password", ""))
-    if user:
-        server.login(user, pwd)
-    return server
+    usar_tls = str(c.get("smtp_tls", "true")).strip().lower() in (
+        "true", "1", "sim", "yes", "on"
+    )
 
+    if not host:
+        raise ValueError("Host SMTP não informado na aba Config.")
+    if not 1 <= port <= 65535:
+        raise ValueError(f"Porta SMTP inválida: {port}.")
+
+    contexto = ssl.create_default_context()
+    server = None
+    try:
+        if port == 465:
+            server = smtplib.SMTP_SSL(
+                host, port, timeout=30, context=contexto
+            )
+        else:
+            server = smtplib.SMTP(host, port, timeout=30)
+            server.ehlo()
+            if usar_tls:
+                server.starttls(context=contexto)
+                server.ehlo()
+
+        user = str(c.get("smtp_user", "")).strip()
+        pwd = str(c.get("smtp_password", ""))
+        if user:
+            server.login(user, pwd)
+
+        return server
+    except Exception:
+        if server is not None:
+            try:
+                server.close()
+            except Exception:
+                pass
+        raise
 
 def enviar_email(
     destinatario: str,
