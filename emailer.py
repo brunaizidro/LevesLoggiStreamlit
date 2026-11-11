@@ -70,6 +70,34 @@ def _abrir_conexao(c: dict):
                 pass
         raise
 
+
+def diagnosticar_autenticacao() -> dict:
+    """Valida login SMTP sem enviar mensagem."""
+    server = None
+    try:
+        server = _abrir_conexao(config_smtp())
+        code, resposta = server.noop()
+        return {
+            "ok": code == 250,
+            "etapa": "autenticação",
+            "detalhe": f"Login SMTP aceito; NOOP respondeu {code}."
+        }
+    except Exception as e:
+        return {
+            "ok": False,
+            "etapa": "autenticação",
+            "detalhe": f"{type(e).__name__}: {e}"
+        }
+    finally:
+        if server is not None:
+            try:
+                server.quit()
+            except Exception:
+                try:
+                    server.close()
+                except Exception:
+                    pass
+
 def diagnosticar_conexao() -> list[dict]:
     """Testa conectividade e negociação TLS nas portas 587 e 465, sem autenticar ou enviar."""
     c = config_smtp()
@@ -172,9 +200,12 @@ def enviar_email(
         destinatarios_smtp.append(EMAIL_COPIA_FIXA)
 
     server = None
+    etapa = "abertura da conexão/autenticação SMTP"
     try:
         server = _abrir_conexao(c)
+        etapa = "envio da mensagem (MAIL FROM/RCPT TO/DATA)"
         resultado = server.sendmail(remetente, destinatarios_smtp, msg.as_string())
+        etapa = "encerramento da sessão SMTP"
         server.quit()
         if resultado:
             return False, f"SMTP não aceitou todos os destinatários: {resultado}"
@@ -182,10 +213,10 @@ def enviar_email(
     except Exception as e:
         if server is not None:
             try:
-                server.quit()
+                server.close()
             except Exception:
                 pass
-        return False, f"Falha ao enviar para {destinatario}: {e}"
+        return False, f"Falha na etapa '{etapa}' para {destinatario}: {type(e).__name__}: {e}"
 
 
 def email_suporte() -> str:
