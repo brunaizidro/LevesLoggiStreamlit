@@ -184,6 +184,7 @@ def page_2():
                 ("diag_smtp_tcp_result", "Resultado TCP"),
                 ("diag_smtp_tls_result", "Resultado TLS"),
                 ("diag_smtp_auth_result", "Resultado de autenticação"),
+                ("diag_smtp_auth_detail_result", "Inspeção dos mecanismos AUTH"),
             ):
                 if chave in st.session_state:
                     st.markdown(f"**{titulo}**")
