@@ -177,6 +177,8 @@ def page_2():
                 st.session_state["diag_smtp_tls_result"] = emailer.diagnosticar_conexao()
             if col_auth.button("Testar autenticação", key="diag_smtp_auth"):
                 st.session_state["diag_smtp_auth_result"] = emailer.diagnosticar_autenticacao()
+            if st.button("Inspecionar AUTH (sem exibir senha)", key="diag_smtp_auth_detail"):
+                st.session_state["diag_smtp_auth_detail_result"] = emailer.diagnosticar_auth_detalhado()
 
             for chave, titulo in (
                 ("diag_smtp_tcp_result", "Resultado TCP"),
