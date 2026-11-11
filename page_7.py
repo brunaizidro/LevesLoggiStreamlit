@@ -97,6 +97,21 @@ def page_7():
         st.rerun()
 
     st.divider()
+    st.markdown("#### Diagnóstico de conexão SMTP")
+    st.caption("Verifica as portas 587 (STARTTLS) e 465 (SSL), sem autenticar e sem enviar e-mail.")
+    if st.button("Diagnosticar conexão SMTP", key="diagnosticar_smtp", width="stretch"):
+        with st.spinner("Testando conexão com o servidor SMTP..."):
+            resultados = emailer.diagnosticar_conexao()
+        for resultado in resultados:
+            titulo = f"Porta {resultado['porta']} — {resultado['etapa']}"
+            if resultado["ok"]:
+                st.success(f"{titulo}: {resultado['detalhe']}")
+            else:
+                st.error(f"{titulo}: {resultado['detalhe']}")
+        if not any(item["ok"] for item in resultados):
+            st.warning("As duas tentativas falharam. Isso pode indicar bloqueio de saída SMTP na hospedagem ou indisponibilidade do servidor.")
+
+    st.divider()
     st.markdown("#### Testar envio")
     if not emailer.smtp_configurado():
         st.info("Preencha e salve o SMTP acima antes de testar.")
