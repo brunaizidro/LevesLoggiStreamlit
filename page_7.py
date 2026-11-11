@@ -112,6 +112,17 @@ def page_7():
             st.warning("As duas tentativas falharam. Isso pode indicar bloqueio de saída SMTP na hospedagem ou indisponibilidade do servidor.")
 
     st.divider()
+    st.markdown("#### Testar autenticação SMTP")
+    st.caption("Valida usuário e senha no Google sem enviar e-mail.")
+    if st.button("Testar autenticação SMTP", key="testar_auth_smtp", width="stretch"):
+        with st.spinner("Validando autenticação SMTP..."):
+            resultado_auth = emailer.diagnosticar_autenticacao()
+        if resultado_auth["ok"]:
+            st.success(resultado_auth["detalhe"])
+        else:
+            st.error(f"{resultado_auth['etapa']}: {resultado_auth['detalhe']}")
+
+    st.divider()
     st.markdown("#### Testar envio")
     if not emailer.smtp_configurado():
         st.info("Preencha e salve o SMTP acima antes de testar.")
