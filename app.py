@@ -1033,6 +1033,10 @@ def tela_login():
 
                 if not st.session_state.get("recuperacao_codigo_enviado"):
                     with st.form("solicitar_recuperacao"):
+                        usuario_rec = st.text_input(
+                            "Usuário",
+                            placeholder="Digite seu login (ex.: TF3)",
+                        )
                         email_rec = st.text_input(
                             "E-mail cadastrado",
                             placeholder="Digite seu e-mail",
@@ -1044,15 +1048,19 @@ def tela_login():
                         )
 
                     if enviar_codigo:
-                        if not (email_rec or "").strip() or "@" not in email_rec:
+                        if not (usuario_rec or "").strip():
+                            st.error("Digite seu usuário.")
+                        elif not (email_rec or "").strip() or "@" not in email_rec:
                             st.error("Digite um endereço de e-mail válido.")
                         else:
                             try:
-                                ok, mensagem, usuario_encontrado = auth.solicitar_recuperacao_por_email(email_rec)
+                                ok, mensagem, usuario_encontrado = auth.solicitar_recuperacao_por_email(
+                                    email_rec, usuario_rec
+                                )
                                 if ok and usuario_encontrado:
                                     st.session_state["recuperacao_usuario"] = usuario_encontrado
                                     st.session_state["recuperacao_codigo_enviado"] = True
-                                    st.success("Código solicitado. Confira sua caixa de entrada e o spam.")
+                                    st.success("Código enviado. Confira sua caixa de entrada e o spam.")
                                     st.rerun()
                                 elif ok:
                                     st.info(mensagem)
