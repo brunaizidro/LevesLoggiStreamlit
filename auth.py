@@ -297,7 +297,7 @@ def _enviar_email_recuperacao(
               <tr>
                 <td align="center" style="background-color:#0866e9;padding:25px 24px 23px;">
                   <img src="{emailer.LOGO_URL}" width="150" alt="Loggi" style="display:block;width:150px;max-width:100%;height:auto;border:0;outline:none;text-decoration:none;filter:brightness(0) invert(1);">
-                  <div style="padding-top:13px;color:#ffffff;font-size:15px;font-weight:700;letter-spacing:1.8px;">PORTAL LEVES</div>
+                  <div style="padding-top:13px;color:#ffffff;font-size:15px;font-weight:700;letter-spacing:1.8px;">Portal Leves</div>
                 </td>
               </tr>
               <tr>
@@ -338,7 +338,7 @@ def _enviar_email_recuperacao(
                 <td style="background-color:#eaf3ff;padding:18px 26px;">
                   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                     <tr>
-                      <td align="left" valign="middle" style="color:#0866e9;font-size:15px;font-weight:700;letter-spacing:1px;">PORTAL LEVES</td>
+                      <td align="left" valign="middle" style="color:#0866e9;font-size:15px;font-weight:700;letter-spacing:1px;">Portal Leves</td>
                       <td align="right" valign="middle" style="color:#7894b8;font-size:12px;">Loggi</td>
                     </tr>
                   </table>
