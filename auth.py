@@ -329,12 +329,14 @@ def _enviar_email_recuperacao(
 
 
 
-def buscar_usuario_por_email(email: str) -> dict | None:
-    """Localiza uma conta ativa pelo e-mail cadastrado."""
+def buscar_usuario_por_email(email: str, usuario: str) -> dict | None:
+    """Localiza a conta ativa pelo par login + e-mail, permitindo e-mail compartilhado."""
     email = (email or "").strip().lower()
-    if not email or "@" not in email:
+    usuario = (usuario or "").strip().lower()
+    if not email or "@" not in email or not usuario:
         return None
 
+    # Evita usar uma lista de usuários desatualizada durante a recuperação.
     try:
         sheets.ler_usuarios.clear()
     except Exception:
@@ -343,19 +345,24 @@ def buscar_usuario_por_email(email: str) -> dict | None:
     encontrados = [
         u for u in sheets.ler_usuarios()
         if u.get("ativo")
+        and str(u.get("usuario", "")).strip().lower() == usuario
         and str(u.get("email", "")).strip().lower() == email
     ]
     return encontrados[0] if len(encontrados) == 1 else None
 
 
-def solicitar_recuperacao_por_email(email: str) -> tuple[bool, str, str]:
-    """Solicita recuperação a partir do e-mail cadastrado."""
-    u = buscar_usuario_por_email(email)
+def solicitar_recuperacao_por_email(
+    email: str,
+    usuario: str,
+) -> tuple[bool, str, str]:
+    """Solicita recuperação validando o login e o e-mail da mesma conta."""
+    u = buscar_usuario_por_email(email, usuario)
     mensagem = (
-        "Se houver uma conta ativa vinculada a esse e-mail, "
-        "enviaremos um código de recuperação."
+        "Se os dados informados corresponderem a uma conta ativa, "
+        "enviaremos um código de recuperação para o e-mail cadastrado."
     )
     if not u:
+        # Resposta genérica para não revelar se o login ou o e-mail existe.
         return True, mensagem, ""
 
     ok, retorno = solicitar_recuperacao(u["usuario"])
