@@ -279,18 +279,78 @@ def _enviar_email_recuperacao(
             + ", ".join(faltantes)
         )
 
+    # Template responsivo e compatível com clientes de e-mail (tabelas + CSS inline).
+    # Usa o mesmo símbolo da Loggi já utilizado nos demais e-mails do portal.
     corpo_html = f"""
-    <div style="font-family:Arial,sans-serif;color:#172033;max-width:560px;margin:auto">
-      <div style="font-size:24px;font-weight:800;color:#0067fc">loggi</div>
-      <div style="color:#6e6e6e;letter-spacing:2px;text-transform:uppercase;font-size:11px;margin:4px 0 20px">Portal LEVES</div>
-      <p>Olá, {escape(nome or "usuário")}!</p>
-      <p>Recebemos uma solicitação para redefinir sua senha do Portal LEVES.</p>
-      <p>Seu código de recuperação é:</p>
-      <div style="font-size:30px;font-weight:bold;letter-spacing:7px;color:#0067fc;padding:12px 0">{escape(codigo)}</div>
-      <p>O código é válido por 15 minutos e pode ser utilizado uma única vez.</p>
-      <p>Se você não solicitou a redefinição, ignore este e-mail.</p>
-      <p style="color:#6e6e6e;font-size:12px;margin-top:24px">Portal LEVES · Loggi</p>
-    </div>
+    <!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Portal Leves | Redefinição de senha</title>
+    </head>
+    <body style="margin:0;padding:0;background-color:#f3f6fb;font-family:Arial,Helvetica,sans-serif;color:#172b4d;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f3f6fb;padding:28px 12px;">
+        <tr>
+          <td align="center">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:620px;background-color:#ffffff;border:1px solid #e1e9f5;border-radius:16px;overflow:hidden;">
+              <tr>
+                <td align="center" style="background-color:#0866e9;padding:25px 24px 23px;">
+                  <img src="{emailer.LOGO_URL}" width="150" alt="Loggi" style="display:block;width:150px;max-width:100%;height:auto;border:0;outline:none;text-decoration:none;filter:brightness(0) invert(1);">
+                  <div style="padding-top:13px;color:#ffffff;font-size:15px;font-weight:700;letter-spacing:1.8px;">PORTAL LEVES</div>
+                </td>
+              </tr>
+              <tr>
+                <td align="center" style="padding:34px 34px 10px;">
+                  <div style="width:64px;height:64px;line-height:64px;border-radius:16px;background-color:#eaf3ff;color:#0866e9;font-size:34px;text-align:center;">&#128273;</div>
+                  <h1 style="margin:20px 0 5px;color:#172b4d;font-size:27px;line-height:1.25;font-weight:700;">Redefinição de senha</h1>
+                  <p style="margin:0;color:#718096;font-size:16px;line-height:1.5;">Portal Leves</p>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:22px 38px 8px;">
+                  <p style="margin:0 0 16px;color:#172b4d;font-size:17px;line-height:1.6;">Olá, <strong>{escape(nome or "usuário")}</strong>!</p>
+                  <p style="margin:0 0 22px;color:#526176;font-size:15px;line-height:1.7;">Recebemos uma solicitação para redefinir sua senha de acesso ao Portal Leves.</p>
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#edf5ff;border:1px solid #d9eaff;border-radius:14px;">
+                    <tr>
+                      <td align="center" style="padding:20px 14px 22px;">
+                        <p style="margin:0 0 9px;color:#526176;font-size:15px;line-height:1.5;">Seu código de recuperação é:</p>
+                        <p style="margin:0;color:#075be8;font-size:38px;line-height:1.25;font-weight:700;letter-spacing:9px;">{escape(codigo)}</p>
+                      </td>
+                    </tr>
+                  </table>
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:22px;">
+                    <tr>
+                      <td width="34" valign="top" style="padding:2px 8px 12px 0;color:#0866e9;font-size:20px;">&#9201;</td>
+                      <td valign="top" style="padding:0 0 12px;color:#526176;font-size:14px;line-height:1.6;">O código é válido por <strong style="color:#075be8;">15 minutos</strong>.</td>
+                    </tr>
+                    <tr>
+                      <td width="34" valign="top" style="padding:0 8px 4px 0;color:#0866e9;font-size:20px;">&#128274;</td>
+                      <td valign="top" style="padding:0 0 4px;color:#526176;font-size:14px;line-height:1.6;">Ele pode ser utilizado apenas uma única vez.</td>
+                    </tr>
+                  </table>
+                  <div style="border-top:1px solid #e5edf7;margin:22px 0 0;padding:19px 0 4px;text-align:center;">
+                    <p style="margin:0;color:#718096;font-size:13px;line-height:1.7;">Se você não solicitou a redefinição, ignore este e-mail.</p>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="background-color:#eaf3ff;padding:18px 26px;">
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                      <td align="left" valign="middle" style="color:#0866e9;font-size:15px;font-weight:700;letter-spacing:1px;">PORTAL LEVES</td>
+                      <td align="right" valign="middle" style="color:#7894b8;font-size:12px;">Loggi</td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+            <p style="margin:16px 0 0;color:#98a6b8;font-size:11px;line-height:1.5;text-align:center;">Mensagem automática do Portal Leves. Não é necessário responder.</p>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
     """
 
     remetente = str(cfg.get("smtp_from", "")).strip() or str(cfg.get("smtp_user", "")).strip()
