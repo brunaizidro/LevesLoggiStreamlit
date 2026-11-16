@@ -296,13 +296,13 @@ def _enviar_email_recuperacao(
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:620px;background-color:#ffffff;border:1px solid #e1e9f5;border-radius:16px;overflow:hidden;">
               <tr>
                 <td align="center" style="background-color:#0866e9;padding:25px 24px 23px;">
-                  <img src="{emailer.LOGO_URL}" width="150" alt="Loggi" style="display:block;width:150px;max-width:100%;height:auto;border:0;outline:none;text-decoration:none;filter:brightness(0) invert(1);">
+                  <img src="https://raw.githubusercontent.com/brunaizidro/LevesLoggiStreamlit/master/image_loggi_branco.png" width="150" alt="Loggi" style="display:block;width:150px;max-width:100%;height:auto;border:0;outline:none;text-decoration:none;">
                   <div style="padding-top:13px;color:#ffffff;font-size:15px;font-weight:700;letter-spacing:1.8px;">Portal Leves</div>
                 </td>
               </tr>
               <tr>
                 <td align="center" style="padding:34px 34px 10px;">
-                  <div style="width:64px;height:64px;line-height:64px;border-radius:16px;background-color:#eaf3ff;color:#0866e9;font-size:34px;text-align:center;">&#128273;</div>
+                  <div style="width:64px;height:64px;line-height:64px;border-radius:16px;background-color:#eaf3ff;color:#0866e9;font-size:34px;text-align:center;">&#128274;</div>
                   <h1 style="margin:20px 0 5px;color:#172b4d;font-size:27px;line-height:1.25;font-weight:700;">Redefinição de senha</h1>
                   <p style="margin:0;color:#718096;font-size:16px;line-height:1.5;">Portal Leves</p>
                 </td>
