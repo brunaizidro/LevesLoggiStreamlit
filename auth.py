@@ -355,12 +355,12 @@ def _enviar_email_recuperacao(
 
     remetente = str(cfg.get("smtp_from", "")).strip() or str(cfg.get("smtp_user", "")).strip()
     msg = EmailMessage()
-    msg["Subject"] = "Portal LEVES — Recuperação de senha"
+    msg["Subject"] = "Portal Leves | Redefinição de senha"
     msg["From"] = remetente
     msg["To"] = destinatario
     msg.set_content(
         f"Olá, {nome or 'usuário'}!\n\n"
-        "Recebemos uma solicitação para redefinir sua senha do Portal LEVES.\n\n"
+        "Recebemos uma solicitação para redefinir sua senha de acesso ao Portal Leves.\n\n"
         f"Seu código de recuperação é: {codigo}\n\n"
         "O código é válido por 15 minutos e pode ser utilizado uma única vez.\n"
         "Se você não solicitou a redefinição, ignore este e-mail.\n"
