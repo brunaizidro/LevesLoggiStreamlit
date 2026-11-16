@@ -296,7 +296,7 @@ def _enviar_email_recuperacao(
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:620px;background-color:#ffffff;border:1px solid #e1e9f5;border-radius:16px;overflow:hidden;">
               <tr>
                 <td align="center" style="background-color:#0866e9;padding:25px 24px 23px;">
-                  <img src="https://raw.githubusercontent.com/brunaizidro/LevesLoggiStreamlit/master/image_loggi_branco.png" width="150" alt="Loggi" style="display:block;width:150px;max-width:100%;height:auto;border:0;outline:none;text-decoration:none;">
+                  <img src="https://raw.githubusercontent.com/brunaizidro/LevesLoggiStreamlit/master/image_loggi_branco.png?v=2" width="150" alt="Loggi" style="display:block;width:150px;max-width:100%;height:auto;border:0;outline:none;text-decoration:none;">
                   <div style="padding-top:13px;color:#ffffff;font-size:15px;font-weight:700;letter-spacing:1.8px;">Portal Leves</div>
                 </td>
               </tr>
