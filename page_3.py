@@ -500,20 +500,32 @@ def page_3():
         saldo = dp.saldo_por_tipo(destino)
     else:
         pendencias_competencia = dp.pending_mes_tipo(destino, mes_ref)
-        conc = dp.conciliacao(mes_ref)
-        if not conc.empty:
-            conc = conc[conc["destino"].map(dp._normalizar) == dp._normalizar(destino)].copy()
-            saldos_por_tipo = {
-                str(tipo).upper().strip(): int(qtd)
-                for tipo, qtd in pendencias_competencia.items()
-            }
-            conc["saldo"] = conc["tipo"].astype(str).str.upper().str.strip().map(saldos_por_tipo).fillna(0).astype(int)
-            conc["devolvido"] = (
-                conc["enviado"].astype(int) - conc["saldo"] - conc["cobrado"].astype(int)
-            ).clip(lower=0)
-            saldo = conc[conc["saldo"] > 0][["tipo", "enviado", "devolvido", "saldo"]].copy()
-        else:
-            saldo = pd.DataFrame(columns=["tipo", "enviado", "devolvido", "saldo"])
+        env = dp.envios_df()
+        env_mes = env[
+            (env["destino"].map(dp._normalizar) == dp._normalizar(destino))
+            & (env["mes"] == mes_ref)
+        ].copy()
+        enviados_por_tipo = env_mes.groupby("tipo")["total"].sum().to_dict()
+        cobrados_por_tipo = {
+            tipo: qtd
+            for (dest, tipo), qtd in dp._cobrado_por_competencia(mes_ref, ate=False).items()
+            if dest == dp._normalizar(destino)
+        }
+        linhas_saldo = []
+        for tipo, enviado in enviados_por_tipo.items():
+            enviado = int(enviado)
+            saldo_tipo = int(pendencias_competencia.get(tipo, 0))
+            cobrado = int(cobrados_por_tipo.get(tipo, 0))
+            devolvido = max(enviado - saldo_tipo - cobrado, 0)
+            linhas_saldo.append({
+                "tipo": tipo,
+                "enviado": enviado,
+                "devolvido": devolvido,
+                "saldo": saldo_tipo,
+            })
+        saldo = pd.DataFrame(
+            linhas_saldo, columns=["tipo", "enviado", "devolvido", "saldo"]
+        )
     if saldo.empty or saldo["enviado"].sum() == 0:
         if eh_admin:
             st.info(f"Nenhum ativo enviado para a operação **{destino}** até o momento.")
