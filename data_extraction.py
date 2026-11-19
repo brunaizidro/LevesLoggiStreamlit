@@ -149,7 +149,7 @@ def _aba(nome: str, cabecalho: list[str]) -> gspread.Worksheet:
 # Leitura (crua) — cacheada para reduzir chamadas à API do Google Sheets
 # ---------------------------------------------------------------------------
 
-@st.cache_data(ttl=600, show_spinner=False)
+@st.cache_data(ttl=120, show_spinner=False)
 def ler_envios() -> list[dict]:
     """Lê os envios brutos da aba Envios."""
     ws = _aba(ABA_ENVIOS, CAB_ENVIOS)
