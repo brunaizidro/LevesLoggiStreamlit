@@ -559,14 +559,107 @@ def _comprometido_por_competencia(mes: str) -> dict:
     return {k: int(v) for k, v in g.items()}
 
 
-def conciliacao(mes: str) -> pd.DataFrame:
-    """Concilia por competência (mês). A devolução informa a competência a que se refere.
+def _alocar_devolucoes_fifo(
+    envc: pd.DataFrame,
+    devs: pd.DataFrame,
+    its: pd.DataFrame,
+    mes: str,
+    cutoff: pd.Timestamp,
+    *,
+    recebido: bool,
+) -> dict:
+    """Aloca devoluções somente aos envios que já existiam na data do evento.
 
-    Colunas: destino, tipo, enviado, devolvido, cobrado, em_aberto, cobravel
-      - enviado: enviado NO mês `mes`
-      - devolvido: recebido de devoluções cuja competência == mes (até o 5º dia útil do mês seguinte)
-      - cobrado: já baixado por cobrança desta competência
-      - em_aberto / cobravel: enviado do mês ainda não devolvido nem cobrado
+    A ordem é FIFO por destino/tipo. Isso impede que uma devolução anterior
+    desconte envios feitos posteriormente dentro da mesma competência.
+    """
+    if envc.empty or devs.empty or its.empty:
+        return {}
+
+    status_validos = STATUS_RECEBIDOS if recebido else STATUS_COMPROMETIDOS
+    d = devs[devs["status"].isin(status_validos)].copy()
+    if d.empty:
+        return {}
+
+    d["comp"] = d.apply(_competencia_do_dev, axis=1)
+    d = d[d["comp"] == mes].copy()
+    if d.empty:
+        return {}
+
+    d["destino_norm"] = d["destino"].map(_normalizar)
+    if recebido:
+        d["data_evento"] = d["dt_recebimento"].fillna(d["dt_criacao"])
+        d = d[d["data_evento"].notna() & (d["data_evento"] <= cutoff)]
+        qtd_col = "qtd_recebida"
+    else:
+        d["data_evento"] = d["dt_criacao"]
+        d = d[d["data_evento"].notna()]
+        qtd_col = "qtd_declarada"
+
+    if d.empty:
+        return {}
+
+    mapa = d.set_index("id")[["destino_norm", "data_evento"]].to_dict("index")
+    it = its[its["id_devolucao"].isin(set(mapa))].copy()
+    if it.empty:
+        return {}
+
+    it["destino_norm"] = it["id_devolucao"].map(
+        lambda ident: mapa[ident]["destino_norm"]
+    )
+    it["data_evento"] = it["id_devolucao"].map(
+        lambda ident: mapa[ident]["data_evento"]
+    )
+    if recebido:
+        it["qtd_evento"] = it[qtd_col].fillna(it["qtd_declarada"])
+    else:
+        it["qtd_evento"] = it[qtd_col]
+    it["qtd_evento"] = pd.to_numeric(it["qtd_evento"], errors="coerce").fillna(0)
+
+    # Lotes enviados, ordenados cronologicamente, separados por operação e tipo.
+    lotes = {}
+    for (destino, tipo), grupo in envc.groupby(["destino_norm", "tipo"]):
+        grupo = grupo.sort_values("dt")
+        lotes[(destino, tipo)] = [
+            [linha.dt, max(float(linha.total), 0.0)]
+            for linha in grupo.itertuples()
+        ]
+
+    alocado = {}
+    eventos = it.sort_values("data_evento")
+    for linha in eventos.itertuples():
+        chave = (linha.destino_norm, linha.tipo)
+        restantes = lotes.get(chave)
+        if not restantes:
+            continue
+
+        qtd = max(float(linha.qtd_evento), 0.0)
+        data_evento = linha.data_evento
+        consumido = 0.0
+        for lote in restantes:
+            if qtd <= 0:
+                break
+            # Não permite que uma devolução consuma um envio futuro.
+            if lote[0] > data_evento:
+                break
+            disponivel = lote[1]
+            if disponivel <= 0:
+                continue
+            usar = min(disponivel, qtd)
+            lote[1] -= usar
+            qtd -= usar
+            consumido += usar
+
+        if consumido:
+            alocado[chave] = alocado.get(chave, 0.0) + consumido
+
+    return {chave: int(round(qtd)) for chave, qtd in alocado.items()}
+
+
+def conciliacao(mes: str) -> pd.DataFrame:
+    """Concilia por competência, alocando devoluções cronologicamente (FIFO).
+
+    Uma devolução só pode abater envios feitos na mesma data ou antes dela.
     """
     cols = ["destino", "tipo", "enviado", "devolvido", "cobrado", "em_aberto", "cobravel"]
     env = envios_df()
@@ -577,15 +670,21 @@ def conciliacao(mes: str) -> pd.DataFrame:
     ini, fim = per.start_time, per.end_time
     cutoff = _cutoff_competencia(mes)
 
-    envc = env[(env["dt"] >= ini) & (env["dt"] <= fim)].copy()  # só os envios do mês da competência
+    envc = env[(env["dt"] >= ini) & (env["dt"] <= fim)].copy()
     if envc.empty:
         return pd.DataFrame(columns=cols)
     envc["destino_norm"] = envc["destino"].map(_normalizar)
     enviado = envc.groupby(["destino_norm", "tipo"])["total"].sum()
     disp = envc.groupby("destino_norm")["destino"].first().to_dict()
 
-    recebido = _recebido_por_competencia(mes, cutoff)
-    comprometido = _comprometido_por_competencia(mes)
+    devs = devolucoes_df()
+    its = itens_df()
+    comprometido = _alocar_devolucoes_fifo(
+        envc, devs, its, mes, cutoff, recebido=False
+    )
+    recebido = _alocar_devolucoes_fifo(
+        envc, devs, its, mes, cutoff, recebido=True
+    )
     cobrado_mes = _cobrado_por_competencia(mes, ate=False)
 
     linhas = []
@@ -594,8 +693,8 @@ def conciliacao(mes: str) -> pd.DataFrame:
         r = int(recebido.get((dn, tipo), 0))
         declarado = int(comprometido.get((dn, tipo), 0))
         cb = int(cobrado_mes.get((dn, tipo), 0))
-        # O declarado em devoluções ativas (incluindo EM_TRANSITO) já saiu
-        # do saldo cobrável. O recebido é exibido separadamente como efetivado.
+        # Devoluções em trânsito também comprometem saldo, mas só podem
+        # consumir lotes enviados até a data em que foram registradas.
         em_aberto = max(env_i - declarado - cb, 0)
         linhas.append({
             "destino": disp.get(dn, dn), "tipo": tipo, "enviado": env_i,
