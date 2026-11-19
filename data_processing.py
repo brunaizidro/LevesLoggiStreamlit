@@ -71,22 +71,23 @@ def envios_df() -> pd.DataFrame:
     df = pd.DataFrame(envios, columns=["data", "tipo", "destino", "total"])
     if df.empty:
         return df
-    # A planilha pode devolver datas em formatos diferentes conforme a
-    # configuração regional/célula (dd/mm/aaaa ou aaaa-mm-dd). Tenta os
-    # formatos conhecidos antes do fallback para não descartar envios recentes.
+    # A aba Envios pode misturar datas brasileiras (dd/mm/aaaa) e ISO
+    # (aaaa-mm-dd). O parser por linha evita que uma célula fora do padrão
+    # faça o registro ser descartado e mantém 19/11/2026 como 19 de novembro.
     datas = df["data"].astype(str).str.strip()
-    dt = pd.to_datetime(datas, format="%d/%m/%Y", errors="coerce")
-    for formato in ("%Y-%m-%d", "%d-%m-%Y", "%d/%m/%y", "%Y/%m/%d"):
+    dt = pd.to_datetime(
+        datas,
+        format="mixed",
+        dayfirst=True,
+        errors="coerce",
+    )
+    # Compatibilidade com versões do pandas sem suporte a format="mixed".
+    if dt.isna().any():
         faltantes = dt.isna()
-        if not faltantes.any():
-            break
         dt.loc[faltantes] = pd.to_datetime(
-            datas.loc[faltantes], format=formato, errors="coerce"
-        )
-    faltantes = dt.isna()
-    if faltantes.any():
-        dt.loc[faltantes] = pd.to_datetime(
-            datas.loc[faltantes], dayfirst=True, errors="coerce"
+            datas.loc[faltantes],
+            dayfirst=True,
+            errors="coerce",
         )
     df["dt"] = dt
     df = df.dropna(subset=["dt"]).copy()
