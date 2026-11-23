@@ -612,9 +612,10 @@ def _alocar_devolucoes_fifo(
     return {k: int(v) for k, v in g.items()}
 
 def conciliacao(mes: str) -> pd.DataFrame:
-    """Concilia por competência, alocando devoluções cronologicamente (FIFO).
+    """Concilia por competência: todas as devoluções da competência abatem os envios.
 
-    Uma devolução só pode abater envios feitos na mesma data ou antes dela.
+    A quantidade declarada compromete o saldo; a recebida compõe o indicador
+    Devolvido. Ambas são limitadas ao total enviado na competência.
     """
     cols = ["destino", "tipo", "enviado", "devolvido", "cobrado", "em_aberto", "cobravel"]
     env = envios_df()
