@@ -71,32 +71,36 @@ def agora_sp() -> pd.Timestamp:
 
 
 def parse_datas(valores) -> pd.Series:
-    """Converte datas ISO e brasileiras, normalizando timestamps com fuso para SP."""
-    serie = pd.Series(valores)
-    resultado = []
-    for valor in serie:
-        texto = str(valor or "").strip()
-        if not texto or texto.lower() in {"nan", "nat", "none"}:
-            resultado.append(pd.NaT)
-            continue
+    """Converte datas ISO/BR em lote; timestamps com fuso são normalizados para SP."""
+    serie = pd.Series(valores, copy=False).astype("string").str.strip()
+    vazias = serie.isna() | serie.str.lower().isin({"", "nan", "nat", "none"})
+    iso = serie.str.match(r"^\d{4}-\d{2}-\d{2}", na=False)
+    # Somente timestamps ISO com Z ou offset explícito precisam de conversão de fuso.
+    com_fuso = iso & serie.str.contains(r"(?:Z|[+-]\d{2}:?\d{2})$", case=False, na=False)
 
-        try:
-            data = pd.to_datetime(texto, errors="coerce", dayfirst=True)
-        except (TypeError, ValueError, OverflowError):
-            data = pd.NaT
+    resultado = pd.Series(pd.NaT, index=serie.index, dtype="datetime64[ns]")
 
-        if pd.isna(data):
-            resultado.append(pd.NaT)
-            continue
+    iso_sem_fuso = iso & ~com_fuso & ~vazias
+    if iso_sem_fuso.any():
+        resultado.loc[iso_sem_fuso] = pd.to_datetime(
+            serie.loc[iso_sem_fuso], format="ISO8601", errors="coerce"
+        )
 
-        data = pd.Timestamp(data)
-        # Não misturar timestamps com fuso e datas sem fuso no mesmo Series.
-        # Datas sem fuso permanecem no horário local informado na planilha.
-        if data.tzinfo is not None:
-            data = data.tz_convert(TZ).tz_localize(None)
-        resultado.append(data)
+    brasileiras = ~iso & ~vazias
+    if brasileiras.any():
+        resultado.loc[brasileiras] = pd.to_datetime(
+            serie.loc[brasileiras], dayfirst=True, errors="coerce"
+        )
 
-    return pd.Series(pd.to_datetime(resultado, errors="coerce"), index=serie.index)
+    if com_fuso.any():
+        datas_utc = pd.to_datetime(
+            serie.loc[com_fuso], errors="coerce", utc=True
+        )
+        resultado.loc[com_fuso] = (
+            datas_utc.dt.tz_convert(TZ).dt.tz_localize(None)
+        )
+
+    return resultado
 
 
 def envios_df() -> pd.DataFrame:
