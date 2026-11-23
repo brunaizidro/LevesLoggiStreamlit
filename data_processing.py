@@ -588,8 +588,7 @@ def _alocar_devolucoes_fifo(
         d = d[d["data_evento"].notna() & (d["data_evento"] <= cutoff)]
         qtd_col = "qtd_recebida"
     else:
-        # Devoluções em trânsito também comprometem o saldo desde a criação.
-        d = d[d["dt_criacao"].notna()]
+        # A competência selecionada define o abatimento; sem corte pela data do envio.
         qtd_col = "qtd_declarada"
 
     if d.empty:
@@ -649,8 +648,7 @@ def conciliacao(mes: str) -> pd.DataFrame:
         r = int(recebido.get((dn, tipo), 0))
         declarado = int(comprometido.get((dn, tipo), 0))
         cb = int(cobrado_mes.get((dn, tipo), 0))
-        # Devoluções em trânsito também comprometem saldo, mas só podem
-        # consumir lotes enviados até a data em que foram registradas.
+        # Todas as devoluções declaradas da competência comprometem o saldo.
         em_aberto = max(env_i - declarado - cb, 0)
         linhas.append({
             "destino": disp.get(dn, dn), "tipo": tipo, "enviado": env_i,
