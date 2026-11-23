@@ -65,31 +65,35 @@ STATUS_RECEBIDOS = {STATUS_RECEBIDO, STATUS_CONFERIDO, STATUS_DIVERGENTE}
 PRAZO_PADRAO_DIAS = 15
 
 
+def agora_sp() -> pd.Timestamp:
+    """Retorna o horário atual de São Paulo sem timezone (compatível com datas do app)."""
+    return pd.Timestamp.now(tz=TZ).tz_localize(None)
+
+
+def parse_datas(valores) -> pd.Series:
+    """Converte datas ISO e brasileiras linha a linha, sem inferir pelo primeiro registro."""
+    serie = pd.Series(valores)
+    resultado = []
+    for valor in serie:
+        texto = str(valor or "").strip()
+        if not texto or texto.lower() in {"nan", "nat", "none"}:
+            resultado.append(pd.NaT)
+            continue
+        data = pd.to_datetime(texto, format="ISO8601", errors="coerce")
+        if pd.isna(data):
+            data = pd.to_datetime(texto, dayfirst=True, errors="coerce")
+        resultado.append(data)
+    return pd.Series(resultado, index=serie.index, dtype="datetime64[ns]")
+
+
 def envios_df() -> pd.DataFrame:
     """DataFrame canônico de todos os envios (sem filtro de usuário)."""
     envios = data_extraction.ler_envios()
     df = pd.DataFrame(envios, columns=["data", "tipo", "destino", "total"])
     if df.empty:
         return df
-    # A aba Envios pode misturar datas brasileiras (dd/mm/aaaa) e ISO
-    # (aaaa-mm-dd). O parser por linha evita que uma célula fora do padrão
-    # faça o registro ser descartado e mantém 19/11/2026 como 19 de novembro.
-    datas = df["data"].astype(str).str.strip()
-    dt = pd.to_datetime(
-        datas,
-        format="mixed",
-        dayfirst=True,
-        errors="coerce",
-    )
-    # Compatibilidade com versões do pandas sem suporte a format="mixed".
-    if dt.isna().any():
-        faltantes = dt.isna()
-        dt.loc[faltantes] = pd.to_datetime(
-            datas.loc[faltantes],
-            dayfirst=True,
-            errors="coerce",
-        )
-    df["dt"] = dt
+    # Aceita datas ISO (aaaa-mm-dd) e brasileiras (dd/mm/aaaa) linha a linha.
+    df["dt"] = parse_datas(df["data"])
     df = df.dropna(subset=["dt"]).copy()
     df["tipo"] = df["tipo"].astype(str).str.upper().str.strip()
     df = df[~df["tipo"].isin(TIPOS_OCULTOS_PORTAL)].copy()
@@ -215,14 +219,8 @@ def devolucoes_df() -> pd.DataFrame:
         .str.normalize("NFKD").str.encode("ascii", errors="ignore").str.decode("ascii")
         .str.replace(" ", "_", regex=False)
     )
-    df["dt_criacao"] = pd.to_datetime(
-        df["data_criacao"].astype(str).str.strip(),
-        dayfirst=True, errors="coerce"
-    )
-    df["dt_recebimento"] = pd.to_datetime(
-        df["data_recebimento"].astype(str).str.strip(),
-        dayfirst=True, errors="coerce"
-    )
+    df["dt_criacao"] = parse_datas(df["data_criacao"])
+    df["dt_recebimento"] = parse_datas(df["data_recebimento"])
     return df
 
 
@@ -264,7 +262,7 @@ def saldo_por_tipo(destino: str) -> pd.DataFrame:
         devolvido = it.groupby("tipo")["qtd_declarada"].sum().to_dict()
 
     # Já cobrado (baixado) — sai do saldo, pois não aceita mais devolução.
-    cobrado = _cobrado_por_chave(pd.Timestamp.now())
+    cobrado = _cobrado_por_chave(agora_sp())
     cobrado = {t: q for (dn, t), q in cobrado.items() if dn == alvo}
 
     tipos = sorted(set(enviado) | set(devolvido) | set(cobrado) | set(CORES_TIPO))
@@ -310,12 +308,12 @@ def prazo_devolucao(mes: str) -> pd.Timestamp:
 
 def competencia_fechavel(mes: str) -> bool:
     """True quando já passou o prazo (5º dia útil do mês seguinte) e a competência pode ser fechada."""
-    return pd.Timestamp.now() > prazo_devolucao(mes)
+    return agora_sp() > prazo_devolucao(mes)
 
 
 def _cutoff_competencia(mes: str) -> pd.Timestamp:
     """Corte para contar devoluções: outubro/2026 considera recebimentos até hoje; demais meses seguem o prazo normal."""
-    agora = pd.Timestamp.now()
+    agora = agora_sp()
     if mes == "2026-10":
         return agora
     return min(prazo_devolucao(mes), agora)
@@ -326,7 +324,7 @@ def _competencia_do_dev(row) -> str:
     c = str(row.get("competencia", "") or "").strip()
     if c:
         return c
-    dt = pd.to_datetime(row.get("data_criacao"), errors="coerce")
+    dt = parse_datas([row.get("data_criacao")]).iloc[0]
     return dt.to_period("M").strftime("%Y-%m") if pd.notna(dt) else ""
 
 
@@ -341,7 +339,7 @@ def competencias_elegiveis(destino: str) -> list[str]:
         return []
     # Compara usando o horário de São Paulo, independentemente do fuso
     # configurado no servidor Streamlit.
-    now = pd.Timestamp.now(tz=TZ).tz_localize(None)
+    now = agora_sp()
     meses = sorted(set(e["mes"]), reverse=True)
     return [m for m in meses if now <= prazo_devolucao(m)]
 
@@ -450,7 +448,7 @@ def pendencias_df() -> pd.DataFrame:
         it = it.dropna(subset=["destino_norm"])
         devolvido = it.groupby(["destino_norm", "tipo"])["qtd_declarada"].sum().to_dict()
 
-    cobrado = _cobrado_por_chave(pd.Timestamp.now())
+    cobrado = _cobrado_por_chave(agora_sp())
 
     linhas = []
     for (dn, tipo), env_v in enviado.items():
@@ -568,10 +566,12 @@ def _alocar_devolucoes_fifo(
     *,
     recebido: bool,
 ) -> dict:
-    """Aloca devoluções somente aos envios que já existiam na data do evento.
+    """Soma devoluções da competência, sem restringir pela data dos envios.
 
-    A ordem é FIFO por destino/tipo. Isso impede que uma devolução anterior
-    desconte envios feitos posteriormente dentro da mesma competência.
+    A regra é a mesma do módulo Devoluções: todas as devoluções válidas da
+    competência abatem o total enviado daquela competência. Para recebidas,
+    respeita-se o corte de recebimento. O excedente é limitado ao total enviado
+    na conciliação e deve ser sinalizado separadamente em auditoria.
     """
     if envc.empty or devs.empty or its.empty:
         return {}
@@ -583,78 +583,33 @@ def _alocar_devolucoes_fifo(
 
     d["comp"] = d.apply(_competencia_do_dev, axis=1)
     d = d[d["comp"] == mes].copy()
-    if d.empty:
-        return {}
-
-    d["destino_norm"] = d["destino"].map(_normalizar)
     if recebido:
         d["data_evento"] = d["dt_recebimento"].fillna(d["dt_criacao"])
         d = d[d["data_evento"].notna() & (d["data_evento"] <= cutoff)]
         qtd_col = "qtd_recebida"
     else:
-        d["data_evento"] = d["dt_criacao"]
-        d = d[d["data_evento"].notna()]
+        # Devoluções em trânsito também comprometem o saldo desde a criação.
+        d = d[d["dt_criacao"].notna()]
         qtd_col = "qtd_declarada"
 
     if d.empty:
         return {}
 
-    mapa = d.set_index("id")[["destino_norm", "data_evento"]].to_dict("index")
-    it = its[its["id_devolucao"].isin(set(mapa))].copy()
+    d["destino_norm"] = d["destino"].map(_normalizar)
+    mapa = d.set_index("id")["destino_norm"].to_dict()
+    it = its[its["id_devolucao"].isin(set(d["id"]))].copy()
     if it.empty:
         return {}
 
-    it["destino_norm"] = it["id_devolucao"].map(
-        lambda ident: mapa[ident]["destino_norm"]
-    )
-    it["data_evento"] = it["id_devolucao"].map(
-        lambda ident: mapa[ident]["data_evento"]
-    )
+    it["destino_norm"] = it["id_devolucao"].map(mapa)
+    it = it.dropna(subset=["destino_norm"])
     if recebido:
         it["qtd_evento"] = it[qtd_col].fillna(it["qtd_declarada"])
     else:
         it["qtd_evento"] = it[qtd_col]
-    it["qtd_evento"] = pd.to_numeric(it["qtd_evento"], errors="coerce").fillna(0)
-
-    # Lotes enviados, ordenados cronologicamente, separados por operação e tipo.
-    lotes = {}
-    for (destino, tipo), grupo in envc.groupby(["destino_norm", "tipo"]):
-        grupo = grupo.sort_values("dt")
-        lotes[(destino, tipo)] = [
-            [linha.dt, max(float(linha.total), 0.0)]
-            for linha in grupo.itertuples()
-        ]
-
-    alocado = {}
-    eventos = it.sort_values("data_evento")
-    for linha in eventos.itertuples():
-        chave = (linha.destino_norm, linha.tipo)
-        restantes = lotes.get(chave)
-        if not restantes:
-            continue
-
-        qtd = max(float(linha.qtd_evento), 0.0)
-        data_evento = linha.data_evento
-        consumido = 0.0
-        for lote in restantes:
-            if qtd <= 0:
-                break
-            # Não permite que uma devolução consuma um envio futuro.
-            if lote[0] > data_evento:
-                break
-            disponivel = lote[1]
-            if disponivel <= 0:
-                continue
-            usar = min(disponivel, qtd)
-            lote[1] -= usar
-            qtd -= usar
-            consumido += usar
-
-        if consumido:
-            alocado[chave] = alocado.get(chave, 0.0) + consumido
-
-    return {chave: int(round(qtd)) for chave, qtd in alocado.items()}
-
+    it["qtd_evento"] = pd.to_numeric(it["qtd_evento"], errors="coerce").fillna(0).clip(lower=0)
+    g = it.groupby(["destino_norm", "tipo"])["qtd_evento"].sum()
+    return {k: int(v) for k, v in g.items()}
 
 def conciliacao(mes: str) -> pd.DataFrame:
     """Concilia por competência, alocando devoluções cronologicamente (FIFO).
