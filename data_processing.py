@@ -71,7 +71,7 @@ def agora_sp() -> pd.Timestamp:
 
 
 def parse_datas(valores) -> pd.Series:
-    """Converte datas ISO e brasileiras linha a linha, sem inferir pelo primeiro registro."""
+    """Converte datas ISO e brasileiras, normalizando timestamps com fuso para SP."""
     serie = pd.Series(valores)
     resultado = []
     for valor in serie:
@@ -79,11 +79,24 @@ def parse_datas(valores) -> pd.Series:
         if not texto or texto.lower() in {"nan", "nat", "none"}:
             resultado.append(pd.NaT)
             continue
-        data = pd.to_datetime(texto, format="ISO8601", errors="coerce")
+
+        try:
+            data = pd.to_datetime(texto, errors="coerce", dayfirst=True)
+        except (TypeError, ValueError, OverflowError):
+            data = pd.NaT
+
         if pd.isna(data):
-            data = pd.to_datetime(texto, dayfirst=True, errors="coerce")
+            resultado.append(pd.NaT)
+            continue
+
+        data = pd.Timestamp(data)
+        # Não misturar timestamps com fuso e datas sem fuso no mesmo Series.
+        # Datas sem fuso permanecem no horário local informado na planilha.
+        if data.tzinfo is not None:
+            data = data.tz_convert(TZ).tz_localize(None)
         resultado.append(data)
-    return pd.Series(resultado, index=serie.index, dtype="datetime64[ns]")
+
+    return pd.Series(pd.to_datetime(resultado, errors="coerce"), index=serie.index)
 
 
 def envios_df() -> pd.DataFrame:
