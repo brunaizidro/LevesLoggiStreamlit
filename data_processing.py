@@ -13,6 +13,7 @@ regras de expedição/status (AT/NP/AD) do DLE clássico.
 
 from __future__ import annotations
 
+import functools
 import os
 
 import pandas as pd
@@ -80,6 +81,15 @@ def parse_datas(valores) -> pd.Series:
 
     resultado = pd.Series(pd.NaT, index=serie.index, dtype="datetime64[ns]")
 
+    # Caminho rápido: o formato da aba Envios é sempre dd/mm/aaaa. Com o
+    # formato explícito o pandas não precisa inferir linha a linha.
+    br_curta = ~iso & ~vazias & serie.str.fullmatch(r"\d{2}/\d{2}/\d{4}", na=False)
+    if br_curta.any():
+        resultado.loc[br_curta] = pd.to_datetime(
+            serie.loc[br_curta], format="%d/%m/%Y", errors="coerce"
+        )
+    vazias = vazias | br_curta  # já tratadas; o restante segue a regra antiga
+
     iso_sem_fuso = iso & ~com_fuso & ~vazias
     if iso_sem_fuso.any():
         resultado.loc[iso_sem_fuso] = pd.to_datetime(
@@ -104,9 +114,21 @@ def parse_datas(valores) -> pd.Series:
 
 
 def envios_df() -> pd.DataFrame:
-    """DataFrame canônico de todos os envios (sem filtro de usuário)."""
-    envios = data_extraction.ler_envios()
-    df = pd.DataFrame(envios, columns=["data", "tipo", "destino", "total"])
+    """DataFrame canônico de todos os envios (sem filtro de usuário).
+
+    O resultado processado fica em cache (antes era recalculado em toda
+    interação, várias vezes por página, sobre 100 mil+ linhas).
+    """
+    return _envios_df_cache(data_extraction.versao("envios"))
+
+
+@st.cache_data(ttl=data_extraction.TTL_ENVIOS, show_spinner=False, max_entries=3)
+def _envios_df_cache(versao_abas: tuple) -> pd.DataFrame:
+    cols = data_extraction.ler_envios_colunas()
+    df = pd.DataFrame(
+        {c: cols[c] for c in ("data", "tipo", "destino", "total")},
+        columns=["data", "tipo", "destino", "total"],
+    )
     if df.empty:
         return df
     # Aceita datas ISO (aaaa-mm-dd) e brasileiras (dd/mm/aaaa) linha a linha.
@@ -127,7 +149,9 @@ def envios_df() -> pd.DataFrame:
 
     df["mes"] = df["dt"].dt.to_period("M").astype(str)  # "2026-08"
     df["dia"] = df["dt"].dt.date
-    return df
+    # Destino normalizado calculado uma vez (usado em todos os filtros).
+    df["destino_norm"] = df["destino"].map(_normalizar)
+    return df.reset_index(drop=True)
 
 
 def envios_do_usuario(user: dict) -> pd.DataFrame:
@@ -148,9 +172,7 @@ def envios_do_usuario(user: dict) -> pd.DataFrame:
     # Demais perfis visualizam somente sua própria base
     alvo = _normalizar(user.get("destino", ""))
 
-    return df[
-        df["destino"].map(_normalizar) == alvo
-    ].copy()
+    return df[df["destino_norm"] == alvo].copy()
 
 
 def rotulo_mes(mes: str) -> str:
@@ -211,6 +233,15 @@ def base_url() -> str:
 
 
 def _normalizar(v) -> str:
+    # Poucos valores distintos (~200 operações) repetidos em 100 mil linhas:
+    # memoiza para não refazer a normalização Unicode a cada linha.
+    if v is None or isinstance(v, str):
+        return _normalizar_str(v)
+    return _normalizar_str(str(v))
+
+
+@functools.lru_cache(maxsize=4096)
+def _normalizar_str(v) -> str:
     import unicodedata
     s = "" if v is None else str(v)
     s = s.strip().lower()
@@ -223,6 +254,11 @@ def _normalizar(v) -> str:
 # ---------------------------------------------------------------------------
 
 def devolucoes_df() -> pd.DataFrame:
+    return _devolucoes_df_cache(data_extraction.versao("devolucoes"))
+
+
+@st.cache_data(ttl=120, show_spinner=False, max_entries=3)
+def _devolucoes_df_cache(versao_abas: tuple) -> pd.DataFrame:
     devs = data_extraction.ler_devolucoes()
     df = pd.DataFrame(devs)
     if df.empty:
@@ -238,10 +274,21 @@ def devolucoes_df() -> pd.DataFrame:
     )
     df["dt_criacao"] = parse_datas(df["data_criacao"])
     df["dt_recebimento"] = parse_datas(df["data_recebimento"])
+    # Competência calculada uma vez, vetorizada (antes era um apply linha a
+    # linha que chamava parse_datas para cada devolução, várias vezes por tela).
+    comp = df["competencia"].fillna("").astype(str).str.strip()
+    comp_legado = df["dt_criacao"].dt.strftime("%Y-%m").fillna("")
+    df["comp"] = comp.where(comp != "", comp_legado)
+    df["destino_norm"] = df["destino"].map(_normalizar)
     return df
 
 
 def itens_df() -> pd.DataFrame:
+    return _itens_df_cache(data_extraction.versao("itens"))
+
+
+@st.cache_data(ttl=120, show_spinner=False, max_entries=3)
+def _itens_df_cache(versao_abas: tuple) -> pd.DataFrame:
     df = pd.DataFrame(data_extraction.ler_dev_itens())
     if df.empty:
         return df
@@ -380,7 +427,7 @@ def pending_mes_tipo(destino: str, mes: str) -> dict:
         d = devs[(devs["destino"].map(_normalizar) == alvo)
                  & (devs["status"].isin(STATUS_COMPROMETIDOS))].copy()
         if not d.empty:
-            d["comp"] = d.apply(_competencia_do_dev, axis=1)
+            # "comp" já vem calculada (vetorizada) em devolucoes_df().
             d = d[d["comp"] == mes]
             it = its[its["id_devolucao"].isin(set(d["id"]))]
             devolvido = it.groupby("tipo")["qtd_declarada"].sum().to_dict()
@@ -538,7 +585,7 @@ def _recebido_por_competencia(mes: str, cutoff: pd.Timestamp) -> dict:
     d = d[d["dt_receb"].notna() & (d["dt_receb"] <= cutoff)]
     if d.empty:
         return {}
-    d["comp"] = d.apply(_competencia_do_dev, axis=1)
+    # "comp" já vem calculada (vetorizada) em devolucoes_df().
     d = d[d["comp"] == mes]
     if d.empty:
         return {}
@@ -561,7 +608,7 @@ def _comprometido_por_competencia(mes: str) -> dict:
     d = devs[devs["status"].isin(STATUS_COMPROMETIDOS)].copy()
     if d.empty:
         return {}
-    d["comp"] = d.apply(_competencia_do_dev, axis=1)
+    # "comp" já vem calculada (vetorizada) em devolucoes_df().
     d = d[d["comp"] == mes]
     if d.empty:
         return {}
@@ -598,7 +645,7 @@ def _alocar_devolucoes_fifo(
     if d.empty:
         return {}
 
-    d["comp"] = d.apply(_competencia_do_dev, axis=1)
+    # "comp" já vem calculada (vetorizada) em devolucoes_df().
     d = d[d["comp"] == mes].copy()
     if recebido:
         d["data_evento"] = d["dt_recebimento"].fillna(d["dt_criacao"])
@@ -632,8 +679,18 @@ def conciliacao(mes: str) -> pd.DataFrame:
 
     A quantidade declarada compromete o saldo; a recebida compõe o indicador
     Devolvido. Ambas são limitadas ao total enviado na competência.
+
+    Em cache por (mês, versão das abas): Pendências chamava esta função 7
+    vezes por interação (mês atual + evolução de 6 meses).
     """
-    cols = ["destino", "tipo", "enviado", "devolvido", "cobrado", "em_aberto", "cobravel"]
+    return _conciliacao_cache(
+        mes, data_extraction.versao("envios", "devolucoes", "itens", "cobrancas")
+    )
+
+
+@st.cache_data(ttl=120, show_spinner=False, max_entries=48)
+def _conciliacao_cache(mes: str, versao_abas: tuple) -> pd.DataFrame:
+    cols =["destino", "tipo", "enviado", "devolvido", "cobrado", "em_aberto", "cobravel"]
     env = envios_df()
     if env.empty:
         return pd.DataFrame(columns=cols)
@@ -645,8 +702,7 @@ def conciliacao(mes: str) -> pd.DataFrame:
     envc = env[(env["dt"] >= ini) & (env["dt"] <= fim)].copy()
     if envc.empty:
         return pd.DataFrame(columns=cols)
-    envc["destino_norm"] = envc["destino"].map(_normalizar)
-    enviado = envc.groupby(["destino_norm", "tipo"])["total"].sum()
+    enviado =envc.groupby(["destino_norm", "tipo"])["total"].sum()
     disp = envc.groupby("destino_norm")["destino"].first().to_dict()
 
     devs = devolucoes_df()

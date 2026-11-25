@@ -55,22 +55,19 @@ def _operacoes_destinos_envios() -> dict[str, dict]:
     preservando a compatibilidade com o portal, e usa a coluna E somente
     para definir o local/CD físico da devolução.
     """
+    # Usa a leitura já em cache da aba Envios. Antes, esta função relia a
+    # aba inteira (100 mil+ linhas) direto da API a cada clique do admin.
     try:
-        ws = dados._aba(
-            dados.ABA_ENVIOS,
-            ["DATA", "tipo", "operacao", "total", "destino"],
-        )
-        valores = ws.get_all_values()
+        cols = dados.ler_envios_colunas()
     except Exception:  # noqa: BLE001
         return {}
 
     mapa = {}
-    for i, row in enumerate(valores):
-        if i == 0 or not any(row):
+    vistos = set()
+    for operacao, destino_fisico in zip(cols["destino"], cols["origem"]):
+        if (operacao, destino_fisico) in vistos:
             continue
-        row = (row + [""] * 5)[:5]
-        operacao = str(row[2]).strip()
-        destino_fisico = str(row[4]).strip()
+        vistos.add((operacao, destino_fisico))
         if not operacao:
             continue
 

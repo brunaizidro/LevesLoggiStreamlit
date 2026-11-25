@@ -62,6 +62,19 @@ _SCOPES = [
 # O cache do Streamlit não participa da geração do ID.
 _DEVOLUCAO_ID_LOCK = threading.Lock()
 
+# Versão de cada aba (no processo). É incrementada sempre que o cache de uma
+# aba é limpo; as camadas de processamento usam esse número como chave de
+# cache, então um DataFrame já processado é descartado assim que a aba muda.
+_VERSOES = {"envios": 0, "usuarios": 0, "devolucoes": 0, "itens": 0, "cobrancas": 0, "config": 0}
+# A aba Envios tem >100 mil linhas: relê-la custa vários segundos. O botão
+# "Atualizar dados" continua forçando a releitura na hora.
+TTL_ENVIOS = 600
+
+
+def versao(*abas: str) -> tuple:
+    """Chave de cache que muda quando qualquer uma das abas é invalidada."""
+    return tuple(_VERSOES.get(a, 0) for a in abas)
+
 
 def _achar_json_local() -> str | None:
     """Procura um arquivo .json de service account na pasta do projeto."""
@@ -149,29 +162,36 @@ def _aba(nome: str, cabecalho: list[str]) -> gspread.Worksheet:
 # Leitura (crua) — cacheada para reduzir chamadas à API do Google Sheets
 # ---------------------------------------------------------------------------
 
-@st.cache_data(ttl=120, show_spinner=False)
-def ler_envios() -> list[dict]:
-    """Lê os envios brutos da aba Envios."""
+@st.cache_data(ttl=TTL_ENVIOS, show_spinner=False)
+def ler_envios_colunas() -> dict[str, list]:
+    """Lê a aba Envios (colunas A:E) em formato colunar.
+
+    Colunar (listas) em vez de lista de dicts: o st.cache_data copia o valor
+    a cada acesso, e copiar 100 mil dicts era um dos gargalos do portal.
+    Lê só A:E em vez da grade inteira (a aba tem 26 colunas e 200 mil linhas).
+    """
     ws = _aba(ABA_ENVIOS, CAB_ENVIOS)
-    valores = ws.get_all_values()
-    linhas = []
+    valores = ws.get_values("A:E")
+    cols = {"data": [], "tipo": [], "destino": [], "total": [], "origem": []}
     for i, row in enumerate(valores):
         if i == 0 or not any(row):
             continue
-        row = (row + ["", "", "", ""])[:4]
-        try:
-            total = float(str(row[3]).replace(".", "").replace(",", ".")) if row[3] else 0
-        except ValueError:
-            total = 0
-        linhas.append(
-            {
-                "data": str(row[0]).strip(),
-                "tipo": str(row[1]).strip(),
-                "destino": str(row[2]).strip(),
-                "total": total,
-            }
-        )
-    return linhas
+        row = (list(row) + ["", "", "", "", ""])[:5]
+        cols["data"].append(str(row[0]).strip())
+        cols["tipo"].append(str(row[1]).strip())
+        cols["destino"].append(str(row[2]).strip())
+        cols["total"].append(_num(row[3]))
+        cols["origem"].append(str(row[4]).strip())
+    return cols
+
+
+def ler_envios() -> list[dict]:
+    """Compatibilidade: envios como lista de dicts (data, tipo, destino, total)."""
+    c = ler_envios_colunas()
+    return [
+        {"data": d, "tipo": t, "destino": de, "total": q}
+        for d, t, de, q in zip(c["data"], c["tipo"], c["destino"], c["total"])
+    ]
 
 
 @st.cache_data(ttl=120, show_spinner=False)
@@ -437,7 +457,7 @@ def limpar_cache(*abas: str):
     """Limpa caches de leitura; sem argumentos limpa todos."""
     alvos = set(abas) or {"envios", "usuarios", "devolucoes", "itens", "cobrancas", "config"}
     funcoes = {
-        "envios": ler_envios,
+        "envios": ler_envios_colunas,
         "usuarios": ler_usuarios,
         "devolucoes": ler_devolucoes,
         "itens": ler_dev_itens,
@@ -448,6 +468,8 @@ def limpar_cache(*abas: str):
         funcao = funcoes.get(alvo)
         if funcao is not None:
             funcao.clear()
+        if alvo in _VERSOES:
+            _VERSOES[alvo] += 1
 
 
 # ---------------------------------------------------------------------------

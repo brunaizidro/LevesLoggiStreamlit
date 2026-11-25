@@ -368,10 +368,13 @@ def page_1():
     
         if eh_admin or eh_gdl:
             operacoes_disp = sorted(df["destino"].dropna().astype(str).unique())
+            # Vazio = todas. Pré-selecionar as ~200 operações desenhava 200
+            # "chips" no filtro a cada interação.
             sel_operacoes = fcol3.multiselect(
                 "Operação",
                 operacoes_disp,
-                default=operacoes_disp,
+                default=[],
+                placeholder="Todas as operações",
             )
         else:
             sel_operacoes = []
@@ -556,7 +559,10 @@ def page_1():
             busca = st.text_input("Buscar destino, operação ou tipo", placeholder="Buscar destino...",
                                   label_visibility="collapsed", key="busca_envios_detalhados")
             cols_tab = ["dt", "destino", "tipo", "total"] if (eh_admin or eh_gdl) else ["dt", "tipo", "total"]
-            tab = dfx[cols_tab].copy()
+            # A aba Envios tem várias linhas por dia/operação/tipo (uma por
+            # carga). Somar por dia deixa a tabela até 10x menor, mesmos totais.
+            chaves_tab = [c for c in cols_tab if c != "total"]
+            tab = dfx.groupby(chaves_tab, as_index=False)["total"].sum()[cols_tab]
             if busca.strip():
                 termo = busca.strip().lower()
                 colunas_busca = [col for col in ["destino", "tipo"] if col in tab.columns]
@@ -575,10 +581,16 @@ def page_1():
             config_tabela["Quantidade"] = st.column_config.NumberColumn(
                 "Quantidade", alignment="center", format="%d"
             )
-            tabela_html = tab.to_html(index=False, escape=True, border=0, classes="leves-html-table")
-            st.markdown(
-                f'<div class="leves-html-table-wrap">{tabela_html}</div>',
-                unsafe_allow_html=True,
+            # st.dataframe é virtualizado (só desenha as linhas visíveis).
+            # Antes a tabela inteira (dezenas de milhares de linhas no mês)
+            # era convertida em HTML e enviada ao navegador a cada clique —
+            # principal causa do portal "travado" para o admin.
+            st.dataframe(
+                tab,
+                hide_index=True,
+                width="stretch",
+                height=420,
+                column_config=config_tabela,
             )
             st.download_button("Baixar CSV", tab.to_csv(index=False).encode("utf-8-sig"),
                                file_name="ativos_leves.csv", mime="text/csv", key="dl_envios")
