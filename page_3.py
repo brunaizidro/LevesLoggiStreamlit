@@ -611,9 +611,33 @@ def page_3():
     with st.container(key="dev-new-panel"):
         st.markdown("""<div class="dev-new-title"><span class="dev-section-icon">＋</span><span class="dev-new-title-copy"><strong>Nova devolução</strong><small>Registre uma nova devolução de insumos</small></span></div>""", unsafe_allow_html=True)
         pend = {t: q for t, q in dp.pending_mes_tipo(destino, mes_ref).items() if q > 0}
+        mes_anterior = str(pd.Period(mes_ref, freq="M") - 1)
+        prazo_anterior = dp.prazo_devolucao(mes_anterior).strftime("%d/%m/%Y")
+        regra_txt = (
+            f"Itens de <b>{dp.rotulo_mes(mes_anterior)}</b> podiam ser devolvidos até "
+            f"<b>{prazo_anterior}</b>. Depois desse prazo, o que for devolvido entra em "
+            f"<b>{escolha_mes}</b> e fica limitado ao que foi enviado para a operação neste mês."
+        )
         if not pend:
-            st.success(f"Sem pendência de devolução para {escolha_mes}. 🎉")
+            # Antes: "Sem pendência 🎉", que gerava chamados ("não tenho saldo
+            # para devolver"). Agora explica a regra com os números do mês.
+            tipos_vis = saldo[saldo["tipo"].astype(str).str.upper().isin(["SACA", "GAYLORD", "PALLET"])]
+            detalhe = " · ".join(
+                f"{str(r['tipo']).title()}: {_fmt(r['enviado'])} enviados, {_fmt(r['devolvido'])} já devolvidos"
+                for _, r in tipos_vis.iterrows()
+            )
+            st.info(
+                f"**Não há saldo para devolver em {escolha_mes}.** "
+                f"Tudo o que foi enviado para a operação neste mês já foi devolvido.\n\n"
+                + (f"{detalhe}\n\n" if detalhe else "")
+                + regra_txt.replace("<b>", "**").replace("</b>", "**")
+                + "\n\nNovos envios para a operação liberam saldo automaticamente."
+            )
         else:
+            st.caption(
+                "Você pode devolver até o saldo de cada insumo (indicado em “Máx.”). "
+                + regra_txt.replace("<b>", "").replace("</b>", "")
+            )
             with st.form("nova_devolucao", clear_on_submit=True):
                 qtds = {}
                 itens_pend = sorted(pend.items())
@@ -663,6 +687,13 @@ def page_3():
                     st.error("Informe ao menos uma quantidade.")
                 elif not placa_norm:
                     st.error("Informe a placa do veículo.")
+                elif excedentes := _itens_acima_do_saldo(destino, mes_ref, itens):
+                    st.error(
+                        "**O saldo mudou e esta devolução passou do limite.** "
+                        "Nada foi registrado. Saldo atual: "
+                        + ", ".join(f"{t.title()} {_fmt(disp)} (você informou {_fmt(q)})" for t, q, disp in excedentes)
+                        + ". Ajuste as quantidades e tente novamente."
+                    )
                 else:
                     total = sum(it["qtd_declarada"] for it in itens)
                     id_dev = dados.proximo_codigo_devolucao()
@@ -686,6 +717,22 @@ def page_3():
                     )
     
     _minhas_devolucoes(destino, eh_admin=eh_admin)
+
+
+def _itens_acima_do_saldo(destino: str, mes_ref: str, itens: list[dict]) -> list[tuple]:
+    """Confere o saldo com dados frescos na hora de gravar.
+
+    O limite do formulário é calculado quando a tela abre; se outra aba ou
+    outra pessoa registrou uma devolução nesse meio-tempo, ele fica velho e
+    permitia passar do saldo. Retorna [(tipo, informado, disponível)].
+    """
+    dados.limpar_cache("devolucoes", "itens")
+    saldo_atual = dp.pending_mes_tipo(destino, mes_ref)
+    return [
+        (it["tipo"], it["qtd_declarada"], int(saldo_atual.get(it["tipo"], 0)))
+        for it in itens
+        if it["qtd_declarada"] > int(saldo_atual.get(it["tipo"], 0))
+    ]
 
 
 def _minhas_devolucoes(destino: str, eh_admin: bool = False, eh_gdl: bool = False):
