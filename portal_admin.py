@@ -51,6 +51,53 @@ MENU = [
 ]
 PAGINAS = [p for _, itens in MENU for p, _ in itens]
 
+# O mesmo portal atende Admin, GDL e Leve (operação); muda o que cada um vê.
+#  - GDL: todas as bases, sem Recebimentos/Configurações; não registra devolução
+#    nem fecha cobrança; cadastra apenas usuários de operação.
+#  - Leve: só a própria base (filtro de operação fixo) e registra as devoluções dela.
+PAGINAS_PERFIL = {
+    "gdl": {"Envios", "Devoluções", "Pendências", "Cobranças", "Bases e usuários", "Manual e ajuda"},
+    "operacao": {"Envios", "Devoluções", "Pendências", "Cobranças", "Manual e ajuda"},
+}
+PAPEL_PERFIL = {"admin": "Gestão de Materiais", "gdl": "GDL"}
+
+
+def _usuario() -> dict:
+    return st.session_state.get("usuario") or {}
+
+
+def _perfil() -> str:
+    p = str(_usuario().get("perfil", "")).strip().lower()
+    return p if p in ("admin", "gdl") else "operacao"
+
+
+def _eh_admin() -> bool:
+    return _perfil() == "admin"
+
+
+def _minha_base() -> str | None:
+    """Sigla da base do usuário Leve; None para Admin e GDL (veem todas)."""
+    if _perfil() != "operacao":
+        return None
+    return str(_usuario().get("destino", "")).strip()
+
+
+def _da_minha_base(df: pd.DataFrame, col: str = "destino") -> pd.DataFrame:
+    """Para a Leve, mantém só as linhas da própria base; Admin/GDL: tudo."""
+    base = _minha_base()
+    if base is None or df.empty:
+        return df
+    alvo = dp._normalizar(base)
+    return df[df[col].map(dp._normalizar) == alvo]
+
+
+def _menu() -> list:
+    permitidas = PAGINAS_PERFIL.get(_perfil())
+    if permitidas is None:
+        return MENU
+    menu = [(sec, [(n, i) for n, i in itens if n in permitidas]) for sec, itens in MENU]
+    return [(sec, itens) for sec, itens in menu if itens]
+
 TIPOS = ["SACA", "GAYLORD", "PALLET"]
 NOME = {"SACA": "Sacas", "GAYLORD": "Gaylords", "PALLET": "Pallets"}
 COR = {"SACA": "#006aff", "GAYLORD": "#00baff", "PALLET": "#9cc3ff"}
@@ -432,7 +479,7 @@ def _sidebar(user: dict, pagina: str, logout) -> None:
         logo = _img_b64("image_logo_loggi_azul.png")
         img = f'<img src="data:image/png;base64,{logo}" alt="Loggi">' if logo else "Loggi"
         _md(f"<div class='ad-logo'>{img}</div>")
-        for secao, itens in MENU:
+        for secao, itens in _menu():
             _md(f"<div class='ad-sec'>{_e(secao)}</div>")
             for nome, icone in itens:
                 if st.button(nome, icon=icone, key=f"ad-nav-{nome}", width="stretch",
@@ -442,8 +489,9 @@ def _sidebar(user: dict, pagina: str, logout) -> None:
         _md("<div class='ad-rodape'></div>")
         nome = str(user.get("nome", "")).strip()
         ini = "".join(x[0] for x in nome.split()[:2]).upper() or "?"
+        papel = PAPEL_PERFIL.get(_perfil()) or f"Base {user.get('destino', '')}"
         _md(f"<div class='ad-user ad-user-menu'><div class='ad-av'>{_e(ini)}</div><div class='ad-nome'>{_e(nome)}"
-            f"<span>Gestão de Materiais</span></div></div>")
+            f"<span>{_e(papel)}</span></div></div>")
         if st.button("Atualizar dados", icon=":material/refresh:", key="ad-atualizar", width="stretch"):
             dados.limpar_cache()
             st.rerun()
@@ -722,11 +770,19 @@ def _devolucao_base() -> None:
     import uuid
     from datetime import datetime
 
-    _titulo_grande("Registro de devoluções",
-                   "Registre uma devolução em nome de uma base: escolha a operação e o mês de referência, "
-                   "informe as quantidades e gere o romaneio.")
+    minha = _minha_base()
+    so_ver = _perfil() == "gdl"  # GDL acompanha, mas não registra devolução
+    if minha is not None:
+        _titulo_grande("Registro de devoluções",
+                       "Escolha o mês de referência, informe quanto vai devolver de cada insumo e gere o romaneio.")
+    elif so_ver:
+        _titulo_grande("Devoluções", "Saldo e devoluções de cada base. O registro de devoluções é feito pela base ou pelo administrador.")
+    else:
+        _titulo_grande("Registro de devoluções",
+                       "Registre uma devolução em nome de uma base: escolha a operação e o mês de referência, "
+                       "informe as quantidades e gere o romaneio.")
     user = st.session_state.get("usuario") or {}
-    env = dp.envios_df()
+    env = _da_minha_base(dp.envios_df())
     if env.empty:
         st.info("Nenhum envio registrado ainda.")
         return
@@ -738,8 +794,12 @@ def _devolucao_base() -> None:
     # ---- Filtros: operação e mês de referência ----
     ops = sorted(env["destino"].dropna().astype(str).unique(), key=str.lower)
     with st.container(key="ad-box-dev-filtros"):
-        f = st.columns([1.2, 2], gap="medium", vertical_alignment="bottom")
-        destino = f[0].selectbox("Operação", ops, index=None, placeholder="Escolha a operação", key="ad-dev-op")
+        if minha is not None:
+            f = st.columns([0.001, 2], gap=None, vertical_alignment="bottom")
+            destino = minha
+        else:
+            f = st.columns([1.2, 2], gap="medium", vertical_alignment="bottom")
+            destino = f[0].selectbox("Operação", ops, index=None, placeholder="Escolha a operação", key="ad-dev-op")
         mes = rot = None
         if destino:
             eleg = dp.competencias_elegiveis(destino)
@@ -774,6 +834,20 @@ def _devolucao_base() -> None:
             _md(f"<div class='pd-faixa verde'>Nada a devolver: {_e(destino)} já devolveu tudo de {_e(rot)}.</div>")
             if criada:
                 _confirmacao_devolucao(criada)
+        elif so_ver:
+            st.write("")
+            cols = st.columns(4, gap="medium")
+            for col, t in zip(cols[:3], TIPOS):
+                saldo = int(pend.get(t, 0))
+                envi = int(resumo.loc[t, "enviado"]) if t in resumo.index else 0
+                dev = int(resumo.loc[t, "em_transito"] + resumo.loc[t, "recebido"]) if t in resumo.index else 0
+                with col, st.container(key=f"ad-dev-card-{t}"):
+                    _md(f"<div class='dv-nome'>{NOME[t].upper()}</div>"
+                        f"<div class='dv-saldo{' zero' if saldo == 0 else ''}'>{_fmt(saldo)}</div>"
+                        f"<div class='dv-sub'>pendentes · recebeu {_fmt(envi)} · já devolveu {_fmt(dev)}</div>")
+            with cols[3], st.container(key="ad-dev-card-total"):
+                _md(f"<div class='dv-nome'>VALOR TOTAL A DEVOLVER</div><div class='dv-saldo valor'>{dp.fmt_brl(valor_total)}</div>"
+                    f"<div class='dv-sub'>{_fmt(sum(int(pend.get(t, 0)) for t in TIPOS))} itens pendentes em {_e(rot)}</div>")
         else:
             st.write("")
             with st.form(f"ad-dev-form-{destino}-{mes}", border=False):
@@ -1008,7 +1082,8 @@ def _usuarios() -> None:
                 senha = c.text_input("Senha", placeholder="mínimo 6 caracteres", type="password")
                 a2, b2, c2_ = st.columns(3, gap="medium")
                 email = a2.text_input("E-mail (para cobrança)", placeholder="base_sp@empresa.com")
-                perfil_lbl = b2.selectbox("Perfil", ["Operação", "Administrador", "Recebimento", "GDL"])
+                perfil_lbl = b2.selectbox("Perfil", ["Operação", "Administrador", "Recebimento", "GDL"]
+                                          if _eh_admin() else ["Operação"])
                 destino = c2_.selectbox("Base (sigla)", [""] + destinos, help="Admin e Recebimento não usam base.")
                 destino_livre = st.text_input("...ou digite uma sigla nova", placeholder="Só se a base ainda não aparece na lista")
                 criar = st.form_submit_button("Criar usuário", icon=":material/person_add:", type="primary")
@@ -1022,6 +1097,9 @@ def _usuarios() -> None:
                 (st.success if ok else st.error)(msg)
 
     us = dados.ler_usuarios()
+    if not _eh_admin():  # GDL vê e cadastra só usuários de operação
+        us = [u for u in us if str(u.get("perfil", "")).lower() in ("operacao", "operação", "")]
+        st.caption("Perfil GDL: você vê e cadastra apenas usuários de operação (bases).")
     if busca:
         b_ = busca.strip().lower()
         us = [u for u in us if b_ in f"{u['nome']} {u['usuario']} {u['destino']} {u.get('email', '')}".lower()]
@@ -1127,19 +1205,26 @@ def _conciliacao_cobrancas() -> None:
     """Notas de crédito dos insumos não devolvidos (aba Cobrancas da LEVES APP)."""
     _titulo_grande("Cobranças",
                    "Insumos não devolvidos cobrados das bases: uma nota por base, por mês.")
-    notas = dp.notas_credito()
+    minha = _minha_base()
+    notas = _da_minha_base(dp.notas_credito())
     if notas.empty:
-        _md("<div class='dv-vazio'><b>Nenhuma nota de crédito lançada ainda.</b>"
-            "<span>As notas lançadas na aba Cobrancas da planilha LEVES APP aparecem aqui.</span></div>")
+        if minha is not None:
+            _md("<div class='dv-vazio'><b>Nenhuma nota de débito para a sua base.</b>"
+                "<span>Quando houver cobrança por insumos não devolvidos no prazo, a nota aparece aqui.</span></div>")
+        else:
+            _md("<div class='dv-vazio'><b>Nenhuma nota de crédito lançada ainda.</b>"
+                "<span>As notas lançadas na aba Cobrancas da planilha LEVES APP aparecem aqui.</span></div>")
         return
 
     meses = sorted([m for m in notas["mes"].unique() if m], reverse=True)
     rot = {dp.rotulo_mes(m): m for m in meses}
     with st.container(key="ad-box-cb-filtros"):
-        f = st.columns([1.4, 2, 0.9], gap="small", vertical_alignment="bottom")
+        f = st.columns([1.4, 2, 0.9] if minha is None else [2, 1.4, 0.9], gap="small", vertical_alignment="bottom")
         mes_sel = f[0].multiselect("Competência", list(rot), default=[], key="ad-cb-mes", placeholder="Todas as competências")
-        ops = sorted([d for d in notas["destino"].unique() if d], key=str.lower)
-        op_sel = f[1].multiselect("Operação", ops, default=[], key="ad-cb-op", placeholder="Todas as operações")
+        op_sel = []
+        if minha is None:
+            ops = sorted([d for d in notas["destino"].unique() if d], key=str.lower)
+            op_sel = f[1].multiselect("Operação", ops, default=[], key="ad-cb-op", placeholder="Todas as operações")
         with f[2]:
             st.button("Limpar filtros", icon=":material/filter_alt_off:", key="ad-cb-limpar",
                       on_click=_limpar_filtros_cob, width="stretch")
@@ -1164,6 +1249,9 @@ def _conciliacao_cobrancas() -> None:
         (_fmt(n_notas), "NOTAS DE DÉBITO", "uma por base, por mês"),
         (_fmt(n_bases), "OPERAÇÕES", "com pelo menos uma nota"),
     ]
+    if minha is not None:
+        cards[1] = (_fmt(n_notas), "NOTAS DE DÉBITO", "uma por mês cobrado")
+        cards[2] = (dp.fmt_brl(medio), "VALOR MÉDIO POR NOTA", "por competência cobrada")
     st.write("")
     k = st.columns(3, gap="medium")
     for col, (valor_c, rotulo, sub) in zip(k, cards):
@@ -1172,11 +1260,12 @@ def _conciliacao_cobrancas() -> None:
 
     # ---- ranking de bases e evolução por competência ----
     st.write("")
-    g1, g2 = st.columns([1.15, 1], gap="medium")
-    with g1, st.container(key="ad-box-cb-top"):
+    g1, g2 = st.columns([1.15, 1], gap="medium") if minha is None else (st.empty(), st.container())
+    por_base = v[v["destino"] != ""].groupby("destino").agg(valor=("valor", "sum"), notas=("nota", "count")) \
+                .sort_values("valor", ascending=False)
+    if minha is None:
+      with g1, st.container(key="ad-box-cb-top"):
         _md("<div class='ad-tit'>Bases com maior valor cobrado<span>top 5 · % do total</span></div>")
-        por_base = v[v["destino"] != ""].groupby("destino").agg(valor=("valor", "sum"), notas=("nota", "count")) \
-                    .sort_values("valor", ascending=False)
         top = por_base.head(5)
         if top.empty:
             _md("<div class='ad-vazio'>Sem notas para os filtros escolhidos.</div>")
@@ -1254,9 +1343,12 @@ def _pendencias() -> None:
     """Conciliação + pendências num módulo só (mesma base: dp.conciliacao)."""
     import emailer
 
+    minha = _minha_base()
     _titulo_grande("Pendências de devolução",
+                   "Enviado × devolvido por competência e o valor que ainda falta devolver."
+                   if minha is not None else
                    "Enviado × devolvido por competência, valor pendente e cobrança das bases.")
-    env = dp.envios_df()
+    env = _da_minha_base(dp.envios_df())
     if env.empty:
         st.info("Nenhum envio registrado ainda.")
         return
@@ -1266,19 +1358,22 @@ def _pendencias() -> None:
 
     # ---- Filtros ----
     with st.container(key="ad-box-pd-filtros"):
-        f = st.columns([1.1, 1.8, 1.4, 0.9], gap="small", vertical_alignment="bottom")
+        f = (st.columns([1.1, 1.4, 0.9], gap="small", vertical_alignment="bottom") if minha is not None
+             else st.columns([1.1, 1.8, 1.4, 0.9], gap="small", vertical_alignment="bottom"))
         comp_rot = f[0].selectbox("Competência", list(rot_mes), index=0, key="ad-pd-comp")
         mes = rot_mes[comp_rot]
         base = dp.conciliacao(mes)
         if base.empty:
             st.info(f"Sem envios em {comp_rot}.")
             return
-        base = base[base["tipo"].isin(TIPOS)].copy()
-        ops = sorted(base["destino"].astype(str).unique(), key=str.lower)
-        op_sel = f[1].multiselect("Operação", ops, default=[], key="ad-pd-op", placeholder="Todas as operações")
-        ins_sel = f[2].multiselect("Insumo", [NOME[t].upper() for t in TIPOS], default=[], key="ad-pd-ins",
-                                   placeholder="Todos os insumos")
-        with f[3]:
+        base = _da_minha_base(base[base["tipo"].isin(TIPOS)]).copy()
+        op_sel = []
+        if minha is None:
+            ops = sorted(base["destino"].astype(str).unique(), key=str.lower)
+            op_sel = f[1].multiselect("Operação", ops, default=[], key="ad-pd-op", placeholder="Todas as operações")
+        ins_sel = f[-2].multiselect("Insumo", [NOME[t].upper() for t in TIPOS], default=[], key="ad-pd-ins",
+                                    placeholder="Todos os insumos")
+        with f[-1]:
             st.button("Limpar filtros", icon=":material/filter_alt_off:", key="ad-pd-limpar",
                       on_click=_limpar_filtros_pend, width="stretch")
 
@@ -1296,7 +1391,8 @@ def _pendencias() -> None:
     if fechada:
         faixa = ("verde", f"Competência fechada — os itens cobrados de {comp_rot} já receberam baixa.")
     elif fechavel:
-        faixa = ("amarelo", f"Prazo encerrado em {prazo:%d/%m/%Y} — o pendente já pode ser cobrado (fechamento no fim da tela).")
+        faixa = ("amarelo", f"Prazo encerrado em {prazo:%d/%m/%Y} — o pendente já pode ser cobrado"
+                            + (" (fechamento no fim da tela)." if _eh_admin() else "."))
     else:
         ini = dp.agora_sp().normalize() + pd.Timedelta(days=1)
         dias = int(sum(1 for d in pd.date_range(ini, prazo.normalize()) if d.weekday() < 5)) if prazo.normalize() >= ini else 0
@@ -1317,7 +1413,9 @@ def _pendencias() -> None:
     cards = [
         (dp.fmt_brl(valor), "VALOR PENDENTE", "itens não devolvidos × preço"),
         (_fmt(pend_itens), "INSUMOS PENDENTES", detalhe_tipo),
-        (f"{_fmt(bases_pend)}", "BASES COM PENDÊNCIA", f"de {_fmt(bases_tot)} bases com envio"),
+        (f"{_fmt(bases_pend)}", "BASES COM PENDÊNCIA", f"de {_fmt(bases_tot)} bases com envio")
+        if minha is None else
+        (f"{_fmt(enviado)}", "INSUMOS RECEBIDOS", f"enviados pela Loggi em {comp_rot}"),
         (f"{taxa:.1f}%".replace(".", ","), "TAXA DE DEVOLUÇÃO", f"{_fmt(recebido)} recebidos de {_fmt(enviado)} enviados"),
     ]
     st.write("")
@@ -1337,8 +1435,9 @@ def _pendencias() -> None:
     emails = {d: dp.emails_por_destino(d) for d in por_base.index}
 
     st.write("")
-    g1, g2 = st.columns([1.15, 1], gap="medium")
-    with g1, st.container(key="ad-box-pd-top"):
+    g1, g2 = st.columns([1.15, 1], gap="medium") if minha is None else (st.empty(), st.container())
+    if minha is None:
+      with g1, st.container(key="ad-box-pd-top"):
         _md("<div class='ad-tit'>Bases com maior valor pendente<span>top 5 · % do total pendente</span></div>")
         top = por_base[por_base["valor"] > 0].head(5)
         if top.empty:
@@ -1397,6 +1496,10 @@ def _pendencias() -> None:
                                file_name=f"pendencias_{mes}.xlsx",
                                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                                icon=":material/download:", key="ad-pd-xlsx")
+
+    # E-mail às bases e fechamento da competência: só o administrador.
+    if not _eh_admin():
+        return
 
     # ---- E-mail de pendências ----
     st.write("")
@@ -1507,9 +1610,11 @@ def _limpar_filtros_envios() -> None:
 
 
 def _envios() -> None:
+    minha = _minha_base()
+    para = "para a sua base" if minha is not None else "para as bases"
     _md("<div class='ad-h1' style='font-size:27px;font-weight:700'>Visão geral de envios</div>"
-        "<div class='ad-sub' style='font-weight:700'>Insumos enviados pela Loggi para as bases, dia a dia.</div>")
-    env = dp.envios_df()
+        f"<div class='ad-sub' style='font-weight:700'>Insumos enviados pela Loggi {para}, dia a dia.</div>")
+    env = _da_minha_base(dp.envios_df())
     if env.empty:
         st.info("Nenhum envio registrado ainda.")
         return
@@ -1519,7 +1624,8 @@ def _envios() -> None:
     meses = sorted(env["mes"].unique(), reverse=True)
     rot_mes = {dp.rotulo_mes(m): m for m in meses}
     with st.container(key="ad-box-env-filtros"):
-        f = st.columns([1.1, 1.45, 1.3, 1.4, 1.0], gap="small", vertical_alignment="bottom")
+        f = (st.columns([1.1, 1.45, 1.3, 1.0], gap="small", vertical_alignment="bottom") if minha is not None
+             else st.columns([1.1, 1.45, 1.3, 1.4, 1.0], gap="small", vertical_alignment="bottom"))
         mes_rot = f[0].selectbox("Mês", list(rot_mes), index=0, key="ad-env-mes")
         mes = rot_mes[mes_rot]
         dm = env[env["mes"] == mes]
@@ -1529,10 +1635,12 @@ def _envios() -> None:
                                     placeholder="Todos os dias")
         ins_sel = f[2].multiselect("Insumo", [NOME[t].upper() for t in TIPOS], default=[], key="ad-env-ins",
                                    placeholder="Todos os insumos")
-        ops = sorted(dm["destino"].dropna().astype(str).unique())
-        op_sel = f[3].multiselect("Operação", ops, default=[], key=f"ad-env-op-{mes}",
-                                  placeholder="Todas as operações")
-        with f[4]:
+        op_sel = []
+        if minha is None:
+            ops = sorted(dm["destino"].dropna().astype(str).unique())
+            op_sel = f[3].multiselect("Operação", ops, default=[], key=f"ad-env-op-{mes}",
+                                      placeholder="Todas as operações")
+        with f[-1]:
             st.button("Limpar filtros", icon=":material/filter_alt_off:", key="ad-env-limpar",
                       on_click=_limpar_filtros_envios, width="stretch")
 
@@ -1636,7 +1744,7 @@ def _envios() -> None:
         cab = "".join(f"<th>{_e(c)}</th>" for c in ["Dia", "Mês"] + cols_qtd)
         _md(f"<div class='ad-grade'><table class='ad-t2'><thead><tr>{cab}</tr></thead>"
             f"<tbody>{corpo}{rodape}</tbody></table></div>")
-        sufixo = "_".join(op_sel)[:40] if op_sel else "todas"
+        sufixo = minha or ("_".join(op_sel)[:40] if op_sel else "todas")
         st.download_button(
             "Exportar Excel", _excel_envios(tab_total, f"Envios — {mes_rot}"),
             file_name=f"envios_{mes}_{sufixo}.xlsx",
@@ -1793,12 +1901,13 @@ def render(user: dict, logout) -> None:
     st.html(_CSS)
     scan_id = st.query_params.get("dev")
     scan_token = st.query_params.get("t")
-    if scan_id and not st.session_state.get("_ad_scan_visto") == scan_id:
+    if scan_id and _eh_admin() and not st.session_state.get("_ad_scan_visto") == scan_id:
         st.session_state["_ad_scan_visto"] = scan_id
         st.session_state[CHAVE] = "Recebimentos"
         st.session_state[CHAVE_SUB] = "Receber no CD"
     pagina = st.session_state.get(CHAVE, "Envios")
-    if pagina not in PAGINAS:
+    permitidas = {n for _, itens in _menu() for n, _ in itens}
+    if pagina not in permitidas:  # também barra página de outro perfil guardada na sessão
         pagina = "Envios"
     _sidebar(user, pagina, logout)
     try:

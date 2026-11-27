@@ -312,15 +312,11 @@ def main():
     # Tela branca com a lebre enquanto carrega (login e troca de módulo).
     login_visual.tela_carregando()
 
-    # Portal da Leve (perfil operação): portal próprio, leve e sem o CSS
-    # global antigo. Admin, GDL e Recebimento seguem no app abaixo.
-    _u = st.session_state.get("usuario") or {}
+    _u =st.session_state.get("usuario") or {}
     _perfil = str(_u.get("perfil", "")).lower() if _u else ""
-    if _u and _perfil not in ("admin", "gdl", "recebimento"):
-        portal_leve.render(_u, logout)
-        return
-    # Admin: portal novo (Gestão de Materiais).
-    if _u and _perfil == "admin":
+    # Admin, GDL e Leve (operação) usam o mesmo portal novo; o portal_admin
+    # ajusta menu, permissões e dados a cada perfil. Recebimento segue no app abaixo.
+    if _u and _perfil != "recebimento":
         portal_admin.render(_u, logout)
         return
 

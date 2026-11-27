@@ -14,7 +14,6 @@ import json
 import os
 
 import streamlit as st
-import streamlit.components.v1 as components
 
 _RAIZ = os.path.dirname(os.path.abspath(__file__))
 
@@ -153,7 +152,7 @@ def tela_carregando() -> None:
     )
     with st.container(key="lg-carregando"):
         st.html("<style>.st-key-lg-carregando,[data-testid='stLayoutWrapper']:has(> .st-key-lg-carregando),[data-testid='stElementContainer']:has(.st-key-lg-carregando){display:none!important}</style>")
-        components.html(js, height=0)
+        st.iframe(js, height=1)  # fica escondido; só roda o script
 
 
 def painel_marca() -> None:
