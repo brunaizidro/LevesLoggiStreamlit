@@ -298,7 +298,10 @@ def page_6():
     ncols = 5 if usa_valor else 4
     cs = st.columns(ncols)
     cs[0].metric("Enviado no mês", _fmt(df_view["enviado"].sum()))
-    cs[1].metric("Devolvido", _fmt(df_view["devolvido"].sum()))
+    cs[1].metric(
+        "Recebido no CD", _fmt(df_view["devolvido"].sum()),
+        help="Devoluções que já chegaram ao CD. Devoluções em trânsito não entram aqui.",
+    )
     cs[2].metric("Já cobrado", _fmt(df_view["cobrado"].sum()))
     cs[3].metric(rot_cobravel, _fmt(df_view["cobravel"].sum()))
     if usa_valor:
@@ -524,7 +527,7 @@ def page_6():
 
     tab_disp = tab.drop(columns=["em_aberto"]).rename(columns={
         "destino": "Operação", "tipo": "Tipo", "enviado": "Enviado",
-        "devolvido": "Devolvido", "cobrado": "Já cobrado", "cobravel": "Cobrável",
+        "devolvido": "Recebido no CD", "cobrado": "Já cobrado", "cobravel": "Cobrável",
     })
     if usa_valor:
         tab_disp["Valor unitário"] = tab_disp["Valor unitário"].map(dp.fmt_brl)

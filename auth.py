@@ -107,7 +107,7 @@ def autenticar(usuario: str, senha: str) -> dict | None:
         return None
 
     try:
-        sheets.ler_usuarios.clear()
+        sheets.limpar_cache("usuarios")
     except Exception:
         pass
 
@@ -143,7 +143,7 @@ def diagnosticar_login(
         return False, "Digite a senha.", None
 
     try:
-        sheets.ler_usuarios.clear()
+        sheets.limpar_cache("usuarios")
     except Exception:
         pass
 
@@ -398,7 +398,7 @@ def buscar_usuario_por_email(email: str, usuario: str) -> dict | None:
 
     # Evita usar uma lista de usuários desatualizada durante a recuperação.
     try:
-        sheets.ler_usuarios.clear()
+        sheets.limpar_cache("usuarios")
     except Exception:
         pass
 

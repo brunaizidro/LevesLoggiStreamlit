@@ -66,9 +66,22 @@ _DEVOLUCAO_ID_LOCK = threading.Lock()
 # aba é limpo; as camadas de processamento usam esse número como chave de
 # cache, então um DataFrame já processado é descartado assim que a aba muda.
 _VERSOES = {"envios": 0, "usuarios": 0, "devolucoes": 0, "itens": 0, "cobrancas": 0, "config": 0}
-# A aba Envios tem >100 mil linhas: relê-la custa vários segundos. O botão
-# "Atualizar dados" continua forçando a releitura na hora.
-TTL_ENVIOS = 600
+# A aba Envios é colada à mão uma vez por dia e tem ~90 mil linhas: relê-la
+# custa alguns segundos. Fica 6 h em cache; depois de colar os envios do dia,
+# use o botão "Atualizar dados" para forçar a releitura na hora.
+TTL_ENVIOS = 6 * 3600
+# Abas pequenas. Toda gravação feita pelo portal já limpa o cache da aba
+# (limpar_cache), então o TTL só importa para edições feitas direto na planilha.
+TTL_ABAS = 600
+
+# Abas pequenas lidas juntas numa única chamada à API (≈0,7 s em vez de ≈4 s
+# lendo uma a uma, porque cada leitura isolada custa 2 chamadas).
+_ABAS_LOTE = ("Usuarios", "Devolucoes", "Devolucoes_Itens", "Cobrancas", "Config")
+
+# Referências das abas já abertas: ss.worksheet() faz uma chamada à API
+# (~0,35 s) toda vez que é usada.
+_WS_CACHE: dict[str, gspread.Worksheet] = {}
+_WS_LOCK = threading.Lock()
 
 
 def versao(*abas: str) -> tuple:
@@ -148,14 +161,48 @@ def _planilha() -> gspread.Spreadsheet:
 
 
 def _aba(nome: str, cabecalho: list[str]) -> gspread.Worksheet:
-    """Retorna a aba, criando-a com cabeçalho se não existir."""
-    ss = _planilha()
-    try:
-        return ss.worksheet(nome)
-    except gspread.WorksheetNotFound:
-        ws = ss.add_worksheet(title=nome, rows=100, cols=max(4, len(cabecalho)))
-        ws.append_row(cabecalho)
+    """Retorna a aba (reaproveitando a referência), criando-a se não existir."""
+    ws = _WS_CACHE.get(nome)
+    if ws is not None:
         return ws
+    with _WS_LOCK:
+        ws = _WS_CACHE.get(nome)
+        if ws is not None:
+            return ws
+        ss = _planilha()
+        try:
+            ws = ss.worksheet(nome)
+        except gspread.WorksheetNotFound:
+            ws = ss.add_worksheet(title=nome, rows=100, cols=max(4, len(cabecalho)))
+            ws.append_row(cabecalho)
+        _WS_CACHE[nome] = ws
+        return ws
+
+
+_CABECALHOS_LOTE = {
+    "Usuarios": CAB_USUARIOS,
+    "Devolucoes": CAB_DEVOLUCOES,
+    "Devolucoes_Itens": CAB_DEV_ITENS,
+    "Cobrancas": CAB_COBRANCAS,
+    "Config": CAB_CONFIG,
+}
+
+
+@st.cache_data(ttl=TTL_ABAS, show_spinner=False)
+def _ler_lote() -> dict[str, list[list[str]]]:
+    """Lê as abas pequenas numa única chamada (mesmos valores de get_all_values)."""
+    try:
+        resp = _planilha().values_batch_get([f"'{n}'" for n in _ABAS_LOTE])
+        faixas = resp.get("valueRanges", [])
+        if len(faixas) == len(_ABAS_LOTE):
+            return {n: f.get("values", []) for n, f in zip(_ABAS_LOTE, faixas)}
+    except gspread.exceptions.APIError:
+        pass  # ex.: aba ainda não existe — cai na leitura uma a uma (que a cria)
+    return {n: _aba(n, _CABECALHOS_LOTE[n]).get_all_values() for n in _ABAS_LOTE}
+
+
+def _valores(nome: str) -> list[list[str]]:
+    return _ler_lote()[nome]
 
 
 # ---------------------------------------------------------------------------
@@ -194,11 +241,10 @@ def ler_envios() -> list[dict]:
     ]
 
 
-@st.cache_data(ttl=120, show_spinner=False)
+@st.cache_data(ttl=TTL_ABAS, show_spinner=False)
 def ler_usuarios() -> list[dict]:
     """Lê todos os usuários (inclui hash/salt — uso interno)."""
-    ws = _aba(ABA_USUARIOS, CAB_USUARIOS)
-    valores = ws.get_all_values()
+    valores = _valores(ABA_USUARIOS)
     linhas = []
     for i, row in enumerate(valores):
         if i == 0 or not any(row):
@@ -225,11 +271,10 @@ def ler_usuarios() -> list[dict]:
     return linhas
 
 
-@st.cache_data(ttl=120, show_spinner=False)
+@st.cache_data(ttl=TTL_ABAS, show_spinner=False)
 def ler_devolucoes() -> list[dict]:
     """Lê os cabeçalhos de devolução."""
-    ws = _aba(ABA_DEVOLUCOES, CAB_DEVOLUCOES)
-    valores = ws.get_all_values()
+    valores = _valores(ABA_DEVOLUCOES)
     linhas = []
     for i, row in enumerate(valores):
         if i == 0 or not any(row):
@@ -241,11 +286,10 @@ def ler_devolucoes() -> list[dict]:
     return linhas
 
 
-@st.cache_data(ttl=120, show_spinner=False)
+@st.cache_data(ttl=TTL_ABAS, show_spinner=False)
 def ler_dev_itens() -> list[dict]:
     """Lê os itens de devolução."""
-    ws = _aba(ABA_DEV_ITENS, CAB_DEV_ITENS)
-    valores = ws.get_all_values()
+    valores = _valores(ABA_DEV_ITENS)
     linhas = []
     for i, row in enumerate(valores):
         if i == 0 or not any(row):
@@ -382,11 +426,10 @@ def atualizar_itens_recebidos(id_dev: str, recebidos: dict):
     limpar_cache("itens")
 
 
-@st.cache_data(ttl=120, show_spinner=False)
+@st.cache_data(ttl=TTL_ABAS, show_spinner=False)
 def ler_cobrancas() -> list[dict]:
     """Lê as cobranças registradas (itens já baixados por cobrança)."""
-    ws = _aba(ABA_COBRANCAS, CAB_COBRANCAS)
-    valores = ws.get_all_values()
+    valores = _valores(ABA_COBRANCAS)
     linhas = []
     for i, row in enumerate(valores):
         if i == 0 or not any(row):
@@ -419,11 +462,10 @@ def competencia_ja_fechada(competencia: str) -> bool:
 # Configuração (chave/valor) — usada para o SMTP de e-mail
 # ---------------------------------------------------------------------------
 
-@st.cache_data(ttl=120, show_spinner=False)
+@st.cache_data(ttl=TTL_ABAS, show_spinner=False)
 def get_config() -> dict:
     """Lê a aba Config como dicionário chave->valor."""
-    ws = _aba(ABA_CONFIG, CAB_CONFIG)
-    valores = ws.get_all_values()
+    valores = _valores(ABA_CONFIG)
     cfg = {}
     for i, row in enumerate(valores):
         if i == 0 or not any(row):
@@ -450,7 +492,7 @@ def set_config(novos: dict):
             ws.update_cell(linha_por_chave[chave], 2, str(valor))
         else:
             ws.append_row([chave, str(valor)], value_input_option="USER_ENTERED")
-    get_config.clear()
+    limpar_cache("config")
 
 
 def limpar_cache(*abas: str):
@@ -464,6 +506,12 @@ def limpar_cache(*abas: str):
         "cobrancas": ler_cobrancas,
         "config": get_config,
     }
+    # As abas pequenas vêm do mesmo lote: limpar qualquer uma relê o lote.
+    if alvos - {"envios"}:
+        _ler_lote.clear()
+    if not abas:
+        # "Atualizar dados": também reabre as abas (caso tenham sido recriadas).
+        _WS_CACHE.clear()
     for alvo in alvos:
         funcao = funcoes.get(alvo)
         if funcao is not None:

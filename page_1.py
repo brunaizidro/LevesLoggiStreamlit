@@ -8,6 +8,7 @@ filtros, gráficos, multi-tenant e exportação CSV.
 from __future__ import annotations
 
 import html
+import pandas as pd
 import plotly.express as px
 import streamlit as st
 
@@ -333,6 +334,11 @@ def page_1():
         unsafe_allow_html=True,
     )
 
+    ate = dp.envios_atualizados_ate()
+    if ate is not None and pd.notna(ate):
+        st.caption(f"📅 Envios atualizados até **{ate.strftime('%d/%m/%Y')}**. "
+                   "Envios mais recentes aparecem na próxima atualização.")
+
     df = dp.envios_do_usuario(user)
     if df.empty:
         st.info(
@@ -405,7 +411,9 @@ def page_1():
     nomes_tipo = {"SACA": "Sacas", "GAYLORD": "Gaylords", "PALLET": "Pallets"}
     kpis = [("Total de insumos", total_geral, "🚚", "no período")]
     for t in tipos_kpi:
-        kpis.append((nomes_tipo.get(t, str(t).title()), por_tipo.get(t, 0), "", "enviados"))
+        # PALLET não vem da planilha: o portal deriva 1 pallet por gaylord.
+        subtitulo_tipo = "1 por gaylord enviado" if t == "PALLET" else "enviados"
+        kpis.append((nomes_tipo.get(t, str(t).title()), por_tipo.get(t, 0), "", subtitulo_tipo))
 
     cols = st.columns(len(kpis))
     for idx, (col, (nome, valor, icone, subtitulo)) in enumerate(zip(cols, kpis)):

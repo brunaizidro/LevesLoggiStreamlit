@@ -257,7 +257,7 @@ def devolucoes_df() -> pd.DataFrame:
     return _devolucoes_df_cache(data_extraction.versao("devolucoes"))
 
 
-@st.cache_data(ttl=120, show_spinner=False, max_entries=3)
+@st.cache_data(ttl=data_extraction.TTL_ABAS, show_spinner=False, max_entries=3)
 def _devolucoes_df_cache(versao_abas: tuple) -> pd.DataFrame:
     devs = data_extraction.ler_devolucoes()
     df = pd.DataFrame(devs)
@@ -287,7 +287,7 @@ def itens_df() -> pd.DataFrame:
     return _itens_df_cache(data_extraction.versao("itens"))
 
 
-@st.cache_data(ttl=120, show_spinner=False, max_entries=3)
+@st.cache_data(ttl=data_extraction.TTL_ABAS, show_spinner=False, max_entries=3)
 def _itens_df_cache(versao_abas: tuple) -> pd.DataFrame:
     df = pd.DataFrame(data_extraction.ler_dev_itens())
     if df.empty:
@@ -437,6 +437,62 @@ def pending_mes_tipo(destino: str, mes: str) -> dict:
     tipos = set(enviado) | set(devolvido) | set(cobrado)
     return {t: max(int(enviado.get(t, 0)) - int(devolvido.get(t, 0)) - int(cobrado.get(t, 0)), 0)
             for t in tipos}
+
+
+def resumo_devolucao(destino: str, mes: str | None = None) -> pd.DataFrame:
+    """Quadro enviado → em trânsito → recebido no CD → cobrado → saldo, por tipo.
+
+    Usa as mesmas regras do saldo (pending_mes_tipo / saldo_por_tipo), só que
+    separando o "devolvido" em EM TRÂNSITO e RECEBIDO NO CD para a tela.
+    `mes=None` considera todos os meses (visão do GDL).
+    Quantidades de devolução = qtd declarada (a que compromete o saldo).
+    """
+    cols = ["tipo", "enviado", "em_transito", "recebido", "cobrado", "saldo"]
+    alvo = _normalizar(destino)
+
+    env = envios_df()
+    enviado = {}
+    if not env.empty:
+        e = env[env["destino_norm"] == alvo]
+        if mes:
+            e = e[e["mes"] == mes]
+        enviado = e.groupby("tipo")["total"].sum().to_dict()
+
+    transito, recebido = {}, {}
+    devs = devolucoes_df()
+    its = itens_df()
+    if not devs.empty and not its.empty:
+        d = devs[(devs["destino_norm"] == alvo) & (devs["status"].isin(STATUS_COMPROMETIDOS))]
+        if mes:
+            d = d[d["comp"] == mes]
+        for status_set, alvo_dict in (({STATUS_TRANSITO}, transito), (STATUS_RECEBIDOS, recebido)):
+            ids = set(d.loc[d["status"].isin(status_set), "id"])
+            it = its[its["id_devolucao"].isin(ids)]
+            alvo_dict.update(it.groupby("tipo")["qtd_declarada"].sum().to_dict())
+
+    if mes:
+        cob_raw = _cobrado_por_competencia(mes, ate=False)
+    else:
+        cob_raw = _cobrado_por_chave(agora_sp())
+    cobrado = {t: q for (dn, t), q in cob_raw.items() if dn == alvo}
+
+    linhas = []
+    for t in sorted(set(enviado) | set(transito) | set(recebido) | set(cobrado)):
+        env_v = int(enviado.get(t, 0))
+        tr_v = int(transito.get(t, 0))
+        rec_v = int(recebido.get(t, 0))
+        cob_v = int(cobrado.get(t, 0))
+        linhas.append({"tipo": t, "enviado": env_v, "em_transito": tr_v, "recebido": rec_v,
+                       "cobrado": cob_v, "saldo": max(env_v - tr_v - rec_v - cob_v, 0)})
+    return pd.DataFrame(linhas, columns=cols)
+
+
+def envios_atualizados_ate():
+    """Maior data presente na aba Envios (os dados são colados manualmente)."""
+    env = envios_df()
+    if env.empty:
+        return None
+    return env["dt"].max()
 
 
 def _consome_fifo(lots: list, retornado: float) -> list:
@@ -688,7 +744,7 @@ def conciliacao(mes: str) -> pd.DataFrame:
     )
 
 
-@st.cache_data(ttl=120, show_spinner=False, max_entries=48)
+@st.cache_data(ttl=data_extraction.TTL_ABAS, show_spinner=False, max_entries=48)
 def _conciliacao_cache(mes: str, versao_abas: tuple) -> pd.DataFrame:
     cols =["destino", "tipo", "enviado", "devolvido", "cobrado", "em_aberto", "cobravel"]
     env = envios_df()

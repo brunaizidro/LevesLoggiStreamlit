@@ -84,6 +84,43 @@ def _operacoes_destinos_envios() -> dict[str, dict]:
     return mapa
 
 
+def _aviso_atualizacao_envios() -> None:
+    """Mostra até que dia os envios estão carregados (a planilha é colada à mão)."""
+    ate = dp.envios_atualizados_ate()
+    if ate is not None and pd.notna(ate):
+        st.caption(f"📅 Envios atualizados até **{ate.strftime('%d/%m/%Y')}**. "
+                   "Envios mais recentes aparecem na próxima atualização.")
+
+
+def _quadro_saldo(saldo: pd.DataFrame, ordem_tipos: list[str]) -> None:
+    """Conta do saldo visível (sem depender de tooltip): enviado − devolvido − cobrado."""
+    tab = saldo[saldo["tipo"].astype(str).str.upper().isin(ordem_tipos)].copy()
+    if tab.empty:
+        return
+    tab["ordem"] = tab["tipo"].astype(str).str.upper().map({t: i for i, t in enumerate(ordem_tipos)})
+    tab = tab.sort_values("ordem")
+    tab = pd.DataFrame({
+        "Insumo": tab["tipo"].astype(str).str.title(),
+        "Enviado": tab["enviado"].astype(int),
+        "Em trânsito": tab["em_transito"].astype(int),
+        "Recebido no CD": tab["recebido"].astype(int),
+        "Já cobrado": tab["cobrado"].astype(int),
+        "Saldo a devolver": tab["saldo"].astype(int),
+    })
+    st.markdown("<div class='dev-section-title'>🧮 &nbsp; Como o saldo é calculado</div>", unsafe_allow_html=True)
+    st.dataframe(
+        tab, hide_index=True, width="stretch",
+        column_config={c: st.column_config.NumberColumn(c, format="localized")
+                       for c in tab.columns if c != "Insumo"},
+    )
+    st.caption(
+        "**Saldo a devolver = Enviado − Em trânsito − Recebido no CD − Já cobrado.** "
+        "*Em trânsito*: devoluções já registradas que ainda não chegaram ao CD. "
+        "*Recebido no CD*: devoluções que já chegaram. "
+        "**Pallet não vem da planilha de envios: o portal considera 1 pallet para cada gaylord enviado.**"
+    )
+
+
 def page_3():
     user = st.session_state.get("usuario") or {}
     eh_admin = user.get("perfil") == "admin"
@@ -493,36 +530,9 @@ def page_3():
     # formulário: envios da competência menos devoluções já registradas
     # (inclusive EM_TRANSITO) e cobranças da própria competência.
     # A conciliação por recebimento continua sendo usada nos relatórios/cobranças.
-    if eh_gdl:
-        saldo = dp.saldo_por_tipo(destino)
-    else:
-        pendencias_competencia = dp.pending_mes_tipo(destino, mes_ref)
-        env = dp.envios_df()
-        env_mes = env[
-            (env["destino"].map(dp._normalizar) == dp._normalizar(destino))
-            & (env["mes"] == mes_ref)
-        ].copy()
-        enviados_por_tipo = env_mes.groupby("tipo")["total"].sum().to_dict()
-        cobrados_por_tipo = {
-            tipo: qtd
-            for (dest, tipo), qtd in dp._cobrado_por_competencia(mes_ref, ate=False).items()
-            if dest == dp._normalizar(destino)
-        }
-        linhas_saldo = []
-        for tipo, enviado in enviados_por_tipo.items():
-            enviado = int(enviado)
-            saldo_tipo = int(pendencias_competencia.get(tipo, 0))
-            cobrado = int(cobrados_por_tipo.get(tipo, 0))
-            devolvido = max(enviado - saldo_tipo - cobrado, 0)
-            linhas_saldo.append({
-                "tipo": tipo,
-                "enviado": enviado,
-                "devolvido": devolvido,
-                "saldo": saldo_tipo,
-            })
-        saldo = pd.DataFrame(
-            linhas_saldo, columns=["tipo", "enviado", "devolvido", "saldo"]
-        )
+    # GDL vê o acumulado de todos os meses; operação/admin, a competência.
+    resumo = dp.resumo_devolucao(destino, None if eh_gdl else mes_ref)
+    saldo = resumo.assign(devolvido=resumo["em_transito"] + resumo["recebido"])
     if saldo.empty or saldo["enviado"].sum() == 0:
         if eh_admin:
             st.info(f"Nenhum ativo enviado para a operação **{destino}** até o momento.")
@@ -530,7 +540,8 @@ def page_3():
             st.info("Nenhum ativo enviado para a sua operação até o momento.")
         return
 
-    titulo_saldo = "Saldo a devolver" + ("" if eh_gdl else f" — {escolha_mes}")
+    titulo_saldo = "Saldo a devolver" + (" — todos os meses" if eh_gdl else f" — {escolha_mes}")
+    _aviso_atualizacao_envios()
     icone_caixa_titulo = "<svg viewBox='0 0 48 48' aria-hidden='true'><path d='m6 15 18-9 18 9v20L24 44 6 35Z' fill='none' stroke='currentColor' stroke-width='3' stroke-linejoin='round'/><path d='m6 15 18 10 18-10M24 25v19M16 10l18 10' fill='none' stroke='currentColor' stroke-width='3' stroke-linejoin='round'/></svg>"
     st.markdown(f"<div class='dev-balance-section-title'>{icone_caixa_titulo}<span>{titulo_saldo}</span></div>", unsafe_allow_html=True)
     pr = dp.precos()
@@ -600,6 +611,8 @@ def page_3():
             f"<div class='dev-total-banner'><span class='dev-total-icon'>{icone_moedas}</span><span class='dev-total-label'>Valor total a devolver</span><strong>{dp.fmt_brl(total_val)}</strong></div>",
             unsafe_allow_html=True,
         )
+
+    _quadro_saldo(saldo, ordem_tipos)
 
     st.markdown("<hr class='sb-sep' style='border-top-color:#e6e6e6;'>", unsafe_allow_html=True)
 
