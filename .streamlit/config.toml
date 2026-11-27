@@ -2,6 +2,7 @@
 primaryColor = "#0067fc"
 backgroundColor = "#FFFFFF"
 textColor = "#262730"
-font = "sans serif"
+font = "Montserrat:https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap"
+headingFont = "Montserrat:https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap"
 
-# A tipografia Montserrat é carregada pelo CSS do aplicativo.
+# Montserrat é a fonte do tema: vale para todos os componentes (filtros, listas, tabelas).

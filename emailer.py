@@ -341,8 +341,12 @@ def enviar_email(
     corpo_html: str,
     reply_to: str | None = None,
     destinatarios_adicionais: list[str] | None = None,
+    anexos: list[tuple[str, bytes, str]] | None = None,
 ) -> tuple[bool, str]:
-    """Envia HTML para a operação e sempre inclui materiais@loggi.com no CC e no envelope SMTP."""
+    """Envia HTML para a operação e sempre inclui materiais@loggi.com no CC e no envelope SMTP.
+
+    `anexos`: lista opcional de (nome_arquivo, conteúdo, mime) — ex.: imagens de um chamado.
+    """
     destinatario = (destinatario or "").strip()
     if not destinatario:
         return False, "Destinatário vazio."
@@ -368,6 +372,20 @@ def enviar_email(
     if reply_to:
         msg["Reply-To"] = reply_to
     msg.attach(MIMEText(corpo_html, "html", "utf-8"))
+    if anexos:
+        from email.mime.application import MIMEApplication
+
+        corpo_alt = msg
+        msg = MIMEMultipart("mixed")
+        for cab in ("Subject", "From", "To", "Bcc", "Cc", "Reply-To"):
+            if corpo_alt[cab]:
+                msg[cab] = corpo_alt[cab]
+        msg.attach(corpo_alt)
+        for nome_arq, conteudo, mime in anexos:
+            parte = MIMEApplication(conteudo, _subtype=(mime.split("/")[-1] if mime else "octet-stream"))
+            parte.replace_header("Content-Type", mime or "application/octet-stream")
+            parte.add_header("Content-Disposition", "attachment", filename=nome_arq)
+            msg.attach(parte)
 
     # O CC precisa estar também na lista de destinatários do SMTP.
     destinatarios_smtp = [destinatario]
@@ -401,7 +419,8 @@ def email_suporte() -> str:
     return str(config_smtp().get("email_suporte", "")).strip()
 
 
-def enviar_duvida(nome: str, email_remetente: str, mensagem: str) -> tuple[bool, str]:
+def enviar_duvida(nome: str, email_remetente: str, mensagem: str,
+                  anexos: list[tuple[str, bytes, str]] | None = None) -> tuple[bool, str]:
     nome = (nome or "").strip()
     email_remetente = (email_remetente or "").strip()
     mensagem = (mensagem or "").strip()
@@ -422,10 +441,12 @@ def enviar_duvida(nome: str, email_remetente: str, mensagem: str) -> tuple[bool,
       <p><b>De:</b> {nome or '(sem nome)'} &lt;{email_remetente}&gt;</p>
       <p><b>Mensagem:</b></p>
       <div style="background:#f1f5fb;border-radius:8px;padding:12px 14px;white-space:pre-wrap">{_escape(mensagem)}</div>
+      {f'<p style="font-size:12px;color:#6e6e6e">{len(anexos)} imagem(ns) em anexo.</p>' if anexos else ''}
       <p style="color:#6e6e6e;font-size:12px;margin-top:14px">Responda diretamente a este e-mail para falar com a operação.</p>
     </div>
     """
-    return enviar_email(destino, f"[Dúvida Portal LEVES] {nome or email_remetente}", corpo, reply_to=email_remetente)
+    return enviar_email(destino, f"[Dúvida Portal LEVES] {nome or email_remetente}", corpo,
+                        reply_to=email_remetente, anexos=anexos)
 
 
 def _escape(s: str) -> str:

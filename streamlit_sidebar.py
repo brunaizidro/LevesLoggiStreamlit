@@ -34,7 +34,7 @@ section[data-testid="stSidebar"] + div {margin-left:0 !important;}
 .sb-sep {border:0;border-top:1px solid rgba(255,255,255,.25);margin:14px 0 !important;}
 .sb-section-label {color:#C8DDFF !important;font-family:Montserrat,sans-serif !important;font-size:10px !important;font-weight:800 !important;letter-spacing:1.6px;text-transform:uppercase;margin:8px 4px 8px;}
 .sb-card {position:relative;background:rgba(255,255,255,.13) !important;border:1px solid rgba(255,255,255,.25) !important;border-radius:16px !important;padding:13px 12px 13px 66px !important;margin:0 0 20px 0 !important;min-height:68px;box-shadow:0 6px 18px rgba(0,0,0,.07);}
-.sb-card:before {content:"person";position:absolute;left:14px;top:13px;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(35,157,255,.72);color:#fff;font-family:"Material Symbols Rounded";font-size:25px;font-weight:500;}
+.sb-card:before {content:"";background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D'12'%20cy%3D'8'%20r%3D'4'%2F%3E%3Cpath%20d%3D'M4%2021v-1a6%206%200%200%201%206-6h4a6%206%200%200%201%206%206v1'%2F%3E%3C%2Fsvg%3E")!important;background-repeat:no-repeat;background-position:center;background-size:24px 24px;position:absolute;left:14px;top:13px;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(35,157,255,.72);color:#fff;font-family:"Material Symbols Rounded";font-size:25px;font-weight:500;}
 .sb-card .nome {color:#fff !important;font-family:Montserrat,sans-serif !important;font-size:13px !important;line-height:1.3 !important;font-weight:800 !important;margin-top:4px;}
 .sb-card .papel {color:#DCEAFF !important;font-family:Montserrat,sans-serif !important;font-size:11px !important;font-weight:600 !important;margin-top:3px;}
 /* Navegação real por botões — separação e estados visuais */
@@ -117,6 +117,7 @@ section[data-testid="stSidebar"] + div {margin-left:0 !important;}
 
 /* Ícones SVG próprios, alinhados ao texto dos botões */
 [data-testid="stSidebar"] .st-key-leves-nav-menu [data-testid="stButton"] > button::before {content:"";display:inline-block;flex:0 0 19px;width:19px;height:19px;background-color:currentColor;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center;-webkit-mask-size:contain;mask-size:contain;}
+.st-key-nav_leves_inicio button::before{-webkit-mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D'M3%2011%2012%204l9%207'%2F%3E%3Cpath%20d%3D'M5%2010v10h5v-6h4v6h5V10'%2F%3E%3C%2Fsvg%3E");mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D'M3%2011%2012%204l9%207'%2F%3E%3Cpath%20d%3D'M5%2010v10h5v-6h4v6h5V10'%2F%3E%3C%2Fsvg%3E");}
 .st-key-nav_leves_envios button::before{-webkit-mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D'm12%203%208%204.5v9L12%2021l-8-4.5v-9L12%203Z'%2F%3E%3Cpath%20d%3D'm4.3%207.5%207.7%204.4%207.7-4.4M12%2021v-9.1'%2F%3E%3C%2Fsvg%3E");mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D'm12%203%208%204.5v9L12%2021l-8-4.5v-9L12%203Z'%2F%3E%3Cpath%20d%3D'm4.3%207.5%207.7%204.4%207.7-4.4M12%2021v-9.1'%2F%3E%3C%2Fsvg%3E");}
 .st-key-nav_leves_recebimentos button::before{-webkit-mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D'M4%2013h4l2%203h4l2-3h4v7H4zM12%203v9m-4-4%204%204%204-4'%2F%3E%3C%2Fsvg%3E");mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D'M4%2013h4l2%203h4l2-3h4v7H4zM12%203v9m-4-4%204%204%204-4'%2F%3E%3C%2Fsvg%3E");}
 .st-key-nav_leves_conciliacao button::before{-webkit-mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D'5'%20y%3D'3'%20width%3D'14'%20height%3D'18'%20rx%3D'1'%2F%3E%3Cpath%20d%3D'M9%208h6M9%2012h6M9%2016h6'%2F%3E%3C%2Fsvg%3E");mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D'5'%20y%3D'3'%20width%3D'14'%20height%3D'18'%20rx%3D'1'%2F%3E%3Cpath%20d%3D'M9%208h6M9%2012h6M9%2016h6'%2F%3E%3C%2Fsvg%3E");}
@@ -280,6 +281,70 @@ section[data-testid="stSidebar"] + div {margin-left:0 !important;}
         unsafe_allow_html=True,
     )
 
+LOGO_AZUL_PATH = "image_logo_loggi_azul.png"
+
+
+def _estilos_claros():
+    """Menu lateral claro (fundo branco, azul só como destaque) — padrão app Loggi.
+
+    Vem depois dos estilos antigos e os sobrepõe; para voltar ao menu azul,
+    basta não chamar esta função em sidebar().
+    """
+    st.markdown(
+        """
+<style>
+[data-testid="stSidebar"] > div:first-child {background:#ffffff !important;border-right:1px solid #e3eaf4 !important;}
+.leves-sb-logo.leves-sb-logo-azul {margin:6px auto 10px !important;}
+.leves-sb-logo.leves-sb-logo-azul img {width:104px !important;}
+.leves-sb-title {color:#002766 !important;font-size:17px !important;font-weight:700 !important;}
+.leves-sb-title .leves-sb-cube svg path {stroke:#006aff !important;}
+.leves-sb-subtitle {color:#8a97ab !important;}
+.sb-sep {border-top-color:#e3eaf4 !important;}
+.sb-section-label, [data-testid="stSidebar"] .st-key-leves-nav-menu .leves-nav-section {color:#8a97ab !important;}
+[data-testid="stSidebar"] .st-key-leves-nav-menu .leves-nav-divider {background:#e3eaf4 !important;}
+.sb-card {background:#f5f8fc !important;border:1px solid #e3eaf4 !important;box-shadow:none !important;}
+.sb-card:before {background-color:#e6f2ff !important;background-image:url("@@PESSOA@@") !important;}
+.sb-card .nome {color:#002766 !important;font-weight:700 !important;}
+.sb-card .papel {color:#5b6b82 !important;}
+[data-testid="stSidebar"] .st-key-leves-nav-menu [data-testid="stButton"] > button,
+[data-testid="stSidebar"] .st-key-leves-nav-menu [data-testid="stButton"] > button[kind="secondary"] {
+  color:#33415c !important;background:transparent !important;border-color:transparent !important;box-shadow:none !important;font-weight:600 !important;font-size:13px !important;height:38px !important;min-height:38px !important;}
+[data-testid="stSidebar"] .st-key-leves-nav-menu [data-testid="stButton"] > button[kind="secondary"]:hover {background:#f1f5fb !important;color:#002766 !important;}
+[data-testid="stSidebar"] .st-key-leves-nav-menu [data-testid="stButton"] > button[kind="primary"] {
+  color:#006aff !important;background:#e6f2ff !important;border-color:#e6f2ff !important;box-shadow:none !important;font-weight:700 !important;}
+[data-testid="stSidebar"] .st-key-leves-nav-menu [data-testid="stButton"] > button[kind="primary"] p,
+[data-testid="stSidebar"] .st-key-leves-nav-menu [data-testid="stButton"] > button[kind="primary"] span {color:#006aff !important;}
+[data-testid="stSidebar"] .st-key-leves-nav-menu [data-testid="stButton"] > button[kind="primary"]:after {border-color:#006aff !important;}
+[data-testid="stSidebar"] .st-key-leves-nav-menu [data-testid="stButton"] > button::before {background-color:currentColor !important;}
+[data-testid="stSidebar"] .stButton:not(.st-key-leves-nav-menu .stButton) > button,
+[data-testid="stSidebar"] [data-testid="stDownloadButton"] > button {
+  background:#ffffff !important;color:#002766 !important;border:1px solid #e3eaf4 !important;font-weight:600 !important;}
+[data-testid="stSidebar"] .stButton:not(.st-key-leves-nav-menu .stButton) > button *,
+[data-testid="stSidebar"] [data-testid="stDownloadButton"] > button * {color:#002766 !important;}
+[data-testid="stSidebar"] .stButton:not(.st-key-leves-nav-menu .stButton) > button:hover,
+[data-testid="stSidebar"] [data-testid="stDownloadButton"] > button:hover {background:#f5f8fc !important;border-color:#006aff !important;}
+[data-testid="stSidebar"] [data-testid="stExpander"] {background:#ffffff !important;border:1px solid #e3eaf4 !important;}
+[data-testid="stSidebar"] [data-testid="stExpander"] summary,
+[data-testid="stSidebar"] [data-testid="stExpander"] summary:hover {background:#ffffff !important;color:#002766 !important;}
+[data-testid="stSidebar"] [data-testid="stExpander"] summary *,
+[data-testid="stSidebar"] [data-testid="stExpander"] summary p,
+[data-testid="stSidebar"] [data-testid="stExpander"] summary span,
+[data-testid="stSidebar"] [data-testid="stExpander"] summary [data-testid="stIconMaterial"] {color:#002766 !important;fill:#002766 !important;font-weight:600 !important;}
+[data-testid="stSidebar"] [data-testid="stExpander"] label,
+[data-testid="stSidebar"] [data-testid="stExpander"] label p,
+[data-testid="stSidebar"] [data-testid="stExpander"] .stMarkdown,
+[data-testid="stSidebar"] [data-testid="stExpander"] .stMarkdown p {color:#33415c !important;}
+[data-testid="stSidebar"] [data-testid="stExpander"] [data-testid="stFormSubmitButton"] button,
+[data-testid="stSidebar"] [data-testid="stExpander"] button[kind="primary"] {background:#006aff !important;border-color:#006aff !important;}
+[data-testid="stSidebar"] [data-testid="stExpander"] [data-testid="stFormSubmitButton"] button *,
+[data-testid="stSidebar"] [data-testid="stExpander"] button[kind="primary"] * {color:#ffffff !important;}
+[data-testid="stAppViewContainer"], [data-testid="stMain"] {background:#ffffff !important;}
+</style>
+        """.replace("@@PESSOA@@", "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23006aff%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D'12'%20cy%3D'8'%20r%3D'4'%2F%3E%3Cpath%20d%3D'M4%2021v-1a6%206%200%200%201%206-6h4a6%206%200%200%201%206%206v1'%2F%3E%3C%2Fsvg%3E"),
+        unsafe_allow_html=True,
+    )
+
+
 def sidebar():
     estilizador = PageStyler()
     base = os.path.dirname(os.path.abspath(__file__))
@@ -287,8 +352,15 @@ def sidebar():
     logo_base64 = get_base64_image(caminho) if os.path.exists(caminho) else ""
     estilizador.apply_sidebar_css(logo_base64)
     _estilos_extra()
+    _estilos_claros()
+    caminho_azul = os.path.join(base, LOGO_AZUL_PATH)
     with st.sidebar:
-        if logo_base64:
+        if os.path.exists(caminho_azul):
+            st.markdown(
+                f'<div class="leves-sb-logo leves-sb-logo-azul"><img src="data:image/png;base64,{get_base64_image(caminho_azul)}" alt="Loggi"></div>',
+                unsafe_allow_html=True,
+            )
+        elif logo_base64:
             st.markdown(
                 f'<div class="leves-sb-logo"><img src="data:image/png;base64,{logo_base64}" alt="Loggi"></div>',
                 unsafe_allow_html=True,

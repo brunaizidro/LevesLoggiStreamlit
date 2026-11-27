@@ -10,6 +10,7 @@ manualmente em nome dela.
 
 from __future__ import annotations
 
+import html
 import uuid
 from datetime import datetime
 
@@ -20,6 +21,7 @@ import data_extraction as dados
 import data_processing as dp
 import manual
 import romaneio
+import tema
 
 
 # O app já possui a rota "Devoluções", mas atualmente o menu do perfil admin
@@ -84,14 +86,6 @@ def _operacoes_destinos_envios() -> dict[str, dict]:
     return mapa
 
 
-def _aviso_atualizacao_envios() -> None:
-    """Mostra até que dia os envios estão carregados (a planilha é colada à mão)."""
-    ate = dp.envios_atualizados_ate()
-    if ate is not None and pd.notna(ate):
-        st.caption(f"📅 Envios atualizados até **{ate.strftime('%d/%m/%Y')}**. "
-                   "Envios mais recentes aparecem na próxima atualização.")
-
-
 def _quadro_saldo(saldo: pd.DataFrame, ordem_tipos: list[str]) -> None:
     """Conta do saldo visível (sem depender de tooltip): enviado − devolvido − cobrado."""
     tab = saldo[saldo["tipo"].astype(str).str.upper().isin(ordem_tipos)].copy()
@@ -107,7 +101,11 @@ def _quadro_saldo(saldo: pd.DataFrame, ordem_tipos: list[str]) -> None:
         "Já cobrado": tab["cobrado"].astype(int),
         "Saldo a devolver": tab["saldo"].astype(int),
     })
-    st.markdown("<div class='dev-section-title'>🧮 &nbsp; Como o saldo é calculado</div>", unsafe_allow_html=True)
+    tema.titulo_secao("Como o saldo é calculado", "ti-calculator")
+    _tabela_saldo(tab)
+
+
+def _tabela_saldo(tab: pd.DataFrame) -> None:
     st.dataframe(
         tab, hide_index=True, width="stretch",
         column_config={c: st.column_config.NumberColumn(c, format="localized")
@@ -451,13 +449,10 @@ def page_3():
         if eh_admin or eh_gdl else
         "Declare o que está devolvendo, gere o romaneio com QR e envie impresso junto com os itens."
     )
-    st.markdown(
-        "<div class='dev-header'>"
-        "<div class='dev-page-kicker'>PORTAL LEVES &nbsp;/&nbsp; DEVOLUÇÕES</div>"
-        "<div class='dev-title-wrap'><div class='dev-page-title'>Devoluções</div></div>"
-        "<div class='dev-page-subtitle'>" + subtitulo + "</div>"
-        "</div>",
-        unsafe_allow_html=True,
+    tema.aplicar_tema()
+    tema.cabecalho(
+        "PORTAL LEVES / DEVOLUÇÕES", "Devoluções", subtitulo,
+        atualizado_ate=dp.envios_atualizados_ate(),
     )
     if eh_admin or eh_gdl:
         mapa_operacoes = _operacoes_destinos_envios()
@@ -487,7 +482,7 @@ def page_3():
             return
 
         rot_mes = {m: dp.rotulo_mes(m) for m in elegiveis}
-        st.markdown("<div class='dev-section-title'>📅 &nbsp; Devolução referente ao saldo de qual mês?</div>", unsafe_allow_html=True)
+        tema.titulo_secao("Devolução referente ao saldo de qual mês?", "ti-calendar")
         if len(elegiveis) > 1:
             st.info("Marque o mês de competência ao qual os itens devolvidos pertencem.")
 
@@ -522,8 +517,7 @@ def page_3():
             return
 
         mes_ref = next(m for m, r in rot_mes.items() if r == escolha_mes)
-        prazo_txt = dp.prazo_devolucao(mes_ref).strftime("%d/%m/%Y")
-        st.success(f"Competência selecionada: **{escolha_mes}** · prazo: **{prazo_txt}**")
+        tema.card_prazo(escolha_mes, dp.prazo_devolucao(mes_ref), dp.agora_sp())
 
     # ---- Saldo a devolver ----
     # Para a operação, o painel deve mostrar o mesmo saldo disponível no
@@ -541,78 +535,12 @@ def page_3():
         return
 
     titulo_saldo = "Saldo a devolver" + (" — todos os meses" if eh_gdl else f" — {escolha_mes}")
-    _aviso_atualizacao_envios()
-    icone_caixa_titulo = "<svg viewBox='0 0 48 48' aria-hidden='true'><path d='m6 15 18-9 18 9v20L24 44 6 35Z' fill='none' stroke='currentColor' stroke-width='3' stroke-linejoin='round'/><path d='m6 15 18 10 18-10M24 25v19M16 10l18 10' fill='none' stroke='currentColor' stroke-width='3' stroke-linejoin='round'/></svg>"
-    st.markdown(f"<div class='dev-balance-section-title'>{icone_caixa_titulo}<span>{titulo_saldo}</span></div>", unsafe_allow_html=True)
     pr = dp.precos()
-    icones_saldo = {
-        "gaylord": "<svg viewBox='0 0 48 48' aria-hidden='true'><path d='M7 15 24 6l17 9v19L24 43 7 34Z' fill='none' stroke='currentColor' stroke-width='2.8' stroke-linejoin='round'/><path d='m7 15 17 10 17-10M24 25v18M16 10l17 10M32 10 15 20' fill='none' stroke='currentColor' stroke-width='2.6' stroke-linejoin='round'/></svg>",
-        "pallet": "<svg viewBox='0 0 48 48' aria-hidden='true'><path d='m5 17 19-10 19 10-19 10Z M5 25l19 10 19-10M5 33l19 10 19-10' fill='none' stroke='currentColor' stroke-width='2.8' stroke-linejoin='round'/><path d='M10 18v7m28-7v7' fill='none' stroke='currentColor' stroke-width='2.4' stroke-linecap='round'/></svg>",
-        "saca": "<svg viewBox='0 0 48 48' aria-hidden='true'><path d='M18 7c2 4 10 4 12 0M18 7l-2 7c-5 4-8 11-8 20 0 5 7 7 16 7s16-2 16-7c0-9-3-16-8-20l-2-7M16 14h16' fill='none' stroke='currentColor' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'/></svg>",
-    }
-    # Exibe somente os três tipos utilizados no controle de devoluções.
-    # A ordenação fixa mantém os cards distribuídos igualmente em três colunas.
-    ordem_tipos = ["GAYLORD", "PALLET", "SACA"]
-    saldo = saldo.copy()
-    saldo["tipo_normalizado"] = saldo["tipo"].astype(str).str.upper().str.strip()
-    saldo = saldo[saldo["tipo_normalizado"].isin(ordem_tipos)].copy()
-    saldo["ordem_exibicao"] = saldo["tipo_normalizado"].map(
-        {tipo: i for i, tipo in enumerate(ordem_tipos)}
-    )
-    saldo = saldo.sort_values("ordem_exibicao")
+    # Exibe somente os três tipos usados no controle de devoluções.
+    ordem_tipos = ["SACA", "GAYLORD", "PALLET"]
+    tema.cards_insumos(titulo_saldo, saldo, ordem_tipos, pr, dp.fmt_brl)
 
-    cols = st.columns(3, gap="large")
-    for i, tipo_fixo in enumerate(ordem_tipos):
-        linhas_tipo = saldo[saldo["tipo_normalizado"] == tipo_fixo]
-        r = linhas_tipo.iloc[0] if not linhas_tipo.empty else {
-            "tipo": tipo_fixo, "saldo": 0, "enviado": 0, "devolvido": 0
-        }
-        tipo = tipo_fixo
-        tipo_chave = str(tipo).strip().lower()
-        qtd_saldo = int(r["saldo"])
-        valor_unitario = pr.get(tipo, 0)
-        valor_total_insumo = qtd_saldo * valor_unitario
-
-        ajuda = f"Enviado: {_fmt(r['enviado'])} · Já devolvido: {_fmt(r['devolvido'])}"
-        if valor_unitario > 0:
-            ajuda += f" · {dp.fmt_brl(valor_total_insumo)}"
-
-        with cols[i]:
-            valor_html = (
-                f"<div class='dev-balance-caption'>Valor do saldo</div>"
-                f"<div class='dev-balance-value'>{dp.fmt_brl(valor_total_insumo)}</div>"
-                if valor_unitario > 0 else ""
-            )
-            icone = icones_saldo.get(tipo_chave, icones_saldo["gaylord"])
-            st.markdown(
-                f"""
-                <div class="dev-balance-card" title="{ajuda}">
-                    <div class="dev-balance-top">
-                        <div class="dev-balance-icon">{icone}</div>
-                        <div class="dev-balance-divider"></div>
-                        <div class="dev-balance-info">
-                            <div class="dev-balance-label">{str(tipo).upper()}</div>
-                            <div class="dev-balance-qty">{_fmt(qtd_saldo)}</div>
-                        </div>
-                    </div>
-                    {valor_html}
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-
-    if dp.tem_precos():
-        total_val = sum(
-            int(r["saldo"]) * pr.get(r["tipo"], 0)
-            for _, r in saldo.iterrows()
-        )
-        icone_moedas = "<svg viewBox='0 0 64 64' aria-hidden='true'><ellipse cx='22' cy='18' rx='15' ry='7' fill='none' stroke='currentColor' stroke-width='4'/><path d='M7 18v9c0 4 7 7 15 7 3 0 6-.5 8-1.5M7 27c0 4 7 7 15 7 3 0 6-.5 8-1.5M7 36c0 4 7 7 15 7 5 0 9-1.5 12-4' fill='none' stroke='currentColor' stroke-width='4' stroke-linecap='round'/><ellipse cx='43' cy='9' rx='13' ry='6' fill='none' stroke='currentColor' stroke-width='4'/><path d='M30 9v8c0 3 6 6 13 6 7 0 13-3 13-6V9M30 17v8c0 3 6 6 13 6 7 0 13-3 13-6v-8M30 25v8c0 3 6 6 13 6 7 0 13-3 13-6v-8' fill='none' stroke='currentColor' stroke-width='4' stroke-linecap='round'/></svg>"
-        st.markdown(
-            f"<div class='dev-total-banner'><span class='dev-total-icon'>{icone_moedas}</span><span class='dev-total-label'>Valor total a devolver</span><strong>{dp.fmt_brl(total_val)}</strong></div>",
-            unsafe_allow_html=True,
-        )
-
-    _quadro_saldo(saldo, ordem_tipos)
+    # "Como o saldo é calculado" removido a pedido (tela mais limpa).
 
     st.markdown("<hr class='sb-sep' style='border-top-color:#e6e6e6;'>", unsafe_allow_html=True)
 
@@ -622,7 +550,7 @@ def page_3():
         return
 
     with st.container(key="dev-new-panel"):
-        st.markdown("""<div class="dev-new-title"><span class="dev-section-icon">＋</span><span class="dev-new-title-copy"><strong>Nova devolução</strong><small>Registre uma nova devolução de insumos</small></span></div>""", unsafe_allow_html=True)
+        tema.titulo_secao("Nova devolução", "ti-circle-plus", "Registre o que está devolvendo e gere o romaneio")
         pend = {t: q for t, q in dp.pending_mes_tipo(destino, mes_ref).items() if q > 0}
         mes_anterior = str(pd.Period(mes_ref, freq="M") - 1)
         prazo_anterior = dp.prazo_devolucao(mes_anterior).strftime("%d/%m/%Y")
@@ -749,73 +677,48 @@ def _itens_acima_do_saldo(destino: str, mes_ref: str, itens: list[dict]) -> list
 
 
 def _minhas_devolucoes(destino: str, eh_admin: bool = False, eh_gdl: bool = False):
-    st.markdown(
-        "<div class='dev-list-title'>"
-        + ("Devoluções da operação" if (eh_admin or eh_gdl) else "Minhas devoluções")
-        + "</div>",
-        unsafe_allow_html=True,
-    )
+    titulo = "Devoluções da operação" if (eh_admin or eh_gdl) else "Minhas devoluções"
     devs = dp.devolucoes_df()
-    if devs.empty:
-        st.caption("Nenhuma devolução registrada ainda.")
-        return
-    minhas = devs[devs["destino"].map(dp._normalizar) == dp._normalizar(destino)]
-    minhas = minhas.sort_values("dt_criacao", ascending=False)
+    minhas = devs[devs["destino"].map(dp._normalizar) == dp._normalizar(destino)] if not devs.empty else devs
     if minhas.empty:
+        tema.titulo_secao(titulo, "ti-route")
         st.caption("Nenhuma devolução registrada ainda.")
         return
+    minhas = minhas.sort_values("dt_criacao", ascending=False)
+    tema.titulo_secao(titulo, "ti-route", f"{len(minhas)} registro(s)")
 
-    with st.container(border=True):
-        st.markdown(
-            "<div class='dev-table-header'>"
-            "<div>REGISTRO</div><div>STATUS</div><div>OPERAÇÃO</div>"
-            "<div>QUANTIDADE</div><div></div></div>",
-            unsafe_allow_html=True,
-        )
+    with st.container(border=True, key="lv-devs"):
         for idx, (_, d) in enumerate(minhas.iterrows()):
-            c1, c2, c3, c4, c5 = st.columns(
-                [2.0, 1.15, 1.2, 0.95, 1.0], vertical_alignment="center"
-            )
+            itens = dp.itens_da_devolucao(d["id"])
+            itens_l = [{"tipo": r["tipo"], "qtd_declarada": r["qtd_declarada"]}
+                       for _, r in itens.iterrows()]
+            ordem = {"SACA": 0, "GAYLORD": 1, "PALLET": 2}
+            plural = {"SACA": "sacas", "GAYLORD": "gaylords", "PALLET": "pallets"}
+            resumo_itens = " · ".join(
+                f"{_fmt(it['qtd_declarada'])} {plural.get(str(it['tipo']).upper(), str(it['tipo']).lower())}"
+                for it in sorted(itens_l, key=lambda x: ordem.get(str(x["tipo"]).upper(), 9))
+                if it["qtd_declarada"]
+            ) or f"{_fmt(d['total_declarado'])} itens"
             comp = d.get("competencia")
             comp_txt = dp.rotulo_mes(comp) if comp and len(str(comp)) == 7 else ""
+            dt = d.get("dt_criacao")
+            data_txt = dt.strftime("%d/%m/%Y %H:%M") if pd.notna(dt) else str(d["data_criacao"])
+            placa = str(d.get("placa") or "").strip()
+            meta = " · ".join(x for x in (data_txt, comp_txt, f"placa {placa}" if placa else "") if x)
+
+            c1, c2, c3 = st.columns([2.1, 3.4, 1.3], vertical_alignment="center")
             c1.markdown(
-                "<div class='dev-record-cell'>"
-                "<span class='dev-record-icon'>▤</span>"
-                "<span><span class='dev-record-id'>" + str(d["id"]) + "</span>"
-                "<span class='dev-record-meta'>" + str(d["data_criacao"]) + "</span>"
-                + (f"<span class='dev-record-meta'>{comp_txt}</span>" if comp_txt else "")
-                + "</span></div>",
+                f"<div class='lv-reg'><b>{html.escape(str(d['id']))}</b>"
+                f"<span>{html.escape(resumo_itens)}</span>"
+                f"<span>{html.escape(meta)}</span></div>",
                 unsafe_allow_html=True,
             )
-            status_txt = dp.STATUS_LABEL.get(d["status"], d["status"])
-            status_class = (
-                "dev-status-cancel" if "cancel" in str(d["status"]).lower()
-                else "dev-status-ok" if any(x in str(status_txt).lower() for x in ("conferido", "recebido"))
-                else ""
-            )
-            c2.markdown(
-                f"<div class='dev-status-wrap'><span class='dev-status {status_class}'>"
-                f"<span class='dev-status-check'>✓</span>{status_txt}</span></div>",
-                unsafe_allow_html=True,
-            )
-            operacao = str(d.get("placa") or "").strip()
-            c3.markdown(
-                f"<div class='dev-operation'><span>🚚</span>{operacao or '—'}</div>",
-                unsafe_allow_html=True,
-            )
-            c4.markdown(
-                f"<div class='dev-quantity-wrap' style='display:flex;justify-content:center;align-items:center;width:100%;text-align:center;'>"
-                f"<span class='dev-quantity' style='display:block;width:100%;text-align:center;margin:0 auto;'>{_fmt(d['total_declarado'])}</span></div>",
-                unsafe_allow_html=True,
-            )
-            with c5:
-                itens = dp.itens_da_devolucao(d["id"])
-                itens_l = [{"tipo": r["tipo"], "qtd_declarada": r["qtd_declarada"]}
-                           for _, r in itens.iterrows()]
-                dev_h = d.to_dict()
+            c2.markdown(tema.linha_do_tempo(d["status"]), unsafe_allow_html=True)
+            with c3:
+                st.markdown(tema.selo_status(d["status"]), unsafe_allow_html=True)
                 st.download_button(
-                    "▤  Romaneio",
-                    romaneio.gerar_romaneio_pdf(dev_h, itens_l, dp.base_url()),
+                    "Romaneio",
+                    romaneio.gerar_romaneio_pdf(d.to_dict(), itens_l, dp.base_url()),
                     file_name=f"{d['id']}.pdf", mime="application/pdf",
                     key=f"rom_{d['id']}",
                 )

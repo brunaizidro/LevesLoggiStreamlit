@@ -487,6 +487,110 @@ def resumo_devolucao(destino: str, mes: str | None = None) -> pd.DataFrame:
     return pd.DataFrame(linhas, columns=cols)
 
 
+TIPOS_DEVOLUCAO = ("SACA", "GAYLORD", "PALLET")
+
+
+def _valor_brl(v) -> float:
+    """' R$  1.000,00 ' -> 1000.0 ; aceita também '1000.5' e números."""
+    if isinstance(v, (int, float)):
+        return float(v)
+    s = str(v or "").replace("R$", "").replace("\xa0", "").strip().replace(" ", "")
+    if "," in s:
+        s = s.replace(".", "").replace(",", ".")
+    try:
+        return float(s)
+    except ValueError:
+        return 0.0
+
+
+def notas_credito() -> pd.DataFrame:
+    """Notas de crédito (aba Cobrancas): uma por base por mês, lançadas à mão.
+
+    Colunas: nota, dt, mes ('2026-09'), rotulo ('Setembro/2026'), destino,
+    destino_norm, valor, emitida_por. Linhas no formato antigo do fechamento
+    automático (tipo SACA/GAYLORD/PALLET, quantidade na coluna de valor) são
+    ignoradas aqui para não virar R$.
+    """
+    cols = ["nota", "dt", "mes", "rotulo", "destino", "destino_norm", "valor", "emitida_por"]
+    linhas = data_extraction._valores("Cobrancas")
+    if not linhas or len(linhas) < 2:
+        return pd.DataFrame(columns=cols)
+    cab = [str(c).strip().lower() for c in linhas[0]]
+    df = pd.DataFrame([list(r) + [""] * (len(cab) - len(r)) for r in linhas[1:]], columns=cab)
+    df = df[df.apply(lambda r: any(str(x).strip() for x in r), axis=1)]
+    if "tipo" in df.columns:
+        df = df[~df["tipo"].astype(str).str.strip().str.upper().isin(TIPOS_DEVOLUCAO)]
+    if df.empty:
+        return pd.DataFrame(columns=cols)
+    dt = pd.to_datetime(df.get("data", ""), format="%d/%m/%Y", errors="coerce")
+    nomes = {v.lower(): k for k, v in MESES_PT.items()}
+
+    def _mes(comp, d):
+        c = str(comp or "").strip()
+        if len(c) == 7 and c[4] == "-":
+            return c
+        n = nomes.get(c.lower())
+        if n and pd.notna(d):
+            # nota emitida no início do mês seguinte refere-se ao mês anterior do mesmo ciclo
+            ano = d.year - 1 if (n == 12 and d.month == 1) else d.year
+            return f"{ano}-{n:02d}"
+        return d.strftime("%Y-%m") if pd.notna(d) else ""
+
+    out = pd.DataFrame({
+        "nota": df.get("id", "").astype(str).str.strip(),
+        "dt": dt,
+        "mes": [_mes(c, d) for c, d in zip(df.get("competencia", ""), dt)],
+        "destino": df.get("destino", "").astype(str).str.strip(),
+        "valor": df.get("valor", "").map(_valor_brl),
+        "emitida_por": df.get("gerado_por", "").astype(str).str.strip(),
+    })
+    out["rotulo"] = out["mes"].map(lambda m: rotulo_mes(m) if len(str(m)) == 7 else "—")
+    out["destino_norm"] = out["destino"].map(_normalizar)
+    return out[cols].reset_index(drop=True)
+
+
+def pendencias_da_operacao(destino: str) -> pd.DataFrame:
+    """Pendência da operação mês a mês (competência), com prazo e situação.
+
+    Usa a mesma regra do saldo da tela de Devoluções (resumo_devolucao).
+    Situação: "Em dia" (nada a devolver), "No prazo" (ainda dá para devolver),
+    "Prazo encerrado" (vira cobrança no fechamento) ou "Cobrado".
+    """
+    cols = ["mes", "rotulo", "tipo", "enviado", "devolvido", "cobrado", "saldo",
+            "valor", "prazo", "situacao"]
+    env = envios_df()
+    if env.empty:
+        return pd.DataFrame(columns=cols)
+    alvo = _normalizar(destino)
+    meses = sorted(env.loc[env["destino_norm"] == alvo, "mes"].unique(), reverse=True)
+    pr = precos()
+    agora = agora_sp()
+    linhas = []
+    for mes in meses:
+        r = resumo_devolucao(destino, mes)
+        r = r[r["tipo"].isin(TIPOS_DEVOLUCAO)].copy()
+        r = r.sort_values("tipo", key=lambda s: s.map({t: i for i, t in enumerate(TIPOS_DEVOLUCAO)}))
+        prazo = prazo_devolucao(mes)
+        saldo_mes = int(r["saldo"].sum())
+        cobrado_mes = int(r["cobrado"].sum())
+        if saldo_mes == 0:
+            situacao = "Cobrado" if cobrado_mes > 0 else "Em dia"
+        elif agora <= prazo:
+            situacao = "No prazo"
+        else:
+            situacao = "Prazo encerrado"
+        for _, x in r.iterrows():
+            linhas.append({
+                "mes": mes, "rotulo": rotulo_mes(mes), "tipo": x["tipo"],
+                "enviado": int(x["enviado"]),
+                "devolvido": int(x["em_transito"]) + int(x["recebido"]),
+                "cobrado": int(x["cobrado"]), "saldo": int(x["saldo"]),
+                "valor": int(x["saldo"]) * float(pr.get(x["tipo"], 0) or 0),
+                "prazo": prazo, "situacao": situacao,
+            })
+    return pd.DataFrame(linhas, columns=cols)
+
+
 def envios_atualizados_ate():
     """Maior data presente na aba Envios (os dados são colados manualmente)."""
     env = envios_df()
