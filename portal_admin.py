@@ -57,7 +57,7 @@ PAGINAS = [p for _, itens in MENU for p, _ in itens]
 #  - Leve: só a própria base (filtro de operação fixo) e registra as devoluções dela.
 PAGINAS_PERFIL = {
     "gdl": {"Envios", "Devoluções", "Pendências", "Cobranças", "Bases e usuários", "Manual e ajuda"},
-    "operacao": {"Envios", "Devoluções", "Pendências", "Cobranças", "Manual e ajuda"},
+    "operacao": {"Envios", "Devoluções", "Cobranças", "Manual e ajuda"},
 }
 PAPEL_PERFIL = {"admin": "Gestão de Materiais", "gdl": "GDL"}
 
@@ -88,6 +88,8 @@ def _da_minha_base(df: pd.DataFrame, col: str = "destino") -> pd.DataFrame:
     if base is None or df.empty:
         return df
     alvo = dp._normalizar(base)
+    if not alvo or alvo == "*":  # Leve sem sigla cadastrada: não mostra nada
+        return df.iloc[0:0]
     return df[df[col].map(dp._normalizar) == alvo]
 
 
